@@ -26,7 +26,9 @@ public class Usuario {
     @Column(nullable = false)
     private String apellido;
 
+    @Column(length = 20)
     private String telefono;
+
 
     @ManyToOne
     @JoinColumn(name = "rol_id", nullable = false)
