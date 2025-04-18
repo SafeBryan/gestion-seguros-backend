@@ -1,13 +1,11 @@
 package com.seguros.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "reembolsos")
-@Data
 public class Reembolso {
 
     @Id
@@ -64,5 +62,88 @@ public class Reembolso {
         this.aprobadoPor = aprobadoPor;
         this.comentarioRevisor = comentario;
         this.fechaRevision = LocalDateTime.now();
+    }
+
+    //Getters y Setters
+
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Contrato getContrato() {
+        return contrato;
+    }
+
+    public void setContrato(Contrato contrato) {
+        this.contrato = contrato;
+    }
+
+    public BigDecimal getMonto() {
+        return monto;
+    }
+
+    public void setMonto(BigDecimal monto) {
+        this.monto = monto;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public EstadoReembolso getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoReembolso estado) {
+        this.estado = estado;
+    }
+
+    public String getArchivos() {
+        return archivos;
+    }
+
+    public void setArchivos(String archivos) {
+        this.archivos = archivos;
+    }
+
+    public Usuario getAprobadoPor() {
+        return aprobadoPor;
+    }
+
+    public void setAprobadoPor(Usuario aprobadoPor) {
+        this.aprobadoPor = aprobadoPor;
+    }
+
+    public String getComentarioRevisor() {
+        return comentarioRevisor;
+    }
+
+    public void setComentarioRevisor(String comentarioRevisor) {
+        this.comentarioRevisor = comentarioRevisor;
+    }
+
+    public LocalDateTime getFechaSolicitud() {
+        return fechaSolicitud;
+    }
+
+    public void setFechaSolicitud(LocalDateTime fechaSolicitud) {
+        this.fechaSolicitud = fechaSolicitud;
+    }
+
+    public LocalDateTime getFechaRevision() {
+        return fechaRevision;
+    }
+
+    public void setFechaRevision(LocalDateTime fechaRevision) {
+        this.fechaRevision = fechaRevision;
     }
 }

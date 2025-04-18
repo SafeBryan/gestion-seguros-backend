@@ -1,69 +1,38 @@
-package com.seguros.model;
+package com.seguros.dto;
 
-import jakarta.persistence.*;
+import com.seguros.model.Pago.EstadoPago;
+import com.seguros.model.Pago.MetodoPago;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "pagos")
-public class Pago {
-
-    public enum MetodoPago {
-        TARJETA, TRANSFERENCIA, DEBITO_AUTOMATICO, EFECTIVO, CHEQUE, REEMBOLSO
-    }
-
-    public enum EstadoPago {
-        PENDIENTE, COMPLETADO, RECHAZADO, REVERTIDO
-    }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class PagoDTO {
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "contrato_id", nullable = false)
-    private Contrato contrato;
-
-    @Column(nullable = false, precision = 10, scale = 2)
+    private Long contratoId;
+    private String contratoReferencia;
+    private String clienteNombre;
     private BigDecimal monto;
-
-    @Column(name = "fecha_pago", nullable = false)
-    private LocalDateTime fechaPago = LocalDateTime.now();
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    private LocalDateTime fechaPago;
     private MetodoPago metodo;
-
-    @Column(length = 100)
     private String referencia;
-
-    @Column(length = 50)
     private String comprobante;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private EstadoPago estado = EstadoPago.COMPLETADO;
-
-    @Column(columnDefinition = "TEXT")
+    private EstadoPago estado;
     private String observaciones;
-
-    @PrePersist
-    protected void onCreate() {
-        if (fechaPago == null) {
-            fechaPago = LocalDateTime.now();
-        }
-    }
-
-    public boolean isCompletado() {
-        return estado == EstadoPago.COMPLETADO;
-    }
+    private LocalDateTime fechaInicio;
+    private LocalDateTime fechaFin;
 
     // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public Contrato getContrato() { return contrato; }
-    public void setContrato(Contrato contrato) { this.contrato = contrato; }
+    public Long getContratoId() { return contratoId; }
+    public void setContratoId(Long contratoId) { this.contratoId = contratoId; }
+
+    public String getContratoReferencia() { return contratoReferencia; }
+    public void setContratoReferencia(String contratoReferencia) { this.contratoReferencia = contratoReferencia; }
+
+    public String getClienteNombre() { return clienteNombre; }
+    public void setClienteNombre(String clienteNombre) { this.clienteNombre = clienteNombre; }
 
     public BigDecimal getMonto() { return monto; }
     public void setMonto(BigDecimal monto) { this.monto = monto; }
@@ -85,4 +54,10 @@ public class Pago {
 
     public String getObservaciones() { return observaciones; }
     public void setObservaciones(String observaciones) { this.observaciones = observaciones; }
+
+    public LocalDateTime getFechaInicio() { return fechaInicio; }
+    public void setFechaInicio(LocalDateTime fechaInicio) { this.fechaInicio = fechaInicio; }
+
+    public LocalDateTime getFechaFin() { return fechaFin; }
+    public void setFechaFin(LocalDateTime fechaFin) { this.fechaFin = fechaFin; }
 }

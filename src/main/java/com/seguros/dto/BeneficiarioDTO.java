@@ -1,52 +1,20 @@
-package com.seguros.model;
+package com.seguros.dto;
 
-import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "beneficiarios")
-public class Beneficiario {
+public class BeneficiarioDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "contrato_id", nullable = false)
-    private Contrato contrato;
-
-    @Column(nullable = false, length = 100)
+    private Long contratoId;
     private String nombre;
-
-    @Column(nullable = false, length = 50)
     private String parentesco;
-
-    @Column(nullable = false, precision = 5, scale = 2)
     private BigDecimal porcentaje;
-
-    @Column(name = "es_principal", columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean esPrincipal;
-
-    @Column(length = 20)
     private String documentoIdentidad;
-
-    @Column(length = 100)
     private String email;
-
-    @Column(length = 20)
     private String telefono;
-
-    @Column(name = "fecha_nacimiento")
     private LocalDate fechaNacimiento;
-
-    @PrePersist
-    @PreUpdate
-    private void validarPorcentaje() {
-        if (porcentaje.compareTo(BigDecimal.ZERO) <= 0 || porcentaje.compareTo(new BigDecimal("100")) > 0) {
-            throw new IllegalArgumentException("El porcentaje debe estar entre 0 y 100");
-        }
-    }
 
     // Getters y Setters
 
@@ -58,12 +26,12 @@ public class Beneficiario {
         this.id = id;
     }
 
-    public Contrato getContrato() {
-        return contrato;
+    public Long getContratoId() {
+        return contratoId;
     }
 
-    public void setContrato(Contrato contrato) {
-        this.contrato = contrato;
+    public void setContratoId(Long contratoId) {
+        this.contratoId = contratoId;
     }
 
     public String getNombre() {
