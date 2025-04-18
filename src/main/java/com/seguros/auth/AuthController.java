@@ -27,7 +27,7 @@ public class AuthController {
             summary = "Iniciar sesión",
             description = "Autentica al usuario y retorna un token JWT"
     )
-    @SecurityRequirements // ✅ Esto desactiva el candado de Swagger para este endpoint
+    @SecurityRequirements
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
@@ -36,7 +36,7 @@ public class AuthController {
 
         if (authentication.isAuthenticated()) {
             String token = jwtService.generateToken(request.getEmail());
-            System.out.println("Token generado: " + token);  // Agregar log para verificar que el token se está generando
+            System.out.println("Token generado: " + token);
             return new LoginResponse(token);
         }
 

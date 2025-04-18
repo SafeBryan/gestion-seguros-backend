@@ -6,7 +6,6 @@ public class LoginRequest {
 
     // getters y setters
 
-
     public String getEmail() {
         return email;
     }

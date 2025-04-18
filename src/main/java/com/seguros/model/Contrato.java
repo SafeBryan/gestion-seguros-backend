@@ -44,7 +44,7 @@ public class Contrato {
     private String firmaElectronica;
 
     @Column(columnDefinition = "JSON")
-    private String archivos; // Almacena rutas de documentos en formato JSON
+    private String archivos;
 
     @OneToMany(mappedBy = "contrato", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Beneficiario> beneficiarios;

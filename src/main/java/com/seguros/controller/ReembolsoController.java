@@ -16,7 +16,6 @@ public class ReembolsoController {
 
     private final ReembolsoService reembolsoService;
 
-    // Constructor manual para inyección de dependencias
     public ReembolsoController(ReembolsoService reembolsoService) {
         this.reembolsoService = reembolsoService;
     }
