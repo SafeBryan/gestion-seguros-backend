@@ -5,6 +5,7 @@ import com.seguros.dto.UsuarioDTO;
 import com.seguros.model.Usuario;
 import com.seguros.service.UsuarioService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -18,6 +19,7 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<Usuario> crearUsuario(@RequestBody RegistroDTO registroDTO) {
         return ResponseEntity.ok(usuarioService.crearUsuario(registroDTO));

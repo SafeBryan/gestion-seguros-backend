@@ -4,6 +4,7 @@ import com.seguros.dto.SeguroDTO;
 import com.seguros.model.Seguro;
 import com.seguros.service.SeguroService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -17,10 +18,12 @@ public class SeguroController {
         this.seguroService = seguroService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<Seguro> crearSeguro(@RequestBody SeguroDTO seguroDTO) {
         return ResponseEntity.ok(seguroService.crearSeguro(seguroDTO));
     }
+
 
     @GetMapping
     public ResponseEntity<List<Seguro>> obtenerSegurosActivos() {
