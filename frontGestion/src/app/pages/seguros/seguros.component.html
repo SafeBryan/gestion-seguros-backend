@@ -1,0 +1,18 @@
+<div class="seguros-container">
+  <mat-card class="seguros-card">
+    <h2 class="seguros-title">Seguros activos</h2>
+
+    <mat-progress-spinner *ngIf="loading" mode="indeterminate" diameter="40" class="seguro-spinner"></mat-progress-spinner>
+
+    <mat-list>
+      <mat-list-item *ngFor="let seguro of seguros">
+        <span matListItemTitle>{{ seguro.nombre }} ({{ seguro.tipo }})</span>
+        <span matListItemLine><strong>Descripción:</strong> {{ seguro.descripcion }}</span>
+        <span matListItemLine><strong>Cobertura:</strong> {{ seguro.cobertura }}</span>
+        <span matListItemLine><strong>Precio anual:</strong> ${{ seguro.precioAnual }}</span>
+        <span matListItemLine><strong>Activo:</strong> {{ seguro.activo ? 'Sí' : 'No' }}</span>
+      </mat-list-item>
+    </mat-list>
+    
+  </mat-card>
+</div>

@@ -1,0 +1,6 @@
+<mat-nav-list class="container">
+    <a *ngFor="let menu of listMenu" [routerLink]="menu.url" mat-list-item>
+      <mat-icon [svgIcon]="menu.icon"></mat-icon>
+      <span class="textAlign">{{ menu.title }}</span>
+    </a>
+  </mat-nav-list>
