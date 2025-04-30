@@ -4,6 +4,7 @@ import com.seguros.dto.RolDTO;
 import com.seguros.model.Rol;
 import com.seguros.service.RolService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class RolController {
         this.rolService = rolService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<Rol> crearRol(@RequestBody RolDTO rolDTO) {
         return ResponseEntity.ok(rolService.crearRol(rolDTO));
