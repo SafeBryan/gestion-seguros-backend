@@ -10,4 +10,4 @@ public class SistemaGestionSegurosApplication {
 		SpringApplication.run(SistemaGestionSegurosApplication.class, args);
 	}
 
-}
+} 
