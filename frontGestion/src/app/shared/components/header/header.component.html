@@ -1,0 +1,19 @@
+<mat-toolbar>
+    <button mat-icon-button (click)="toggleSidenav.emit()">
+      <mat-icon style="color: white;">menu</mat-icon>
+    </button>
+  
+    <span class="spacer"></span>
+  
+    <button mat-icon-button [matMenuTriggerFor]="menu">
+      <mat-icon style="color: white; " >account_circle</mat-icon>
+    </button>
+  
+    <mat-menu  #menu="matMenu">
+      <button mat-menu-item (click)="singOut()">
+        <mat-icon >logout</mat-icon>
+        <span>Cerrar Sesión</span>
+      </button>
+    </mat-menu>
+  </mat-toolbar>
+  

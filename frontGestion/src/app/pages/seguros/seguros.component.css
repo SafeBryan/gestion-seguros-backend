@@ -1,0 +1,183 @@
+.seguros-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #1e293b;
+}
+
+.seguro-spinner {
+  display: block;
+  margin: 3rem auto;
+}
+
+.seguros-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.seguro-card {
+  flex: 1 1 calc(33.333% - 1.5rem);
+  border-radius: 16px;
+  padding: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  background-color: #ffffff;
+}
+
+.seguro-card:hover {
+  transform: translateY(-5px);
+}
+
+.seguro-activo {
+  border: 2px solid #00ff6651;
+  box-shadow: 0 0 12px #00ff6680;
+}
+
+.seguro-inactivo {
+  border: 2px solid #ff4d4d;
+  box-shadow: 0 0 12px #ff4d4d;
+}
+
+.seguro-nombre {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.seguro-tipo {
+  font-size: 0.95rem;
+  color: #475569;
+}
+
+.seguro-detalle {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: #334155;
+}
+
+.seguro-detalle p {
+  margin: 0;
+  word-wrap: break-word;
+}
+
+.activo {
+  color: #00b300;
+  font-weight: bold;
+}
+
+.inactivo {
+  color: #cc0000;
+  font-weight: bold;
+}
+
+.no-seguros {
+  text-align: center;
+  font-size: 1rem;
+  color: #64748b;
+  margin-top: 2rem;
+}
+
+@media (max-width: 1024px) {
+  .seguro-card {
+    flex: 1 1 calc(50% - 1.5rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .seguro-card {
+    flex: 1 1 100%;
+  }
+}
+
+/* Estilos para el modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 0px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 100vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  font-size: 1.5rem;
+  color: #1e293b;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: 700;
+}
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #cbd5e1;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn-cancelar,
+.btn-guardar {
+  flex: 1;
+  padding: 0.5rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.btn-cancelar {
+  background-color: #e2e8f0;
+  color: #1e293b;
+}
+
+.btn-guardar {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.btn-guardar:hover {
+  background-color: #2563eb;
+}
+
+.btn-cancelar:hover {
+  background-color: #cbd5e1;
+}
