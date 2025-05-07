@@ -1,2 +1,245 @@
-<h1>Bienvenido al Home</h1>
-<p>Este es el contenido protegido.</p>
+<div class="container-fluid py-4">
+    <h1 class="mb-4 text-primary">Dashboard de Gestión de Seguros</h1>
+    
+    <!-- Resumen de Estadísticas -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Estadísticas de Usuarios</h5>
+          </div>
+          <div class="card-body">
+            <div *ngIf="cargandoUsuarios" class="text-center py-3">
+              <div class="spinner-border text-primary" role="status"></div>
+              <p class="mt-2">Cargando datos...</p>
+            </div>
+            
+            <div *ngIf="!cargandoUsuarios">
+              <div class="row text-center mb-3">
+                <div class="col-4">
+                  <h2 class="text-primary">{{totalUsuarios}}</h2>
+                  <p class="text-muted">Total</p>
+                </div>
+                <div class="col-4">
+                  <h2 class="text-success">{{usuariosActivos}}</h2>
+                  <p class="text-muted">Activos</p>
+                </div>
+                <div class="col-4">
+                  <h2 class="text-secondary">{{usuariosInactivos}}</h2>
+                  <p class="text-muted">Inactivos</p>
+                </div>
+              </div>
+              
+              <div class="progress mb-1">
+                <div 
+                  class="progress-bar bg-success" 
+                  role="progressbar" 
+                  [style.width]="(usuariosActivos / totalUsuarios * 100) + '%'"
+                  [attr.aria-valuenow]="usuariosActivos" 
+                  aria-valuemin="0" 
+                  [attr.aria-valuemax]="totalUsuarios">
+                  {{(usuariosActivos / totalUsuarios * 100).toFixed(0)}}%
+                </div>
+              </div>
+              <p class="text-muted small">Porcentaje de usuarios activos</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Estadísticas de Seguros</h5>
+          </div>
+          <div class="card-body">
+            <div *ngIf="cargandoSeguros" class="text-center py-3">
+              <div class="spinner-border text-primary" role="status"></div>
+              <p class="mt-2">Cargando datos...</p>
+            </div>
+            
+            <div *ngIf="!cargandoSeguros">
+              <div class="row text-center mb-3">
+                <div class="col-3">
+                  <h2 class="text-primary">{{totalSeguros}}</h2>
+                  <p class="text-muted">Total</p>
+                </div>
+                <div class="col-3">
+                  <h2 class="text-info">{{segurosSalud}}</h2>
+                  <p class="text-muted">Salud</p>
+                </div>
+                <div class="col-3">
+                  <h2 class="text-warning">{{segurosVida}}</h2>
+                  <p class="text-muted">Vida</p>
+                </div>
+                <div class="col-3">
+                  <h2 class="text-success">{{segurosActivos}}</h2>
+                  <p class="text-muted">Activos</p>
+                </div>
+              </div>
+              
+              <div class="progress mb-1">
+                <div 
+                  class="progress-bar bg-info" 
+                  role="progressbar" 
+                  [style.width]="(segurosSalud / totalSeguros * 100) + '%'" 
+                  [attr.aria-valuenow]="segurosSalud" 
+                  aria-valuemin="0" 
+                  [attr.aria-valuemax]="totalSeguros">
+                  {{(segurosSalud / totalSeguros * 100).toFixed(0)}}%
+                </div>
+                <div 
+                  class="progress-bar bg-warning" 
+                  role="progressbar" 
+                  [style.width]="(segurosVida / totalSeguros * 100) + '%'" 
+                  [attr.aria-valuenow]="segurosVida" 
+                  aria-valuemin="0" 
+                  [attr.aria-valuemax]="totalSeguros">
+                  {{(segurosVida / totalSeguros * 100).toFixed(0)}}%
+                </div>
+              </div>
+              <p class="text-muted small">Distribución por tipo de seguro</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Últimos Registros -->
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card shadow mb-4">
+          <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Últimos Usuarios Registrados</h5>
+            <a routerLink="/usuarios" class="btn btn-sm btn-light">Ver Todos</a>
+          </div>
+          <div class="card-body">
+            <div *ngIf="cargandoUsuarios" class="text-center py-3">
+              <div class="spinner-border text-primary" role="status"></div>
+              <p class="mt-2">Cargando datos...</p>
+            </div>
+            
+            <div *ngIf="!cargandoUsuarios && ultimosUsuarios.length === 0" class="text-center py-3">
+              <p class="text-muted">No hay usuarios registrados</p>
+            </div>
+            
+            <div *ngIf="!cargandoUsuarios && ultimosUsuarios.length > 0">
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Email</th>
+                      <th>Rol</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let usuario of ultimosUsuarios">
+                      <td>{{usuario.nombre}} {{usuario.apellido}}</td>
+                      <td>{{usuario.email}}</td>
+                      <td>{{usuario.rolNombre}}</td>
+                      <td>
+                        <span class="badge" [ngClass]="usuario.activo ? 'bg-success' : 'bg-secondary'">
+                          {{usuario.activo ? 'Activo' : 'Inactivo'}}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+        <div class="card shadow mb-4">
+          <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Últimos Seguros Registrados</h5>
+            <a routerLink="/seguros" class="btn btn-sm btn-light">Ver Todos</a>
+          </div>
+          <div class="card-body">
+            <div *ngIf="cargandoSeguros" class="text-center py-3">
+              <div class="spinner-border text-primary" role="status"></div>
+              <p class="mt-2">Cargando datos...</p>
+            </div>
+            
+            <div *ngIf="!cargandoSeguros && ultimosSeguros.length === 0" class="text-center py-3">
+              <p class="text-muted">No hay seguros registrados</p>
+            </div>
+            
+            <div *ngIf="!cargandoSeguros && ultimosSeguros.length > 0">
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Nombre</th>
+                      <th>Tipo</th>
+                      <th>Precio</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let seguro of ultimosSeguros">
+                      <td>{{seguro.nombre}}</td>
+                      <td>
+                        <span class="badge" [ngClass]="seguro.tipo === 'SALUD' ? 'bg-info' : 'bg-warning'">
+                          {{seguro.tipo}}
+                        </span>
+                      </td>
+                      <td>${{seguro.precioAnual}}</td>
+                      <td>
+                        <span class="badge" [ngClass]="seguro.activo ? 'bg-success' : 'bg-secondary'">
+                          {{seguro.activo ? 'Activo' : 'Inactivo'}}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Acceso Rápido -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Acceso Rápido</h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-3 col-6">
+                <a routerLink="/usuarios" class="btn btn-outline-primary w-100 py-3">
+                  <i class="bi bi-people-fill fs-4 d-block mb-2"></i>
+                  Usuarios
+                </a>
+              </div>
+              <div class="col-md-3 col-6">
+                <a routerLink="/seguros" class="btn btn-outline-primary w-100 py-3">
+                  <i class="bi bi-shield-fill-check fs-4 d-block mb-2"></i>
+                  Seguros
+                </a>
+              </div>
+              <div class="col-md-3 col-6">
+                <a routerLink="/reportes" class="btn btn-outline-primary w-100 py-3">
+                  <i class="bi bi-bar-chart-fill fs-4 d-block mb-2"></i>
+                  Reportes
+                </a>
+              </div>
+              <div class="col-md-3 col-6">
+                <a routerLink="/configuracion" class="btn btn-outline-primary w-100 py-3">
+                  <i class="bi bi-gear-fill fs-4 d-block mb-2"></i>
+                  Configuración
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
