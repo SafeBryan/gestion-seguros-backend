@@ -79,8 +79,11 @@
               <input class="form-control" [(ngModel)]="nuevoUsuario.telefono" name="telefono" />
             </div>
             <div class="mb-3">
-              <label>Rol ID</label>
-              <input type="number" class="form-control" [(ngModel)]="nuevoUsuario.rolId" name="rolId" required />
+              <label>Rol</label>
+              <select class="form-select" [(ngModel)]="nuevoUsuario.rolId" name="rolId" required>
+                <option [ngValue]="0" disabled>Seleccione un rol</option>
+                <option *ngFor="let rol of roles" [ngValue]="rol.id">{{ rol.nombre }}</option>
+              </select>
             </div>
           </form>
         </div>

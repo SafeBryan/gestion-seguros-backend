@@ -4,7 +4,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { UsuarioService, RegistroDTO } from '../../core/services/usuario.service';
 import { Usuario } from '../../models/usuario.model';
-
+import { RolService } from '../../core/services/rol.service';
+import { Rol } from '../../models/rol.model';
 @Component({
   selector: 'app-usuarios',
   standalone: true,
@@ -24,6 +25,7 @@ export class UsuariosComponent implements OnInit {
   mostrarModal = false;
   modoEdicion = false;
   usuarioEditando: Usuario | null = null;
+  roles: Rol[] = [];
 
   nuevoUsuario: RegistroDTO = {
     email: '',
@@ -34,10 +36,24 @@ export class UsuariosComponent implements OnInit {
     rolId: 0
   };
 
-  constructor(private usuarioService: UsuarioService) {}
-
+  constructor(
+    private usuarioService: UsuarioService,
+    private rolService: RolService
+  ) {}
   ngOnInit(): void {
     this.cargarUsuarios();
+    this.cargarRoles();
+  }
+
+  cargarRoles(): void {
+    this.rolService.obtenerTodos().subscribe({
+      next: (data) => {
+        this.roles = data;
+      },
+      error: (err) => {
+        console.error('Error al cargar roles', err);
+      }
+    });
   }
 
   cargarUsuarios(): void {
