@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { jwtDecode } from 'jwt-decode';
 
 interface LoginRequest {
   email: string;
@@ -11,6 +12,14 @@ interface LoginRequest {
 
 interface LoginResponse {
   token: string;
+}
+
+interface JwtPayload {
+  id: number;      // 👈 Aquí está el ID real
+  rol: string;
+  sub: string;     // usuario o email
+  iat: number;
+  exp: number;
 }
 
 @Injectable({
@@ -63,6 +72,24 @@ export class AuthService {
     const token = this.getToken();
     return new HttpHeaders().set('Authorization', `Bearer ${token ?? ''}`);
   }
+
+  // Get user ID from decoded JWT
+  getUsuarioId(): number | null {
+    const token = this.getToken();
+    console.log('Token obtenido:', token); // 👈 LOG
+    if (token) {
+      try {
+        const decoded = jwtDecode<JwtPayload>(token);
+        console.log('Token decodificado:', decoded); // 👈 LOG
+        return decoded.id; // ⚠️ Asegúrate que `decoded.id` exista
+      } catch (e) {
+        console.error('Error al decodificar el token:', e);
+        return null;
+      }
+    }
+    return null;
+  }
+  
 
   // Check if the token exists in localStorage
   private hasToken(): boolean {

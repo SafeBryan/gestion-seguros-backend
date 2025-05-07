@@ -1,15 +1,9 @@
-.container {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-  }
+
   
   mat-nav-list {
     width: 100%;
     margin-top: 64px;
     overflow-y: auto;
-    padding: 16px 0;
   }
   
   /* Apuntar correctamente al enlace que actúa como item */
@@ -51,5 +45,9 @@
   
   .textAlign {
     color: white !important;
+    font-size: 18px;
+    text-align: center;
+    font-weight: bold;
+    letter-spacing: 3px;
   }
   

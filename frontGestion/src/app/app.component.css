@@ -23,7 +23,8 @@ html, body {
     overflow-y: auto; /* Permite scroll si el menú es muy largo */
     border-radius: 0; /* Evita bordes redondeados */
     z-index: 1001; /* Asegura que esté sobre el contenido */
-  }a
+    align-items: stretch; /* Alinea los elementos para ocupar todo el ancho */
+  }
   
   /* Contenido principal */
   mat-drawer-content {

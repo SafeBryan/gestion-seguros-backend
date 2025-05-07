@@ -3,6 +3,7 @@ package com.seguros.controller;
 import com.seguros.dto.SeguroDTO;
 import com.seguros.model.Seguro;
 import com.seguros.service.SeguroService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -18,13 +19,17 @@ public class SeguroController {
     }
 
     @PostMapping
-    public ResponseEntity<Seguro> crearSeguro(@RequestBody SeguroDTO seguroDTO) {
+    public ResponseEntity<Seguro> crearSeguro(@Valid @RequestBody SeguroDTO seguroDTO) {
         return ResponseEntity.ok(seguroService.crearSeguro(seguroDTO));
     }
 
-    @GetMapping
+    @GetMapping("/activos")
     public ResponseEntity<List<Seguro>> obtenerSegurosActivos() {
         return ResponseEntity.ok(seguroService.obtenerSegurosActivos());
+    }
+    @GetMapping()
+    public ResponseEntity<List<Seguro>> obtenerTodosLosSeguros() {
+        return ResponseEntity.ok(seguroService.obtenerTodosLosSeguros());
     }
 
     @GetMapping("/tipo/{tipo}")
@@ -38,4 +43,6 @@ public class SeguroController {
             @RequestParam boolean activo) {
         return ResponseEntity.ok(seguroService.actualizarEstado(id, activo));
     }
+
+
 }
