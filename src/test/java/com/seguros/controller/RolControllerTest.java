@@ -117,5 +117,67 @@ public class RolControllerTest {
                 .andExpect(jsonPath("$.nombre").value("ACTUALIZADO"));
     }
 
+    @Test
+    void testEliminarRol() throws Exception {
+        mockSecurityContext();
+
+        Mockito.doNothing().when(rolService).eliminarRol(1L);
+
+        mockMvc.perform(delete("/api/roles/1")
+                        .header("Authorization", token))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void testObtenerRolPorId() throws Exception {
+        mockSecurityContext();
+
+        RolDTO dto = new RolDTO();
+        dto.setId(1L);
+        dto.setNombre("ADMIN");
+        dto.setDescripcion("Administrador");
+
+        Mockito.when(rolService.obtenerRolPorId(1L)).thenReturn(dto);
+
+        mockMvc.perform(get("/api/roles/1")
+                        .header("Authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nombre").value("ADMIN"));
+    }
+
+    @Test
+    void testCrearRolConDatosInvalidos() throws Exception {
+        mockSecurityContext();
+
+        RolDTO dto = new RolDTO();
+        dto.setNombre(""); // nombre inválido
+        dto.setDescripcion("Sin nombre");
+
+        mockMvc.perform(post("/api/roles")
+                        .header("Authorization", token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testActualizarRolInexistente() throws Exception {
+        mockSecurityContext();
+
+        RolDTO dto = new RolDTO();
+        dto.setNombre("ACTUALIZADO");
+        dto.setDescripcion("Nuevo nombre");
+
+        Mockito.when(rolService.actualizarRol(eq(999L), any()))
+                .thenThrow(new RuntimeException("Rol no encontrado"));
+
+        mockMvc.perform(put("/api/roles/999")
+                        .header("Authorization", token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNotFound());
+    }
+
+
 }
 
