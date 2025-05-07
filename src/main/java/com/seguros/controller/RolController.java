@@ -6,6 +6,8 @@ import com.seguros.service.RolService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -20,7 +22,7 @@ public class RolController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<Rol> crearRol(@RequestBody RolDTO rolDTO) {
+    public ResponseEntity<Rol> crearRol(@RequestBody @Valid RolDTO rolDTO) {
         return ResponseEntity.ok(rolService.crearRol(rolDTO));
     }
 
@@ -29,10 +31,22 @@ public class RolController {
         return ResponseEntity.ok(rolService.obtenerTodosRoles());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{id}")
+    public ResponseEntity<RolDTO> obtenerRolPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(rolService.obtenerRolPorId(id));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<Rol> actualizarRol(
-            @PathVariable Long id,
-            @RequestBody RolDTO rolDTO) {
+    public ResponseEntity<Rol> actualizarRol(@PathVariable Long id, @RequestBody @Valid RolDTO rolDTO) {
         return ResponseEntity.ok(rolService.actualizarRol(id, rolDTO));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarRol(@PathVariable Long id) {
+        rolService.eliminarRol(id);
+        return ResponseEntity.noContent().build();
     }
 }
