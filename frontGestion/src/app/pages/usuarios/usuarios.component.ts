@@ -22,6 +22,8 @@ export class UsuariosComponent implements OnInit {
   usuarios: Usuario[] = [];
   loading = true;
   mostrarModal = false;
+  modoEdicion = false;
+  usuarioEditando: Usuario | null = null;
 
   nuevoUsuario: RegistroDTO = {
     email: '',
@@ -57,6 +59,8 @@ export class UsuariosComponent implements OnInit {
   }
 
   crearUsuario(): void {
+    this.modoEdicion = false;
+    this.usuarioEditando = null;
     this.nuevoUsuario = {
       email: '',
       password: '',
@@ -70,27 +74,69 @@ export class UsuariosComponent implements OnInit {
 
   cerrarModal(): void {
     this.mostrarModal = false;
+    this.modoEdicion = false;
+    this.usuarioEditando = null;
   }
 
   guardarUsuario(): void {
-    this.usuarioService.crear(this.nuevoUsuario).subscribe({
-      next: () => {
-        this.cargarUsuarios();
-        this.cerrarModal();
-      },
-      error: (err) => {
-        console.error('Error al crear usuario', err);
-      }
-    });
+    if (this.modoEdicion && this.usuarioEditando) {
+      // Si estamos en modo edición, actualizamos
+      this.usuarioService.editar(this.usuarioEditando.id!, this.nuevoUsuario).subscribe({
+        next: () => {
+          this.cargarUsuarios();
+          this.cerrarModal();
+          alert('Usuario actualizado correctamente');
+        },
+        error: (err) => {
+          console.error('Error al actualizar usuario', err);
+          alert('Error al actualizar usuario');
+        }
+      });
+    } else {
+      // Si no, creamos un nuevo usuario
+      this.usuarioService.crear(this.nuevoUsuario).subscribe({
+        next: () => {
+          this.cargarUsuarios();
+          this.cerrarModal();
+          alert('Usuario creado correctamente');
+        },
+        error: (err) => {
+          console.error('Error al crear usuario', err);
+          alert('Error al crear usuario');
+        }
+      });
+    }
   }
 
   editarUsuario(usuario: Usuario): void {
-    console.log('Editar usuario', usuario);
-    // Lógica futura
+    this.modoEdicion = true;
+    this.usuarioEditando = usuario;
+    
+    // Crear un objeto que cumpla con la estructura RegistroDTO para el formulario
+    this.nuevoUsuario = {
+      email: usuario.email,
+      password: '', // Generalmente no se rellena la contraseña en edición
+      nombre: usuario.nombre,
+      apellido: usuario.apellido,
+      telefono: usuario.telefono || '',
+      rolId: usuario.rolId
+    };
+    
+    this.mostrarModal = true;
   }
 
   eliminarUsuario(usuario: Usuario): void {
-    console.log('Eliminar usuario', usuario);
-    // Lógica futura
+    if (confirm(`¿Estás seguro de eliminar al usuario ${usuario.nombre} ${usuario.apellido}?`)) {
+      this.usuarioService.eliminar(usuario.id!).subscribe({
+        next: () => {
+          this.cargarUsuarios();
+          alert('Usuario eliminado correctamente');
+        },
+        error: (err) => {
+          console.error('Error al eliminar usuario', err);
+          alert('Error al eliminar usuario');
+        }
+      });
+    }
   }
 }

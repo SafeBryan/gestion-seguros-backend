@@ -22,6 +22,17 @@ public class UsuarioController {
     public ResponseEntity<Usuario> crearUsuario(@RequestBody RegistroDTO registroDTO) {
         return ResponseEntity.ok(usuarioService.crearUsuario(registroDTO));
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<Usuario> actualizarUsuario(
+            @PathVariable Long id,
+            @RequestBody UsuarioDTO usuarioDTO) {
+        return ResponseEntity.ok(usuarioService.actualizarUsuario(id, usuarioDTO));
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
+        usuarioService.eliminarUsuario(id);
+        return ResponseEntity.noContent().build();
+    }
 
     @GetMapping
     public ResponseEntity<List<UsuarioDTO>> obtenerTodosUsuarios() {

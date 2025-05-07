@@ -48,4 +48,15 @@ export class UsuarioService {
       headers: this.getAuthHeaders()
     });
   }
+  editar(id: number, usuario: Partial<Usuario>): Observable<Usuario> {
+    return this.http.put<Usuario>(`${this.baseUrl}/${id}`, usuario, {
+      headers: this.getAuthHeaders()
+    });
+  }
+  
+  eliminar(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
 }
