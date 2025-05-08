@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Router } from '@angular/router';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
+import { Router } from '@angular/router';
 
 interface LoginRequest {
   email: string;
@@ -26,7 +26,7 @@ interface JwtPayload {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8082/api/auth';
+  private apiUrl = 'http://localhost:8080/api/auth';
   private tokenKey = 'jwtToken';
   private loggedIn = new BehaviorSubject<boolean>(false);
 

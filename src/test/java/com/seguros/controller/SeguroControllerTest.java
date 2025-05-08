@@ -81,14 +81,26 @@ class SeguroControllerTest {
     void testObtenerSegurosActivos() throws Exception {
         mockSecurityContext();
 
-        List<Seguro> lista = Arrays.asList(new Seguro(), new Seguro());
+        Seguro seguro1 = new Seguro();
+        seguro1.setId(1L);
+        seguro1.setNombre("Seguro Vida");
+        seguro1.setActivo(true);
+
+        Seguro seguro2 = new Seguro();
+        seguro2.setId(2L);
+        seguro2.setNombre("Seguro Auto");
+        seguro2.setActivo(true);
+
+        List<Seguro> lista = Arrays.asList(seguro1, seguro2);
+
         Mockito.when(seguroService.obtenerSegurosActivos()).thenReturn(lista);
 
-        mockMvc.perform(get("/api/seguros")
+        mockMvc.perform(get("/api/seguros/activos")
                         .header("Authorization", token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2));
     }
+
 
     @Test
     void testObtenerPorTipo() throws Exception {
