@@ -3,7 +3,7 @@ export interface Usuario {
     email: string;
     nombre: string;
     apellido: string;
-    telefono: string;
+    telefono?: string;
     rolId: number;
     rolNombre: string;
     activo: boolean;

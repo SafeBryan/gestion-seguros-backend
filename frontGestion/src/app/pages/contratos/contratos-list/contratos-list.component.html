@@ -1,0 +1,59 @@
+<div class="container mt-4">
+  <h2>Historial de Contratos</h2>
+
+  <table
+    class="table table-bordered table-striped"
+    *ngIf="contratos.length > 0; else sinContratos"
+  >
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Seguro</th>
+        <th>Agente</th>
+        <th>Inicio</th>
+        <th>Fin</th>
+        <th>Pago</th>
+        <th>Estado</th>
+        <th>Beneficiarios</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let contrato of contratos; let i = index">
+        <td>{{ i + 1 }}</td>
+        <td>{{ contrato.seguro?.nombre || "Seguro desconocido" }}</td>
+        <td>{{ contrato.agente?.nombre }} {{ contrato.agente?.apellido }}</td>
+        <td>{{ contrato.fechaInicio }}</td>
+        <td>{{ contrato.fechaFin }}</td>
+        <td>{{ contrato.frecuenciaPago }}</td>
+        <td>{{ contrato.estado }}</td>
+        <td>
+          <ul>
+            <li *ngFor="let b of contrato.beneficiarios">
+              {{ b.nombre }} ({{ b.parentesco }}) - {{ b.porcentaje }}%
+            </li>
+          </ul>
+        </td>
+        <td>
+          <button
+            class="btn btn-warning btn-sm me-2"
+            (click)="editarContrato(contrato)"
+          >
+            Editar
+          </button>
+          <button
+            class="btn btn-danger btn-sm"
+            (click)="desactivarContrato(contrato.id!)"
+            [disabled]="contrato.estado === 'CANCELADO'"
+          >
+            Desactivar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ng-template #sinContratos>
+    <p class="text-muted">No hay contratos registrados.</p>
+  </ng-template>
+</div>

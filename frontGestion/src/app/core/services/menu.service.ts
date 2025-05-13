@@ -7,27 +7,25 @@ export interface IMenu {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MenuService {
-
   private listMenu: IMenu[] = [
     { title: 'Inicio', url: '/home', icon: 'home' },
     { title: 'Usuario', url: '/usuarios', icon: 'user' },
     { title: 'Seguros', url: '/seguros', icon: 'seguro' },
-    
+    { title: 'Contratos', url: '/contratos', icon: 'contrato' },
   ];
 
-  constructor() { }
+  constructor() {}
 
   getMenu() {
     return [...this.listMenu];
   }
 
-  getMenuByUrl(url: string): IMenu {
+  getMenuByUrl(url: string): IMenu | undefined {
     return this.listMenu.find(
       (menu) => menu.url.toLowerCase() === url.toLowerCase()
-    ) as IMenu;
+    );
   }
-
 }

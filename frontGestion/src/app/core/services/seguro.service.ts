@@ -5,7 +5,7 @@ import { Seguro } from '../../models/seguro.model';
 import { AuthService } from '../../services/auth.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SeguroService {
   private baseUrl = 'http://localhost:8080/api/seguros';
@@ -18,31 +18,46 @@ export class SeguroService {
 
   crearSeguro(seguro: Omit<Seguro, 'id' | 'creadoPorId'>): Observable<Seguro> {
     return this.http.post<Seguro>(this.baseUrl, seguro, {
-      headers: this.getAuthHeaders()
+      headers: this.getAuthHeaders(),
     });
   }
 
   obtenerSegurosActivos(): Observable<Seguro[]> {
     return this.http.get<Seguro[]>(`${this.baseUrl}/activos`, {
-      headers: this.getAuthHeaders()
+      headers: this.getAuthHeaders(),
     });
   }
 
   obtenerPorTipo(tipo: 'VIDA' | 'SALUD'): Observable<Seguro[]> {
     return this.http.get<Seguro[]>(`${this.baseUrl}/tipo/${tipo}`, {
-      headers: this.getAuthHeaders()
+      headers: this.getAuthHeaders(),
     });
   }
 
   actualizarEstado(id: number, activo: boolean): Observable<Seguro> {
-    return this.http.put<Seguro>(`${this.baseUrl}/${id}/estado?activo=${activo}`, {}, {
-      headers: this.getAuthHeaders()
-    });
+    return this.http.put<Seguro>(
+      `${this.baseUrl}/${id}/estado?activo=${activo}`,
+      {},
+      {
+        headers: this.getAuthHeaders(),
+      }
+    );
   }
 
   obtenerTodosLosSeguros(): Observable<Seguro[]> {
     return this.http.get<Seguro[]>(this.baseUrl, {
-      headers: this.getAuthHeaders()
+      headers: this.getAuthHeaders(),
+    });
+  }
+  editarSeguro(id: number, seguro: Partial<Seguro>): Observable<Seguro> {
+    return this.http.put<Seguro>(`${this.baseUrl}/${id}`, seguro, {
+      headers: this.getAuthHeaders(),
+    });
+  }
+
+  eliminarSeguro(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`, {
+      headers: this.getAuthHeaders(),
     });
   }
 }

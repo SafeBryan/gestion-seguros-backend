@@ -1,10 +1,16 @@
 export interface Seguro {
-  id: number; // ← ya no es opcional
+  id: number;
   nombre: string;
   tipo: 'VIDA' | 'SALUD';
   descripcion: string;
   cobertura: string;
   precioAnual: number;
   activo: boolean;
-  creadoPorId?: number; 
+  creadoPorId?: number;
+
+  beneficiarios?: string;
+  montoCobertura?: number;
+
+  hospitalesConvenio?: string;
+  numeroConsultasIncluidas?: number;
 }

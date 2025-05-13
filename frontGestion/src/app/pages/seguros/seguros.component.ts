@@ -21,29 +21,32 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatListModule,
     MatProgressSpinnerModule,
     NgIf,
-    NgFor
+    NgFor,
   ],
   templateUrl: './seguros.component.html',
-  styleUrls: ['./seguros.component.css']
+  styleUrls: ['./seguros.component.css'],
 })
 export class SegurosComponent implements OnInit {
   seguros: Seguro[] = [];
   segurosActivos: Seguro[] = [];
   segurosInactivos: Seguro[] = [];
   loading = true;
-
   mostrarModal = false;
 
-  nuevoSeguro: Omit<Seguro, 'id' | 'creadoPorId'> = {
+  // ✅ Ahora con `id` opcional
+  nuevoSeguro: Partial<Seguro> = {
     nombre: '',
     tipo: 'VIDA',
     descripcion: '',
     cobertura: '',
     precioAnual: 0,
-    activo: true
+    activo: true,
   };
 
-  constructor(private seguroService: SeguroService, private authService: AuthService) {}
+  constructor(
+    private seguroService: SeguroService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.cargarSeguros();
@@ -53,14 +56,14 @@ export class SegurosComponent implements OnInit {
     this.seguroService.obtenerTodosLosSeguros().subscribe({
       next: (data) => {
         this.seguros = data;
-        this.segurosActivos = data.filter(s => s.activo);
-        this.segurosInactivos = data.filter(s => !s.activo);
+        this.segurosActivos = data.filter((s) => s.activo);
+        this.segurosInactivos = data.filter((s) => !s.activo);
         this.loading = false;
       },
       error: (err) => {
         console.error('Error al cargar seguros', err);
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -75,7 +78,11 @@ export class SegurosComponent implements OnInit {
       descripcion: '',
       cobertura: '',
       precioAnual: 0,
-      activo: true
+      activo: true,
+      beneficiarios: '',
+      montoCobertura: 0,
+      hospitalesConvenio: '',
+      numeroConsultasIncluidas: 0,
     };
     this.mostrarModal = true;
   }
@@ -85,34 +92,63 @@ export class SegurosComponent implements OnInit {
   }
 
   guardarSeguro(): void {
-    // Aquí se incluye el `creadoPorId`
-    const seguroConUsuario = { ...this.nuevoSeguro, creadoPorId: this.authService.getUsuarioId() };
-    console.log(this.authService.getUsuarioId());
-    this.seguroService.crearSeguro(seguroConUsuario).subscribe({
-      next: () => {
-        this.cargarSeguros();
-        this.cerrarModal();
-      },
-      error: (err) => {
-        console.error('Error al guardar el seguro', err);
-      }
-    });
+    const usuarioId = this.authService.getUsuarioId();
+
+    const seguroConUsuario: Seguro = {
+      ...(this.nuevoSeguro as Seguro), // Forzar a tipo completo
+      creadoPorId: usuarioId,
+    };
+
+    if (this.nuevoSeguro.id) {
+      this.seguroService
+        .editarSeguro(this.nuevoSeguro.id, seguroConUsuario)
+        .subscribe({
+          next: () => {
+            this.cargarSeguros();
+            this.cerrarModal();
+          },
+          error: (err) => {
+            console.error('Error al editar el seguro', err);
+          },
+        });
+    } else {
+      this.seguroService.crearSeguro(seguroConUsuario).subscribe({
+        next: () => {
+          this.cargarSeguros();
+          this.cerrarModal();
+        },
+        error: (err) => {
+          console.error('Error al guardar el seguro', err);
+        },
+      });
+    }
   }
 
   editarSeguro(seguro: Seguro): void {
-    console.log('Editar seguro', seguro);
     this.nuevoSeguro = {
+      id: seguro.id, // 👈 Importante para saber que es edición
       nombre: seguro.nombre,
       tipo: seguro.tipo,
       descripcion: seguro.descripcion,
       cobertura: seguro.cobertura,
       precioAnual: seguro.precioAnual,
-      activo: seguro.activo
+      activo: seguro.activo,
+      beneficiarios: seguro.beneficiarios || '',
+      montoCobertura: seguro.montoCobertura || 0,
+      hospitalesConvenio: seguro.hospitalesConvenio || '',
+      numeroConsultasIncluidas: seguro.numeroConsultasIncluidas || 0,
     };
     this.mostrarModal = true;
   }
 
   eliminarSeguro(seguro: Seguro): void {
-    console.log('Eliminar seguro', seguro);
+    if (
+      confirm(`¿Seguro que quieres desactivar el seguro "${seguro.nombre}"?`)
+    ) {
+      this.seguroService.actualizarEstado(seguro.id, false).subscribe({
+        next: () => this.cargarSeguros(),
+        error: (err) => console.error('Error al desactivar el seguro', err),
+      });
+    }
   }
 }

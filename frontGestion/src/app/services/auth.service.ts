@@ -15,15 +15,15 @@ interface LoginResponse {
 }
 
 interface JwtPayload {
-  id: number;      // 👈 Aquí está el ID real
+  id: number; // 👈 Aquí está el ID real
   rol: string;
-  sub: string;     // usuario o email
+  sub: string; // usuario o email
   iat: number;
   exp: number;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private apiUrl = 'http://localhost:8080/api/auth';
@@ -38,14 +38,16 @@ export class AuthService {
 
   // Login method
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
-      tap(response => {
-        if (this.isBrowser()) {
-          localStorage.setItem(this.tokenKey, response.token);
-          this.loggedIn.next(true);
-        }
-      })
-    );
+    return this.http
+      .post<LoginResponse>(`${this.apiUrl}/login`, credentials)
+      .pipe(
+        tap((response) => {
+          if (this.isBrowser()) {
+            localStorage.setItem(this.tokenKey, response.token);
+            this.loggedIn.next(true);
+          }
+        })
+      );
   }
 
   // Logout method
@@ -74,22 +76,26 @@ export class AuthService {
   }
 
   // Get user ID from decoded JWT
-  getUsuarioId(): number | null {
+  getUsuarioId(): number {
     const token = this.getToken();
-    console.log('Token obtenido:', token); // 👈 LOG
-    if (token) {
-      try {
-        const decoded = jwtDecode<JwtPayload>(token);
-        console.log('Token decodificado:', decoded); // 👈 LOG
-        return decoded.id; // ⚠️ Asegúrate que `decoded.id` exista
-      } catch (e) {
-        console.error('Error al decodificar el token:', e);
-        return null;
-      }
+    if (!token) {
+      throw new Error('Token no encontrado');
     }
-    return null;
+
+    try {
+      const decoded = jwtDecode<JwtPayload>(token);
+      console.log('Token decodificado:', decoded);
+
+      if (typeof decoded.id !== 'number') {
+        throw new Error('ID de usuario no válido en el token');
+      }
+
+      return decoded.id;
+    } catch (e) {
+      console.error('Error al decodificar el token:', e);
+      throw new Error('Token inválido');
+    }
   }
-  
 
   // Check if the token exists in localStorage
   private hasToken(): boolean {

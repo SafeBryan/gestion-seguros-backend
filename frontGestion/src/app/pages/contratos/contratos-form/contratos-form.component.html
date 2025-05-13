@@ -1,0 +1,140 @@
+<!-- Fondo oscuro para el modal -->
+<div class="modal-backdrop" (click)="cancelar()"></div>
+
+<!-- Ventana modal centrada -->
+<div class="modal-container">
+  <h2>{{ contrato?.id ? "Editar Contrato" : "Contratar Seguro" }}</h2>
+
+  <form (ngSubmit)="guardarContrato()">
+    <!-- SEGURO -->
+    <div class="form-group">
+      <label for="seguro">Seguro</label>
+      <select
+        id="seguro"
+        [(ngModel)]="contrato!.seguroId"
+        name="seguroId"
+        required
+      >
+        <option *ngFor="let seguro of seguros" [value]="seguro.id">
+          {{ seguro.nombre }} - {{ seguro.tipo }}
+        </option>
+      </select>
+    </div>
+
+    <!-- AGENTE -->
+    <div class="form-group">
+      <label for="agente">Agente</label>
+      <select
+        id="agente"
+        [(ngModel)]="contrato!.agenteId"
+        name="agenteId"
+        required
+      >
+        <option *ngFor="let agente of agentes" [value]="agente.id">
+          {{ agente.nombre }} {{ agente.apellido }}
+        </option>
+      </select>
+    </div>
+
+    <!-- FECHAS -->
+    <div class="form-group">
+      <label for="fechaInicio">Fecha de Inicio</label>
+      <input
+        type="date"
+        id="fechaInicio"
+        [(ngModel)]="contrato!.fechaInicio"
+        name="fechaInicio"
+        required
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="fechaFin">Fecha de Fin</label>
+      <input
+        type="date"
+        id="fechaFin"
+        [(ngModel)]="contrato!.fechaFin"
+        name="fechaFin"
+        required
+      />
+    </div>
+
+    <!-- FRECUENCIA DE PAGO -->
+    <div class="form-group">
+      <label for="frecuenciaPago">Frecuencia de Pago</label>
+      <select
+        id="frecuenciaPago"
+        [(ngModel)]="contrato!.frecuenciaPago"
+        name="frecuenciaPago"
+        required
+      >
+        <option value="MENSUAL">Mensual</option>
+        <option value="TRIMESTRAL">Trimestral</option>
+        <option value="ANUAL">Anual</option>
+      </select>
+    </div>
+
+    <!-- ESTADO -->
+    <div class="form-group" *ngIf="contrato?.id">
+      <label for="estado">Estado</label>
+      <select
+        id="estado"
+        [(ngModel)]="contrato!.estado"
+        name="estado"
+        [disabled]="contrato!.estado === 'ACTIVO'"
+      >
+        <option value="ACTIVO">Activo</option>
+        <option value="CANCELADO">Cancelado</option>
+      </select>
+    </div>
+
+    <!-- BENEFICIARIOS -->
+    <div class="form-group">
+      <label>Beneficiarios</label>
+      <div *ngFor="let b of contrato!.beneficiarios; let i = index">
+        <input
+          type="text"
+          [(ngModel)]="b.nombre"
+          name="beneficiarioNombre{{ i }}"
+          placeholder="Nombre"
+          required
+        />
+        <input
+          type="text"
+          [(ngModel)]="b.parentesco"
+          name="beneficiarioParentesco{{ i }}"
+          placeholder="Parentesco"
+          required
+        />
+        <input
+          type="number"
+          [(ngModel)]="b.porcentaje"
+          name="beneficiarioPorcentaje{{ i }}"
+          placeholder="%"
+          required
+        />
+        <button type="button" (click)="eliminarBeneficiario(i)">
+          Eliminar
+        </button>
+      </div>
+      <button type="button" (click)="agregarBeneficiario()">
+        + Añadir Beneficiario
+      </button>
+    </div>
+
+    <!-- BOTONES -->
+    <div class="d-flex gap-2 mt-3 justify-content-end">
+      <button
+        type="submit"
+        class="btn"
+        [ngClass]="contrato?.id ? 'btn-primary' : 'btn-success'"
+      >
+        {{ contrato?.id ? "Actualizar Contrato" : "Contratar" }}
+      </button>
+
+      <button type="button" class="btn btn-secondary" (click)="cancelar()">
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>

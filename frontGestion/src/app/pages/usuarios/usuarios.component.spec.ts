@@ -227,4 +227,10 @@ describe('UsuariosComponent', () => {
     expect(console.error).toHaveBeenCalled();
     expect(window.alert).toHaveBeenCalledWith('Error al eliminar usuario');
   });
+
+  it('debería asignar "" a telefono si no está definido al editar usuario', () => {
+    const usuarioSinTelefono = { ...mockUsuario, telefono: undefined };
+    component.editarUsuario(usuarioSinTelefono);
+    expect(component.nuevoUsuario.telefono).toBe('');
+  });
 });

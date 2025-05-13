@@ -1,6 +1,9 @@
 <!-- BOTÓN AGREGAR -->
 <div class="d-flex justify-content-end mb-3">
-  <button class="btn btn-primary d-flex align-items-center gap-2" (click)="crearSeguro()">
+  <button
+    class="btn btn-primary d-flex align-items-center gap-2"
+    (click)="crearSeguro()"
+  >
     <i class="bi bi-plus-lg"></i> Agregar
   </button>
 </div>
@@ -12,7 +15,13 @@
     <form (ngSubmit)="guardarSeguro()">
       <div class="form-group">
         <label for="nombre">Nombre</label>
-        <input id="nombre" type="text" [(ngModel)]="nuevoSeguro.nombre" name="nombre" required />
+        <input
+          id="nombre"
+          type="text"
+          [(ngModel)]="nuevoSeguro.nombre"
+          name="nombre"
+          required
+        />
       </div>
 
       <div class="form-group">
@@ -25,30 +34,91 @@
 
       <div class="form-group">
         <label for="descripcion">Descripción</label>
-        <textarea id="descripcion" [(ngModel)]="nuevoSeguro.descripcion" name="descripcion" rows="2" required></textarea>
+        <textarea
+          id="descripcion"
+          [(ngModel)]="nuevoSeguro.descripcion"
+          name="descripcion"
+          rows="2"
+          required
+        ></textarea>
       </div>
 
       <div class="form-group">
         <label for="cobertura">Cobertura</label>
-        <textarea id="cobertura" [(ngModel)]="nuevoSeguro.cobertura" name="cobertura" rows="2" required></textarea>
+        <textarea
+          id="cobertura"
+          [(ngModel)]="nuevoSeguro.cobertura"
+          name="cobertura"
+          rows="2"
+          required
+        ></textarea>
       </div>
 
       <div class="form-group">
         <label for="precio">Precio Anual</label>
-        <input id="precio" type="number" [(ngModel)]="nuevoSeguro.precioAnual" name="precioAnual" required />
+        <input
+          id="precio"
+          type="number"
+          [(ngModel)]="nuevoSeguro.precioAnual"
+          name="precioAnual"
+          required
+        />
       </div>
 
       <div class="form-group">
         <label for="activo">Activo</label>
-        <select id="activo" [(ngModel)]="nuevoSeguro.activo" name="activo" required>
+        <select
+          id="activo"
+          [(ngModel)]="nuevoSeguro.activo"
+          name="activo"
+          required
+        >
           <option [ngValue]="true">Sí</option>
           <option [ngValue]="false">No</option>
         </select>
       </div>
 
+      <!-- CAMPOS VIDA -->
+      <div *ngIf="nuevoSeguro.tipo === 'VIDA'">
+        <div class="form-group">
+          <label for="montoCobertura">Monto de Cobertura</label>
+          <input
+            id="montoCobertura"
+            type="number"
+            [(ngModel)]="nuevoSeguro.montoCobertura"
+            name="montoCobertura"
+          />
+        </div>
+      </div>
+
+      <!-- CAMPOS SALUD -->
+      <div *ngIf="nuevoSeguro.tipo === 'SALUD'">
+        <div class="form-group">
+          <label for="hospitalesConvenio">Hospitales en convenio</label>
+          <input
+            id="hospitalesConvenio"
+            type="text"
+            [(ngModel)]="nuevoSeguro.hospitalesConvenio"
+            name="hospitalesConvenio"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="numeroConsultas">Consultas incluidas</label>
+          <input
+            id="numeroConsultas"
+            type="number"
+            [(ngModel)]="nuevoSeguro.numeroConsultasIncluidas"
+            name="numeroConsultasIncluidas"
+          />
+        </div>
+      </div>
+
       <div class="form-buttons">
         <button class="btn btn-success" type="submit">Guardar</button>
-        <button class="btn btn-secondary" type="button" (click)="cerrarModal()">Cancelar</button>
+        <button class="btn btn-secondary" type="button" (click)="cerrarModal()">
+          Cancelar
+        </button>
       </div>
     </form>
   </div>
@@ -61,20 +131,27 @@
   *ngIf="loading"
   mode="indeterminate"
   diameter="40"
-  class="seguro-spinner">
+  class="seguro-spinner"
+>
 </mat-progress-spinner>
 
 <div *ngIf="!loading && segurosActivos.length > 0" class="seguros-container">
   <mat-card
     class="seguro-card position-relative"
     *ngFor="let seguro of segurosActivos; trackBy: trackBySeguroId"
-    [ngClass]="{ 'seguro-activo': seguro.activo }">
-
+    [ngClass]="{ 'seguro-activo': seguro.activo }"
+  >
     <div class="btn-group btn-group-sm position-absolute top-0 end-0 m-2">
-      <button class="btn btn-info text-white rounded p-1" (click)="editarSeguro(seguro)">
+      <button
+        class="btn btn-info text-white rounded p-1"
+        (click)="editarSeguro(seguro)"
+      >
         <i class="bi bi-pencil fs-2"></i>
       </button>
-      <button class="btn btn-danger text-white rounded p-1 ms-2" (click)="eliminarSeguro(seguro)">
+      <button
+        class="btn btn-danger text-white rounded p-1 ms-2"
+        (click)="eliminarSeguro(seguro)"
+      >
         <i class="bi bi-trash fs-2"></i>
       </button>
     </div>
@@ -88,6 +165,28 @@
       <p><strong>Descripción:</strong> {{ seguro.descripcion }}</p>
       <p><strong>Cobertura:</strong> {{ seguro.cobertura }}</p>
       <p><strong>Precio anual:</strong> ${{ seguro.precioAnual }}</p>
+
+      <!-- Campos específicos -->
+      <ng-container *ngIf="seguro.tipo === 'VIDA'">
+        <p>
+          <strong>Beneficiarios:</strong> {{ seguro.beneficiarios || "N/A" }}
+        </p>
+        <p>
+          <strong>Monto de cobertura:</strong> ${{ seguro.montoCobertura || 0 }}
+        </p>
+      </ng-container>
+
+      <ng-container *ngIf="seguro.tipo === 'SALUD'">
+        <p>
+          <strong>Hospitales convenio:</strong>
+          {{ seguro.hospitalesConvenio || "N/A" }}
+        </p>
+        <p>
+          <strong>Consultas incluidas:</strong>
+          {{ seguro.numeroConsultasIncluidas || 0 }}
+        </p>
+      </ng-container>
+
       <p><strong>Activo:</strong> Sí</p>
     </mat-card-content>
   </mat-card>
@@ -104,13 +203,19 @@
   <mat-card
     class="seguro-card position-relative"
     *ngFor="let seguro of segurosInactivos; trackBy: trackBySeguroId"
-    [ngClass]="{ 'seguro-inactivo': true }">
-
+    [ngClass]="{ 'seguro-inactivo': true }"
+  >
     <div class="btn-group btn-group-sm position-absolute top-0 end-0 m-2">
-      <button class="btn btn-info text-white rounded p-1" (click)="editarSeguro(seguro)">
+      <button
+        class="btn btn-info text-white rounded p-1"
+        (click)="editarSeguro(seguro)"
+      >
         <i class="bi bi-pencil fs-2"></i>
       </button>
-      <button class="btn btn-danger text-white rounded p-1 ms-2" (click)="eliminarSeguro(seguro)">
+      <button
+        class="btn btn-danger text-white rounded p-1 ms-2"
+        (click)="eliminarSeguro(seguro)"
+      >
         <i class="bi bi-trash fs-2"></i>
       </button>
     </div>
@@ -124,6 +229,28 @@
       <p><strong>Descripción:</strong> {{ seguro.descripcion }}</p>
       <p><strong>Cobertura:</strong> {{ seguro.cobertura }}</p>
       <p><strong>Precio anual:</strong> ${{ seguro.precioAnual }}</p>
+
+      <!-- Campos específicos -->
+      <ng-container *ngIf="seguro.tipo === 'VIDA'">
+        <p>
+          <strong>Beneficiarios:</strong> {{ seguro.beneficiarios || "N/A" }}
+        </p>
+        <p>
+          <strong>Monto de cobertura:</strong> ${{ seguro.montoCobertura || 0 }}
+        </p>
+      </ng-container>
+
+      <ng-container *ngIf="seguro.tipo === 'SALUD'">
+        <p>
+          <strong>Hospitales convenio:</strong>
+          {{ seguro.hospitalesConvenio || "N/A" }}
+        </p>
+        <p>
+          <strong>Consultas incluidas:</strong>
+          {{ seguro.numeroConsultasIncluidas || 0 }}
+        </p>
+      </ng-container>
+
       <p><strong>Activo:</strong> No</p>
     </mat-card-content>
   </mat-card>
