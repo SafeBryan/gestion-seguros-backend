@@ -100,19 +100,19 @@ describe('SeguroService', () => {
         descripcion: 'Cobertura total',
         cobertura: 'Todo riesgo',
         precioAnual: 700,
-        activo: true
-      }
+        activo: true,
+      },
     ];
-  
+
     service.obtenerSegurosActivos().subscribe((res) => {
       expect(res).toEqual(mockSeguros);
     });
-  
+
     const req = httpMock.expectOne('http://localhost:8080/api/seguros/activos');
     expect(req.request.method).toBe('GET');
     req.flush(mockSeguros);
   });
-  
+
   it('debería actualizar el estado de un seguro', () => {
     const seguroActualizado: Seguro = {
       id: 1,
@@ -121,19 +121,21 @@ describe('SeguroService', () => {
       descripcion: 'Cobertura parcial',
       cobertura: 'Emergencias',
       precioAnual: 400,
-      activo: false
+      activo: false,
     };
-  
+
     service.actualizarEstado(1, false).subscribe((res) => {
       expect(res).toEqual(seguroActualizado);
     });
-  
-    const req = httpMock.expectOne('http://localhost:8080/api/seguros/1/estado?activo=false');
+
+    const req = httpMock.expectOne(
+      'http://localhost:8080/api/seguros/1/estado?activo=false'
+    );
     expect(req.request.method).toBe('PUT');
     expect(req.request.body).toEqual({});
     req.flush(seguroActualizado);
   });
-  
+
   it('debería obtener todos los seguros', () => {
     const mockSeguros: Seguro[] = [
       {
@@ -143,17 +145,49 @@ describe('SeguroService', () => {
         descripcion: 'Básico',
         cobertura: 'Muerte natural',
         precioAnual: 250,
-        activo: true
-      }
+        activo: true,
+      },
     ];
-  
+
     service.obtenerTodosLosSeguros().subscribe((res) => {
       expect(res).toEqual(mockSeguros);
     });
-  
+
     const req = httpMock.expectOne('http://localhost:8080/api/seguros');
     expect(req.request.method).toBe('GET');
     req.flush(mockSeguros);
   });
-  
+
+  it('debería editar un seguro', () => {
+    const seguroEditado: Seguro = {
+      id: 1,
+      nombre: 'Seguro Editado',
+      tipo: 'VIDA',
+      descripcion: 'Modificado',
+      cobertura: 'Nueva cobertura',
+      precioAnual: 600,
+      activo: true,
+    };
+
+    const datosParciales = { nombre: 'Seguro Editado', precioAnual: 600 };
+
+    service.editarSeguro(1, datosParciales).subscribe((res) => {
+      expect(res).toEqual(seguroEditado);
+    });
+
+    const req = httpMock.expectOne('http://localhost:8080/api/seguros/1');
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual(datosParciales);
+    req.flush(seguroEditado);
+  });
+
+  it('debería eliminar un seguro', () => {
+    service.eliminarSeguro(1).subscribe((res) => {
+      expect(res).toBeNull(); // porque retorna void
+    });
+
+    const req = httpMock.expectOne('http://localhost:8080/api/seguros/1');
+    expect(req.request.method).toBe('DELETE');
+    req.flush(null); // respuesta vacía del backend
+  });
 });

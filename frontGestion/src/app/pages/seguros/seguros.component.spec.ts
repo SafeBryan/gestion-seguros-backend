@@ -122,4 +122,78 @@ describe('SegurosComponent', () => {
     expect(component.mostrarModal).toBeTrue();
     expect(component.nuevoSeguro.nombre).toBe(mockSeguro.nombre);
   });
+
+  it('debería editar un seguro existente y recargar la lista', () => {
+    mockSeguroService.editarSeguro = jasmine
+      .createSpy()
+      .and.returnValue(of(mockSeguro));
+    mockSeguroService.obtenerTodosLosSeguros.and.returnValue(of(mockSeguros));
+    mockAuthService.getUsuarioId.and.returnValue(42);
+
+    spyOn(component, 'cargarSeguros').and.callThrough();
+    spyOn(component, 'cerrarModal').and.callThrough();
+
+    component.nuevoSeguro = { ...mockSeguro }; // Contiene id → modo edición
+    component.guardarSeguro();
+
+    expect(mockSeguroService.editarSeguro).toHaveBeenCalledWith(
+      99,
+      jasmine.any(Object)
+    );
+    expect(component.cargarSeguros).toHaveBeenCalled();
+    expect(component.cerrarModal).toHaveBeenCalled();
+  });
+
+  it('debería manejar error al editar seguro', () => {
+    mockSeguroService.editarSeguro = jasmine
+      .createSpy()
+      .and.returnValue(throwError(() => new Error('Falló edición')));
+    spyOn(console, 'error');
+    mockAuthService.getUsuarioId.and.returnValue(42);
+
+    component.nuevoSeguro = { ...mockSeguro }; // Tiene id → modo edición
+    component.guardarSeguro();
+
+    expect(console.error).toHaveBeenCalledWith(
+      'Error al editar el seguro',
+      jasmine.any(Error)
+    );
+  });
+
+  it('debería desactivar un seguro cuando se confirma', () => {
+    spyOn(window, 'confirm').and.returnValue(true);
+    mockSeguroService.actualizarEstado = jasmine
+      .createSpy()
+      .and.returnValue(of(mockSeguro));
+    spyOn(component, 'cargarSeguros');
+
+    component.eliminarSeguro(mockSeguro);
+
+    expect(mockSeguroService.actualizarEstado).toHaveBeenCalledWith(99, false);
+    expect(component.cargarSeguros).toHaveBeenCalled();
+  });
+
+  it('debería manejar error al desactivar seguro', () => {
+    spyOn(window, 'confirm').and.returnValue(true);
+    mockSeguroService.actualizarEstado = jasmine
+      .createSpy()
+      .and.returnValue(throwError(() => new Error('Error al eliminar')));
+    spyOn(console, 'error');
+
+    component.eliminarSeguro(mockSeguro);
+
+    expect(console.error).toHaveBeenCalledWith(
+      'Error al desactivar el seguro',
+      jasmine.any(Error)
+    );
+  });
+
+  it('no debería desactivar seguro si el usuario cancela', () => {
+    spyOn(window, 'confirm').and.returnValue(false);
+    mockSeguroService.actualizarEstado = jasmine.createSpy();
+
+    component.eliminarSeguro(mockSeguro);
+
+    expect(mockSeguroService.actualizarEstado).not.toHaveBeenCalled();
+  });
 });

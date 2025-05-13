@@ -1,13 +1,16 @@
 package com.seguros.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "tipo", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "seguros")
-public class Seguro {
+public abstract class Seguro {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,10 +18,6 @@ public class Seguro {
 
     @Column(nullable = false, length = 100)
     private String nombre;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "ENUM('VIDA', 'SALUD')")
-    private TipoSeguro tipo;
 
     @Column(columnDefinition = "TEXT")
     private String descripcion;
@@ -43,12 +42,7 @@ public class Seguro {
         VIDA, SALUD
     }
 
-    public boolean isActivo() {
-        return activo;
-    }
-
-    //Getters y Setters
-
+    // === Getters y Setters ===
 
     public Long getId() {
         return id;
@@ -64,14 +58,6 @@ public class Seguro {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
-
-    public TipoSeguro getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(TipoSeguro tipo) {
-        this.tipo = tipo;
     }
 
     public String getDescripcion() {
@@ -120,5 +106,15 @@ public class Seguro {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    @JsonProperty("tipo")
+    public TipoSeguro getTipo() {
+        if (this instanceof SeguroVida) {
+            return TipoSeguro.VIDA;
+        } else if (this instanceof SeguroSalud) {
+            return TipoSeguro.SALUD;
+        }
+        return null;
     }
 }

@@ -4,34 +4,41 @@ import { HomeComponent } from './pages/home/home.component';
 import { authGuard } from './guards/auth.guard';
 import { SegurosComponent } from './pages/seguros/seguros.component';
 import { UsuariosComponent } from './pages/usuarios/usuarios.component';
+import { ContratosListComponent } from './pages/contratos/contratos-list/contratos-list.component';
+import { ContratosPageComponent } from './pages/contratos/contratos-page/contratos-page.component';
 
 export const routes: Routes = [
   {
     path: '',
     redirectTo: 'login',
-    pathMatch: 'full'
+    pathMatch: 'full',
   },
   {
     path: 'login',
-    component: LoginComponent
+    component: LoginComponent,
   },
   {
     path: 'home',
     component: HomeComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard],
   },
   {
     path: 'usuarios',
     component: UsuariosComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard],
   },
   {
     path: 'seguros',
     component: SegurosComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+  },
+  {
+    path: 'contratos',
+    component: ContratosPageComponent,
+    canActivate: [authGuard],
   },
   {
     path: '**',
-    redirectTo: 'login'
-  }
+    redirectTo: 'login',
+  },
 ];

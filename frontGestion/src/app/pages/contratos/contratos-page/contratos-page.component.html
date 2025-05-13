@@ -1,0 +1,15 @@
+<div *ngIf="!mostrarFormulario">
+  <button class="btn btn-success mb-3" (click)="nuevoContrato()">
+    + Nuevo Contrato
+  </button>
+
+  <app-contratos-list (editar)="editarContrato($event)"></app-contratos-list>
+</div>
+
+<div *ngIf="mostrarFormulario">
+  <app-contratos-form
+    [contrato]="contratoAEditar"
+    (guardado)="alGuardar()"
+    (cancelado)="cancelarFormulario()"
+  ></app-contratos-form>
+</div>

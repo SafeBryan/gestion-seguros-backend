@@ -46,6 +46,15 @@ public class SeguroController {
             @RequestParam boolean activo) {
         return ResponseEntity.ok(seguroService.actualizarEstado(id, activo));
     }
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}")
+    public ResponseEntity<Seguro> editarSeguro(
+            @PathVariable Long id,
+            @RequestBody SeguroDTO seguroDTO) {
+
+        return ResponseEntity.ok(seguroService.editarSeguro(id, seguroDTO));
+    }
+
 
 
 }
