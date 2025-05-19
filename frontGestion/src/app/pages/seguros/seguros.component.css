@@ -1,196 +1,421 @@
-/* Títulos */
-.seguros-title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin: 2rem 0 1.5rem;
-  text-align: center;
-  color: #1e293b;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+.modal-content {
+  background: var(--card-background);
+  border-radius: var(--border-radius);
+  width: 95%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease;
 }
 
-/* Spinner */
-.seguro-spinner {
-  display: block;
-  margin: 3rem auto;
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
-/* Contenedor de tarjetas en 2 columnas */
-.seguros-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1.5rem;
-  justify-items: center;
-  padding: 0 1rem;
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 0;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 24px;
 }
 
-/* Tarjeta individual */
-.seguro-card {
-  width: 100%;
-  border-radius: 12px;
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.close-button {
+  color: var(--text-secondary);
+}
+
+/* Form Styles */
+.seguro-form {
+  padding: 0 24px 24px;
+}
+
+.form-section {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.full-width {
+  flex: 1;
+}
+
+.half-width {
+  flex: 1;
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  margin: 16px 0;
+}
+
+.toggle-label {
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.cancel-button {
+  color: var(--text-secondary);
+}
+
+.save-button {
+  transition: var(--transition);
+}
+
+/* Content Container */
+.content-container {
+  background: var(--card-background);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
   overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
-  background-color: #ffffff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.loading-spinner {
+  display: block;
+  margin: 64px auto;
+}
+
+/* Tabs */
+.seguros-tabs {
+  .mat-mdc-tab-label {
+    min-width: 160px;
+  }
+}
+
+.tab-icon {
+  margin-right: 8px;
+}
+
+.tab-badge {
+  margin-left: 8px;
+}
+
+.tab-content {
+  padding: 24px;
+  min-height: 400px;
+}
+
+/* Grid de seguros */
+.seguros-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 24px;
+  margin-top: 16px;
+}
+
+/* Tarjetas de seguro */
+.seguro-card {
+  transition: var(--transition);
+  position: relative;
+  border-radius: var(--border-radius);
+  overflow: hidden;
 }
 
 .seguro-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-.seguro-activo {
-  border-left: 6px solid #10b981;
+.active-card {
+  border-left: 4px solid var(--success-color);
 }
 
-.seguro-inactivo {
-  border-left: 6px solid #ef4444;
+.inactive-card {
+  border-left: 4px solid var(--warn-color);
+  opacity: 0.8;
 }
 
-/* Texto dentro de la tarjeta */
-mat-card-title {
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: #1e293b;
-}
-
-mat-card-subtitle {
-  font-size: 0.95rem;
-  color: #64748b;
-}
-
-mat-card-content p {
-  margin: 0.3rem 0;
-  font-size: 0.95rem;
-  color: #334155;
-  line-height: 1.4;
-}
-
-/* Botones flotantes */
-.btn-group {
-  display: flex;
-  gap: 0.4rem;
-}
-
-/* Estados */
-.activo {
-  color: #10b981;
-  font-weight: 600;
-}
-
-.inactivo {
-  color: #ef4444;
-  font-weight: 600;
-}
-
-/* Cuando no hay seguros */
-.no-seguros {
-  text-align: center;
-  font-size: 1rem;
-  color: #64748b;
-  margin-top: 2rem;
-}
-
-/* Estilos para el modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.6);
+/* Avatar de la tarjeta */
+.card-avatar {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1050;
-}
-
-.modal-content {
-  background: #ffffff;
-  padding: 2rem;
-  border-radius: 12px;
-  width: 95%;
-  max-width: 600px;
-  max-height: 95vh;
-  overflow-y: auto;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-}
-
-.modal-content h3 {
-  margin-top: 0;
-  font-size: 1.6rem;
-  color: #1e293b;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  font-weight: 700;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-.form-group label {
-  display: block;
-  font-weight: 600;
-  color: #334155;
-  margin-bottom: 0.4rem;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 0.5rem;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  background-color: #f9fafb;
-  font-size: 0.95rem;
-}
-
-.form-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-.btn-cancelar,
-.btn-guardar {
-  padding: 0.6rem 1.2rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-.btn-cancelar {
-  background-color: #e2e8f0;
-  color: #1e293b;
-}
-
-.btn-guardar {
-  background-color: #3b82f6;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   color: white;
 }
 
-.btn-guardar:hover {
-  background-color: #2563eb;
+.active-avatar {
+  background-color: var(--success-color);
 }
 
-.btn-cancelar:hover {
-  background-color: #cbd5e1;
+.inactive-avatar {
+  background-color: var(--warn-color);
 }
 
-/* Responsive */
+/* Acciones de la tarjeta */
+.card-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+/* Contenido de la tarjeta */
+.card-content {
+  padding: 16px 24px 24px;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid #e0e0e0;
+}
+
+.info-icon {
+  color: var(--primary-color);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.info-label {
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.info-value {
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.price-item {
+  border-left-color: var(--success-color);
+  background-color: #f1f8e9;
+}
+
+.price-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--success-color);
+}
+
+.specific-info {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Estado vacío */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 64px 24px;
+  color: var(--text-secondary);
+}
+
+.empty-icon {
+  font-size: 4rem;
+  width: 4rem;
+  height: 4rem;
+  color: #e0e0e0;
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin: 0 0 8px;
+  color: var(--text-primary);
+}
+
+.empty-state p {
+  font-size: 1rem;
+  margin: 0 0 24px;
+  color: var(--text-secondary);
+}
+
+/* Chips personalizados */
+::ng-deep .mat-mdc-chip {
+  border-radius: 16px;
+  font-weight: 500;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-  .form-buttons {
-    flex-direction: column;
-    align-items: stretch;
+  .page-container {
+    padding: 16px;
   }
 
-  .btn-cancelar,
-  .btn-guardar {
+  .header-container {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .page-title {
+    font-size: 2rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  .half-width {
     width: 100%;
   }
+
+  .seguros-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .modal-content {
+    width: 100%;
+    height: 100vh;
+    border-radius: 0;
+    max-height: none;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-content {
+    padding: 12px 16px 16px;
+  }
+
+  .info-item {
+    padding: 8px;
+    margin-bottom: 12px;
+  }
+
+  .tab-content {
+    padding: 16px;
+  }
+
+  .empty-state {
+    padding: 32px 16px;
+  }
+
+  .empty-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+/* Animaciones */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.seguro-card {
+  animation: slideInUp 0.3s ease forwards;
+}
+
+/* Mejoras de accesibilidad */
+.seguro-card:focus-within {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+button:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Estilos para formularios de Angular Material */
+::ng-deep .mat-mdc-form-field {
+  width: 100%;
+}
+
+::ng-deep .mat-mdc-form-field .mdc-notched-outline {
+  border-radius: 8px;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mdc-notched-outline {
+  border-color: var(--primary-color);
+  border-width: 2px;
+}
+
+/* Estilos para el slide toggle */
+::ng-deep .mat-mdc-slide-toggle.mat-checked .mdc-switch__track {
+  background-color: var(--primary-color);
+}
+
+::ng-deep .mat-mdc-slide-toggle.mat-checked .mdc-switch__handle::after {
+  background-color: var(--primary-color);
+}
+
+/* Estilos para las tabs */
+::ng-deep .mat-mdc-tab-group .mat-mdc-tab-header {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+::ng-deep .mat-mdc-tab-group .mat-mdc-tab-label-active {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+/* Mejoras para el spinner */
+::ng-deep .mat-mdc-progress-spinner circle {
+  stroke: var(--primary-color);
 }
