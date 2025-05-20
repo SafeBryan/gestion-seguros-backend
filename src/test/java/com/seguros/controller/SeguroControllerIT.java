@@ -3,6 +3,7 @@ package com.seguros.controller;
 import com.seguros.model.Rol;
 import com.seguros.model.Seguro;
 import com.seguros.model.Seguro.TipoSeguro;
+import com.seguros.model.SeguroVida;
 import com.seguros.model.Usuario;
 import com.seguros.repository.RolRepository;
 import com.seguros.repository.SeguroRepository;
@@ -60,19 +61,21 @@ public class SeguroControllerIT {
         creador.setNombre("Admin");
         creador.setApellido("User");
         creador.setActivo(true);
-        creador.setRol(rolAdmin); // asociar el rol existente
+        creador.setRol(rolAdmin);
         creador = usuarioRepository.save(creador);
 
-        // Crear seguro
-        seguroExistente = new Seguro();
-        seguroExistente.setNombre("Seguro Vida");
-        seguroExistente.setDescripcion("Cobertura completa de vida");
-        seguroExistente.setTipo(TipoSeguro.VIDA);
-        seguroExistente.setActivo(true);
-        seguroExistente.setPrecioAnual(new BigDecimal("120.00"));
-        seguroExistente.setCreadoPor(creador);
-        seguroRepository.save(seguroExistente);
+        // Crear seguro de tipo VIDA (instanciar subclase concreta)
+        SeguroVida seguroVida = new SeguroVida();
+        seguroVida.setNombre("Seguro Vida");
+        seguroVida.setDescripcion("Cobertura completa de vida");
+        seguroVida.setActivo(true);
+        seguroVida.setPrecioAnual(new BigDecimal("120.00"));
+        seguroVida.setMontoCobertura(new BigDecimal("50000")); // campo obligatorio
+        seguroVida.setCreadoPor(creador);
+
+        seguroExistente = seguroRepository.save(seguroVida);
     }
+
 
 
 

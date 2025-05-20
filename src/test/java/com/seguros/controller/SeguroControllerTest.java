@@ -5,6 +5,7 @@ import com.seguros.config.SecurityTestConfig;
 import com.seguros.dto.SeguroDTO;
 import com.seguros.model.Seguro;
 import com.seguros.model.Seguro.TipoSeguro;
+import com.seguros.model.SeguroVida;
 import com.seguros.security.JwtService;
 import com.seguros.service.SeguroService;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -66,7 +68,17 @@ class SeguroControllerTest {
         mockSecurityContext();
 
         SeguroDTO dto = new SeguroDTO();
-        Seguro seguro = new Seguro();
+        dto.setNombre("Seguro Vida");
+        dto.setTipo(TipoSeguro.VIDA);
+        dto.setPrecioAnual(BigDecimal.valueOf(120.0));
+        dto.setActivo(true);
+        dto.setMontoCobertura(BigDecimal.valueOf(50000));
+
+        SeguroVida seguro = new SeguroVida();
+        seguro.setNombre(dto.getNombre());
+        seguro.setActivo(dto.getActivo());
+        seguro.setPrecioAnual(dto.getPrecioAnual());
+        seguro.setMontoCobertura(dto.getMontoCobertura());
 
         Mockito.when(seguroService.crearSeguro(any(SeguroDTO.class))).thenReturn(seguro);
 
@@ -81,15 +93,19 @@ class SeguroControllerTest {
     void testObtenerSegurosActivos() throws Exception {
         mockSecurityContext();
 
-        Seguro seguro1 = new Seguro();
+        SeguroVida seguro1 = new SeguroVida();
         seguro1.setId(1L);
         seguro1.setNombre("Seguro Vida");
         seguro1.setActivo(true);
+        seguro1.setPrecioAnual(BigDecimal.valueOf(120.0));
+        seguro1.setMontoCobertura(BigDecimal.valueOf(50000));
 
-        Seguro seguro2 = new Seguro();
+        SeguroVida seguro2 = new SeguroVida();
         seguro2.setId(2L);
-        seguro2.setNombre("Seguro Auto");
+        seguro2.setNombre("Seguro Vida Plus");
         seguro2.setActivo(true);
+        seguro2.setPrecioAnual(BigDecimal.valueOf(150.0));
+        seguro2.setMontoCobertura(BigDecimal.valueOf(60000));
 
         List<Seguro> lista = Arrays.asList(seguro1, seguro2);
 
@@ -101,13 +117,19 @@ class SeguroControllerTest {
                 .andExpect(jsonPath("$.length()").value(2));
     }
 
-
     @Test
     void testObtenerPorTipo() throws Exception {
         mockSecurityContext();
 
         TipoSeguro tipo = TipoSeguro.VIDA;
-        List<Seguro> lista = Arrays.asList(new Seguro());
+        SeguroVida seguro = new SeguroVida();
+        seguro.setId(3L);
+        seguro.setNombre("Seguro Especial");
+        seguro.setActivo(true);
+        seguro.setPrecioAnual(BigDecimal.valueOf(200));
+        seguro.setMontoCobertura(BigDecimal.valueOf(75000));
+
+        List<Seguro> lista = Arrays.asList(seguro);
         Mockito.when(seguroService.obtenerSegurosPorTipo(tipo)).thenReturn(lista);
 
         mockMvc.perform(get("/api/seguros/tipo/" + tipo)
@@ -120,7 +142,11 @@ class SeguroControllerTest {
     void testActualizarEstado() throws Exception {
         mockSecurityContext();
 
-        Seguro seguro = new Seguro();
+        SeguroVida seguro = new SeguroVida();
+        seguro.setId(4L);
+        seguro.setActivo(true);
+        seguro.setNombre("Seguro Estado");
+
         Mockito.when(seguroService.actualizarEstado(eq(1L), eq(true))).thenReturn(seguro);
 
         mockMvc.perform(put("/api/seguros/1/estado")
