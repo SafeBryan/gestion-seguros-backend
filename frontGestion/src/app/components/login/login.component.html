@@ -11,9 +11,15 @@
         placeholder="Correo electrónico"
         formControlName="email"
         required
+        name="email"
       />
-      <div *ngIf="f['email'].invalid && f['email'].touched" class="error-message">
-        <span *ngIf="f['email'].errors?.['required']">El correo es obligatorio.</span>
+      <div
+        *ngIf="f['email'].invalid && f['email'].touched"
+        class="error-message"
+      >
+        <span *ngIf="f['email'].errors?.['required']"
+          >El correo es obligatorio.</span
+        >
         <span *ngIf="f['email'].errors?.['email']">Formato inválido.</span>
       </div>
 
@@ -22,8 +28,12 @@
         placeholder="Contraseña"
         formControlName="password"
         required
+        name="password"
       />
-      <div *ngIf="f['password'].invalid && f['password'].touched" class="error-message">
+      <div
+        *ngIf="f['password'].invalid && f['password'].touched"
+        class="error-message"
+      >
         <span>La contraseña es obligatoria.</span>
       </div>
 

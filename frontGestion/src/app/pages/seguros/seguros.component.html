@@ -1,6 +1,7 @@
 <!-- BOTÓN AGREGAR -->
 <div class="d-flex justify-content-end mb-3">
   <button
+    name="crear"
     class="btn btn-primary d-flex align-items-center gap-2"
     (click)="crearSeguro()"
   >
@@ -115,8 +116,15 @@
       </div>
 
       <div class="form-buttons">
-        <button class="btn btn-success" type="submit">Guardar</button>
-        <button class="btn btn-secondary" type="button" (click)="cerrarModal()">
+        <button name="guardar" class="btn btn-success" type="submit">
+          Guardar
+        </button>
+        <button
+          name="cancelar"
+          class="btn btn-secondary"
+          type="button"
+          (click)="cerrarModal()"
+        >
           Cancelar
         </button>
       </div>
@@ -151,6 +159,7 @@
       <button
         class="btn btn-danger text-white rounded p-1 ms-2"
         (click)="eliminarSeguro(seguro)"
+        name="borrar"
       >
         <i class="bi bi-trash fs-2"></i>
       </button>
