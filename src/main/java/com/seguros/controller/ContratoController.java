@@ -38,4 +38,9 @@ public class ContratoController {
             @RequestParam Contrato.EstadoContrato estado) {
         return ResponseEntity.ok(contratoService.actualizarEstado(id, estado));
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
 }
