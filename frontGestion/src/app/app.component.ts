@@ -1,10 +1,15 @@
 import { Component, inject } from '@angular/core';
-import { MatSidenavModule, MatDrawerContainer, MatDrawer, MatDrawerContent } from '@angular/material/sidenav';
+import {
+  MatSidenavModule,
+  MatDrawerContainer,
+  MatDrawer,
+  MatDrawerContent,
+} from '@angular/material/sidenav';
 import { RouterOutlet, Router } from '@angular/router';
 import { MenuComponent } from '../app/components/menu/menu.component';
 import { MatIconModule } from '@angular/material/icon';
 import { HttpClientModule } from '@angular/common/http';
-import { HeaderComponent } from "./shared/components/header/header.component";
+import { HeaderComponent } from './shared/components/header/header.component';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from './services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -24,10 +29,10 @@ import { CommonModule } from '@angular/common';
     MenuComponent,
     HeaderComponent,
     CommonModule,
-    MatIconModule
+    MatIconModule,
   ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.css',
 })
 export class AppComponent {
   isSidenavOpen = true;

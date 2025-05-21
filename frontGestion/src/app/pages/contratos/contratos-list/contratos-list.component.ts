@@ -24,7 +24,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
   templateUrl: './contratos-list.component.html',
   styleUrls: ['./contratos-list.component.css'],
   imports: [
-    CommonModule, 
+    CommonModule,
     FormsModule,
     MatTableModule,
     MatSortModule,
@@ -36,15 +36,22 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
     MatProgressSpinnerModule,
     MatCardModule,
     MatSnackBarModule,
-    MatDialogModule
+    MatDialogModule,
   ],
 })
 export class ContratosListComponent implements OnInit {
   contratos: Contrato[] = [];
   loading = false;
-  displayedColumns: string[] = ['id', 'seguro', 'fechaInicio', 'fechaFin', 'estado', 'acciones'];
+  displayedColumns: string[] = [
+    'id',
+    'seguro',
+    'fechaInicio',
+    'fechaFin',
+    'estado',
+    'acciones',
+  ];
 
-  @Output() editar = new EventEmitter<Contrato>(); 
+  @Output() editar = new EventEmitter<Contrato>();
 
   constructor(
     private contratoService: ContratoService,
@@ -68,7 +75,9 @@ export class ContratosListComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error al cargar contratos', err);
-          this.snackBar.open('Error al cargar los contratos', 'Cerrar', { duration: 3000 });
+          this.snackBar.open('Error al cargar los contratos', 'Cerrar', {
+            duration: 3000,
+          });
           this.loading = false;
         },
       });
@@ -76,29 +85,35 @@ export class ContratosListComponent implements OnInit {
 
   desactivarContrato(contrato: Contrato): void {
     if (!contrato?.id) return;
-    
+
     // Confirmación antes de desactivar
-    const confirmar = confirm(`¿Está seguro que desea cancelar el contrato #${contrato.id}?`);
+    const confirmar = confirm(
+      `¿Está seguro que desea cancelar el contrato #${contrato.id}?`
+    );
     if (!confirmar) return;
-    
+
     this.loading = true;
     this.contratoService.actualizarEstado(contrato.id, 'CANCELADO').subscribe({
       next: () => {
-        this.snackBar.open('Contrato cancelado exitosamente', 'Cerrar', { duration: 3000 });
+        this.snackBar.open('Contrato cancelado exitosamente', 'Cerrar', {
+          duration: 3000,
+        });
         this.cargarContratos();
       },
       error: (err) => {
         console.error('Error al desactivar contrato', err);
-        this.snackBar.open('Error al cancelar el contrato', 'Cerrar', { duration: 3000 });
+        this.snackBar.open('Error al cancelar el contrato', 'Cerrar', {
+          duration: 3000,
+        });
         this.loading = false;
       },
     });
   }
 
   editarContrato(contrato: Contrato): void {
-    this.editar.emit({...contrato});
+    this.editar.emit({ ...contrato });
   }
-  
+
   getEstadoColor(estado: string): string {
     switch (estado) {
       case 'ACTIVO':
@@ -111,7 +126,7 @@ export class ContratosListComponent implements OnInit {
         return '';
     }
   }
-  
+
   getFrecuenciaPagoTexto(frecuencia: string): string {
     switch (frecuencia) {
       case 'MENSUAL':
@@ -126,9 +141,13 @@ export class ContratosListComponent implements OnInit {
         return frecuencia;
     }
   }
-  
+
   formatearFecha(fecha: string): string {
     if (!fecha) return '';
-    return new Date(fecha).toLocaleDateString('es-ES');
+    const date = new Date(fecha);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   }
 }

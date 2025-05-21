@@ -8,7 +8,7 @@ import { AuthService } from '../../services/auth.service';
   providedIn: 'root',
 })
 export class ContratoService {
-  private baseUrl = 'http://localhost:8082/api/contratos';
+  private baseUrl = 'http://localhost:8080/api/contratos';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 

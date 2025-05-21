@@ -13,11 +13,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -57,12 +57,12 @@ public class AuthController {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
 
                 Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
-                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                        .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
                 List<String> roles = userDetails.getAuthorities()
                         .stream()
                         .map(GrantedAuthority::getAuthority)
-                        .collect(Collectors.toList());
+                        .toList();
 
                 String token = jwtService.generateToken(
                         userDetails,

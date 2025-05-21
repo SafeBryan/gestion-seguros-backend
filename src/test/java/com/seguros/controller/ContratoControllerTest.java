@@ -83,7 +83,7 @@ class ContratoControllerTest {
         dtoEsperado.setId(1L);
 
         Mockito.when(contratoService.crearContrato(any(ContratoDTO.class))).thenReturn(contrato);
-        Mockito.when(contratoService.convertirAContratoDTO(eq(contrato))).thenReturn(dtoEsperado);
+        Mockito.when(contratoService.convertirAContratoDTO((contrato))).thenReturn(dtoEsperado);
 
         mockMvc.perform(post("/api/contratos")
                         .header("Authorization", token)
@@ -259,7 +259,7 @@ class ContratoControllerTest {
 
         Mockito.when(contratoService.actualizarContrato(eq(1L), any(ContratoDTO.class)))
                 .thenReturn(contratoActualizado);
-        Mockito.when(contratoService.convertirAContratoDTO(eq(contratoActualizado)))
+        Mockito.when(contratoService.convertirAContratoDTO((contratoActualizado)))
                 .thenReturn(respuestaDTO);
 
         mockMvc.perform(put("/api/contratos/1")

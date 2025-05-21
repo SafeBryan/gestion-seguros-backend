@@ -14,11 +14,15 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'frontGestion' title`, () => {
+  it(`should have the 'Gestion de Seguros' title`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('frontGestion');
+    expect(app.title).toEqual('Gestion de Seguros');
   });
 
-
+  it(`should have the 'Gestion de Seguros' title`, () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    expect(app.title).toEqual('Gestion de Seguros');
+  });
 });

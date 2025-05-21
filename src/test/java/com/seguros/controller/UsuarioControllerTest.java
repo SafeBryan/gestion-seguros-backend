@@ -18,6 +18,7 @@ import java.util.Arrays;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -147,6 +148,45 @@ public class UsuarioControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(usuarioService).eliminarUsuario(1L);
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void actualizarUsuario_NoExiste_DeberiaRetornarNotFound() throws Exception {
+        given(usuarioService.actualizarUsuario(anyLong(), any(UsuarioDTO.class)))
+                .willThrow(new RuntimeException("Usuario no encontrado"));
+
+        mockMvc.perform(put("/api/usuarios/99")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                    {
+                      "email": "noexiste@test.com",
+                      "nombre": "N",
+                      "apellido": "A",
+                      "telefono": "0000000000",
+                      "rolId": 1
+                    }
+                """))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void obtenerUsuariosPorRol_RolInexistente_DeberiaRetornarListaVacia() throws Exception {
+        given(usuarioService.obtenerUsuariosPorRol("ROL_FAKE")).willReturn(Arrays.asList());
+
+        mockMvc.perform(get("/api/usuarios/rol/ROL_FAKE"))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[]"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void eliminarUsuario_NoExiste_DeberiaRetornarNotFound() throws Exception {
+        doThrow(new RuntimeException("Usuario no encontrado")).when(usuarioService).eliminarUsuario(99L);
+
+        mockMvc.perform(delete("/api/usuarios/99"))
+                .andExpect(status().isNotFound());
     }
 
 

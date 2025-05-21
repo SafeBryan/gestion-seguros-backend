@@ -95,4 +95,51 @@ class AuthControllerTest {
         verify(authenticationManager).authenticate(any());
         verify(jwtService).generateToken(userDetails, usuarioId, nombre, apellido);
     }
+
+    @Test
+    void testLogin_credencialesInvalidas() throws Exception {
+        String email = "mal@mail.com";
+        String password = "incorrecto";
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new RuntimeException("Credenciales inválidas"));
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\": \"" + email + "\", \"password\": \"" + password + "\"}"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void testLogin_camposVacios() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\": \"\", \"password\": \"\"}"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void testLogin_jsonMalFormado() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{email: 'sin comillas'}")) // JSON inválido
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testLogin_sinPassword() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\": \"test@mail.com\"}"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void testLogin_sinEmail() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"password\": \"123456\"}"))
+                .andExpect(status().isUnauthorized());
+    }
+
 }

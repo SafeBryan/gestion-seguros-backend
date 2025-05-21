@@ -1,8 +1,17 @@
-import { Component, OnInit, ViewChild, TemplateRef, AfterViewInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  TemplateRef,
+  AfterViewInit,
+} from '@angular/core';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { UsuarioService, RegistroDTO } from '../../core/services/usuario.service';
+import {
+  UsuarioService,
+  RegistroDTO,
+} from '../../core/services/usuario.service';
 import { Usuario } from '../../models/usuario.model';
 import { RolService } from '../../core/services/rol.service';
 import { Rol } from '../../models/rol.model';
@@ -43,24 +52,33 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
     MatChipsModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
   ],
   templateUrl: './usuarios.component.html',
-  styleUrls: ['./usuarios.component.css']
+  styleUrls: ['./usuarios.component.css'],
 })
 export class UsuariosComponent implements OnInit, AfterViewInit {
   // Propiedades de datos
   usuarios: Usuario[] = [];
   roles: Rol[] = [];
   dataSource = new MatTableDataSource<Usuario>([]);
-  columnas: string[] = ['id', 'nombre', 'apellido', 'email', 'telefono', 'rolNombre', 'activo', 'acciones'];
-  
+  columnas: string[] = [
+    'id',
+    'nombre',
+    'apellido',
+    'email',
+    'telefono',
+    'rolNombre',
+    'activo',
+    'acciones',
+  ];
+
   // Estado UI
   loading = true;
   modoEdicion = false;
   usuarioEditando: Usuario | null = null;
   hidePassword = true;
-  
+
   // Form data
   nuevoUsuario: RegistroDTO = {
     email: '',
@@ -68,7 +86,7 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
     nombre: '',
     apellido: '',
     telefono: '',
-    rolId: 0
+    rolId: 0,
   };
 
   // Referencias a elementos del DOM
@@ -87,7 +105,7 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
     this.cargarUsuarios();
     this.cargarRoles();
   }
-  
+
   ngAfterViewInit() {
     // Configurar paginador y ordenamiento después de que las vistas se inicialicen
     if (this.dataSource) {
@@ -104,7 +122,7 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
       error: (err) => {
         console.error('Error al cargar roles', err);
         this.mostrarNotificacion('Error al cargar roles', 'error');
-      }
+      },
     });
   }
 
@@ -122,7 +140,7 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
         console.error('Error al cargar usuarios', err);
         this.loading = false;
         this.mostrarNotificacion('Error al cargar usuarios', 'error');
-      }
+      },
     });
   }
 
@@ -149,9 +167,9 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
       nombre: '',
       apellido: '',
       telefono: '',
-      rolId: 0
+      rolId: 0,
     };
-    
+
     this.abrirDialog();
   }
 
@@ -159,7 +177,7 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
     this.modoEdicion = true;
     this.usuarioEditando = usuario;
     this.hidePassword = true;
-    
+
     // Crear un objeto que cumpla con la estructura RegistroDTO para el formulario
     this.nuevoUsuario = {
       email: usuario.email,
@@ -167,19 +185,19 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
       nombre: usuario.nombre,
       apellido: usuario.apellido,
       telefono: usuario.telefono || '',
-      rolId: usuario.rolId
+      rolId: usuario.rolId,
     };
-    
+
     this.abrirDialog();
   }
 
   abrirDialog(): void {
     const dialogRef = this.dialog.open(this.dialogTemplate, {
       width: '600px',
-      disableClose: true
+      disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result === 'save') {
         this.guardarUsuario();
       }
@@ -188,30 +206,37 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 
   guardarUsuario(): void {
     if (this.modoEdicion && this.usuarioEditando) {
-      // Si estamos en modo edición, actualizamos
-      this.usuarioService.editar(this.usuarioEditando.id!, this.nuevoUsuario).subscribe({
-        next: () => {
-          this.cargarUsuarios();
-          this.dialog.closeAll();
-          this.mostrarNotificacion('Usuario actualizado correctamente', 'success');
-        },
-        error: (err) => {
-          console.error('Error al actualizar usuario', err);
-          this.mostrarNotificacion('Error al actualizar usuario', 'error');
-        }
-      });
+      this.loading = true;
+      this.usuarioService
+        .editar(this.usuarioEditando.id!, this.nuevoUsuario)
+        .subscribe({
+          next: () => {
+            this.loading = false;
+            this.cargarUsuarios();
+            this.dialog.closeAll();
+            this.mostrarNotificacion(
+              'Usuario editado correctamente',
+              'success'
+            );
+          },
+          error: () => {
+            this.loading = false;
+            this.mostrarNotificacion('Error al editar usuario', 'error');
+          },
+        });
     } else {
-      // Si no, creamos un nuevo usuario
+      this.loading = true;
       this.usuarioService.crear(this.nuevoUsuario).subscribe({
         next: () => {
+          this.loading = false;
           this.cargarUsuarios();
           this.dialog.closeAll();
           this.mostrarNotificacion('Usuario creado correctamente', 'success');
         },
-        error: (err) => {
-          console.error('Error al crear usuario', err);
+        error: () => {
+          this.loading = false;
           this.mostrarNotificacion('Error al crear usuario', 'error');
-        }
+        },
       });
     }
   }
@@ -223,21 +248,24 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
         title: 'Confirmar eliminación',
         message: `¿Estás seguro de eliminar al usuario ${usuario.nombre} ${usuario.apellido}?`,
         confirmText: 'Eliminar',
-        cancelText: 'Cancelar'
-      }
+        cancelText: 'Cancelar',
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.usuarioService.eliminar(usuario.id!).subscribe({
           next: () => {
             this.cargarUsuarios();
-            this.mostrarNotificacion('Usuario eliminado correctamente', 'success');
+            this.mostrarNotificacion(
+              'Usuario eliminado correctamente',
+              'success'
+            );
           },
           error: (err) => {
             console.error('Error al eliminar usuario', err);
             this.mostrarNotificacion('Error al eliminar usuario', 'error');
-          }
+          },
         });
       }
     });
@@ -245,7 +273,7 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 
   getRoleClass(rolNombre: string): string {
     if (!rolNombre) return 'role-default';
-    
+
     const rolLower = rolNombre.toLowerCase();
     if (rolLower.includes('admin')) return 'role-admin';
     if (rolLower.includes('medic')) return 'role-medico';
@@ -253,16 +281,14 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
     return 'role-default';
   }
 
-  mostrarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'info'): void {
-    const config = {
+  mostrarNotificacion(
+    mensaje: string,
+    tipo: 'success' | 'error' | 'info'
+  ): void {
+    this.snackBar.open(mensaje, 'Cerrar', {
       duration: 3000,
-      horizontalPosition: 'end' as const,
-      verticalPosition: 'top' as const,
-      panelClass: tipo === 'success' ? ['mat-snack-bar-success'] : 
-                  tipo === 'error' ? ['mat-snack-bar-error'] : ['mat-snack-bar-info']
-    };
-    
-    this.snackBar.open(mensaje, 'Cerrar', config);
+      panelClass: tipo === 'error' ? ['error-snackbar'] : ['success-snackbar'],
+    });
   }
 }
 

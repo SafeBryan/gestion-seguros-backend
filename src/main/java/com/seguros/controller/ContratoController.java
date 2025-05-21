@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/contratos")
@@ -31,7 +30,7 @@ public class ContratoController {
         List<Contrato> contratos = contratoService.obtenerContratosPorCliente(clienteId);
         List<ContratoDTO> dtos = contratos.stream()
                 .map(contratoService::convertirAContratoDTO)
-                .collect(Collectors.toList());
+                .toList();
         return ResponseEntity.ok(dtos);
     }
 
@@ -40,9 +39,10 @@ public class ContratoController {
         List<Contrato> contratos = contratoService.obtenerContratosPorVencer(dias);
         List<ContratoDTO> dtos = contratos.stream()
                 .map(contratoService::convertirAContratoDTO)
-                .collect(Collectors.toList());
+                .toList();
         return ResponseEntity.ok(dtos);
     }
+
 
     @PutMapping("/{id}/estado")
     public ResponseEntity<ContratoDTO> actualizarEstado(
