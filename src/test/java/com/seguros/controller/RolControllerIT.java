@@ -1,8 +1,12 @@
 package com.seguros.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.qameta.allure.*;
+import io.qameta.allure.junit5.AllureJunit5;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,11 +22,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@ExtendWith(AllureJunit5.class)
 public class RolControllerIT {
 
     @Autowired
     private MockMvc mockMvc;
 
+    @Epic("Gestión de Usuarios")
+    @Feature("CRUD de Rol")
+    @Story("Creación de rol desde API")
+    @DisplayName("Crear rol correctamente con MockMvc")
     @Test
     @WithMockUser(roles = "ADMIN")
     void crearRol_IntegrationTest() throws Exception {
@@ -42,6 +51,7 @@ public class RolControllerIT {
 
 
     @Test
+    @DisplayName("Obtener todos los roles como ADMIN")
     @WithMockUser(roles = "ADMIN")
     void obtenerTodosRoles_IntegrationTest() throws Exception {
         mockMvc.perform(get("/api/roles"))
