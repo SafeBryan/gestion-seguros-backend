@@ -180,8 +180,8 @@ export class ContratosFormComponent implements OnInit {
         porcentajeTotal += beneficiario.porcentaje;
       }
       
-      if (porcentajeTotal !== 100) {
-        this.snackBar.open('El porcentaje total de beneficiarios debe sumar 100%', 'Cerrar', { duration: 3000 });
+      if (porcentajeTotal >= 100) {
+        this.snackBar.open('El porcentaje total de beneficiarios debe ser menor al 100%', 'Cerrar', { duration: 3000 });
         return false;
       }
     }
