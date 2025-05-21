@@ -136,5 +136,44 @@ class RolServiceTest {
         assertEquals("Actualizado", actualizado.getDescripcion());
     }
 
+    @Test
+    void testObtenerRolPorId_exito() {
+        Rol rol = new Rol("ADMIN", "Administrador");
+        rol.setId(1L);
+
+        when(rolRepository.findById(1L)).thenReturn(Optional.of(rol));
+
+        RolDTO dto = rolService.obtenerRolPorId(1L);
+
+        assertNotNull(dto);
+        assertEquals("ADMIN", dto.getNombre());
+        assertEquals("Administrador", dto.getDescripcion());
+    }
+
+    @Test
+    void testObtenerRolPorId_noExiste() {
+        when(rolRepository.findById(99L)).thenReturn(Optional.empty());
+
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> rolService.obtenerRolPorId(99L));
+        assertEquals("Rol no encontrado", ex.getMessage());
+    }
+
+    @Test
+    void testEliminarRol_exito() {
+        when(rolRepository.existsById(5L)).thenReturn(true);
+        doNothing().when(rolRepository).deleteById(5L);
+
+        assertDoesNotThrow(() -> rolService.eliminarRol(5L));
+        verify(rolRepository).deleteById(5L);
+    }
+
+    @Test
+    void testEliminarRol_noExiste() {
+        when(rolRepository.existsById(99L)).thenReturn(false);
+
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> rolService.eliminarRol(99L));
+        assertEquals("Rol no encontrado", ex.getMessage());
+    }
+
 
 }

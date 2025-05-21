@@ -62,4 +62,13 @@ class SeguroTest {
         assertEquals("Hospital Central", seguro.getHospitalesConvenio());
         assertEquals(10, seguro.getNumeroConsultasIncluidas());
     }
+
+    @Test
+    void testSeguroBaseGetTipoRetornaNull() {
+        Seguro seguro = new Seguro() {
+        };
+
+        assertNull(seguro.getTipo(), "El tipo debería ser null en la implementación base");
+    }
+
 }

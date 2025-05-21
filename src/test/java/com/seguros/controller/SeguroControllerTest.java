@@ -154,4 +154,54 @@ class SeguroControllerTest {
                         .param("activo", "true"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    void testObtenerTodosLosSeguros() throws Exception {
+        mockSecurityContext();
+
+        SeguroVida seguro1 = new SeguroVida();
+        seguro1.setId(1L);
+        seguro1.setNombre("Seguro Vida Total");
+        seguro1.setPrecioAnual(BigDecimal.valueOf(1000));
+
+        Mockito.when(seguroService.obtenerTodosLosSeguros()).thenReturn(List.of(seguro1));
+
+        mockMvc.perform(get("/api/seguros")
+                        .header("Authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].nombre").value("Seguro Vida Total"));
+    }
+
+    @Test
+    void testEditarSeguro() throws Exception {
+        mockSecurityContext();
+
+        SeguroDTO dto = new SeguroDTO();
+        dto.setNombre("Editado");
+        dto.setTipo(TipoSeguro.VIDA);
+        dto.setActivo(true);
+        dto.setPrecioAnual(BigDecimal.valueOf(999));
+        dto.setMontoCobertura(BigDecimal.valueOf(99999));
+
+        SeguroVida seguroEditado = new SeguroVida();
+        seguroEditado.setId(5L);
+        seguroEditado.setNombre(dto.getNombre());
+        seguroEditado.setActivo(dto.getActivo());
+        seguroEditado.setPrecioAnual(dto.getPrecioAnual());
+        seguroEditado.setMontoCobertura(dto.getMontoCobertura());
+
+        Mockito.when(seguroService.editarSeguro(eq(5L), any(SeguroDTO.class)))
+                .thenReturn(seguroEditado);
+
+        mockMvc.perform(put("/api/seguros/5")
+                        .header("Authorization", token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nombre").value("Editado"))
+                .andExpect(jsonPath("$.precioAnual").value(999));
+    }
+
+
 }

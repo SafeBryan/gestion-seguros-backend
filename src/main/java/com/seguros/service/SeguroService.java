@@ -31,6 +31,9 @@ public class SeguroService {
         Usuario creadoPor = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+        if (seguroDTO.getTipo() == null) {
+            throw new IllegalArgumentException("Tipo de seguro no válido");
+        }
 
         Seguro seguro;
 
@@ -58,6 +61,7 @@ public class SeguroService {
 
         return seguroRepository.save(seguro);
     }
+
 
     public List<Seguro> obtenerSegurosActivos() {
         return seguroRepository.findByActivoTrue();
