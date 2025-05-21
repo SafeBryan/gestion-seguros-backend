@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SeguroService } from '../../core/services/seguro.service';
 import { Seguro } from '../../models/seguro.model';
@@ -11,7 +10,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatDialogModule, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -27,7 +26,6 @@ import { MatBadgeModule } from '@angular/material/badge';
   standalone: true,
   imports: [
     CommonModule,
-    HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
     MatCardModule,
@@ -55,16 +53,19 @@ export class SegurosComponent implements OnInit {
   segurosActivos: Seguro[] = [];
   segurosInactivos: Seguro[] = [];
   loading = true;
-  mostrarModal = false;
   editMode = false;
   
   seguroForm!: FormGroup;
+  dialogRef: MatDialogRef<any> | null = null;
+  
+  @ViewChild('dialogTemplate') dialogTemplate!: TemplateRef<any>;
 
   constructor(
     private seguroService: SeguroService,
     private authService: AuthService,
     private fb: FormBuilder,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {
     this.initForm();
   }
@@ -108,7 +109,7 @@ export class SegurosComponent implements OnInit {
     });
   }
 
-  trackBySeguroId(index: number, seguro: Seguro): number {
+  trackBySeguroId(_: number, seguro: Seguro): number {
     return seguro.id;
   }
 
@@ -121,11 +122,21 @@ export class SegurosComponent implements OnInit {
       montoCobertura: 0,
       numeroConsultasIncluidas: 0
     });
-    this.mostrarModal = true;
+    this.abrirModal();
+  }
+
+  abrirModal(): void {
+    this.dialogRef = this.dialog.open(this.dialogTemplate, {
+      width: '700px',
+      disableClose: true
+    });
   }
 
   cerrarModal(): void {
-    this.mostrarModal = false;
+    if (this.dialogRef) {
+      this.dialogRef.close();
+      this.dialogRef = null;
+    }
     this.seguroForm.reset();
   }
 
@@ -185,7 +196,7 @@ export class SegurosComponent implements OnInit {
       hospitalesConvenio: seguro.hospitalesConvenio || '',
       numeroConsultasIncluidas: seguro.numeroConsultasIncluidas || 0,
     });
-    this.mostrarModal = true;
+    this.abrirModal();
   }
 
   eliminarSeguro(seguro: Seguro): void {
@@ -232,7 +243,7 @@ export class SegurosComponent implements OnInit {
   formatearPrecio(precio: number): string {
     return new Intl.NumberFormat('es-ES', {
       style: 'currency',
-      currency: 'EUR'
+      currency: 'USD'
     }).format(precio);
   }
 }
