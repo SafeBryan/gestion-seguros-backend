@@ -15,7 +15,12 @@ class ContratoTest {
         Contrato contrato = new Contrato();
         Usuario cliente = new Usuario();
         Usuario agente = new Usuario();
-        Seguro seguro = new Seguro();
+
+        // ✅ Usar clase concreta en lugar de Seguro abstracto
+        SeguroVida seguro = new SeguroVida();
+        seguro.setId(10L);
+        seguro.setNombre("Seguro Vida");
+        seguro.setMontoCobertura(new java.math.BigDecimal("10000.00"));
 
         LocalDate fechaInicio = LocalDate.of(2025, 1, 1);
         LocalDate fechaFin = LocalDate.of(2026, 1, 1);
@@ -52,4 +57,5 @@ class ContratoTest {
         assertEquals(createdAt, contrato.getCreatedAt());
         assertTrue(contrato.isActivo());
     }
+
 }

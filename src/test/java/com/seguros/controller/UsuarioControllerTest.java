@@ -16,7 +16,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.Arrays;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -99,5 +101,53 @@ public class UsuarioControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].email").value("admin@test.com"));
     }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void actualizarUsuario_DeberiaRetornarUsuarioActualizado() throws Exception {
+        UsuarioDTO dto = new UsuarioDTO();
+        dto.setEmail("actualizado@test.com");
+        dto.setNombre("NombreActualizado");
+        dto.setApellido("ApellidoActualizado");
+        dto.setTelefono("0987654321");
+        dto.setRolId(2L);
+
+        Usuario usuarioActualizado = new Usuario();
+        usuarioActualizado.setId(1L);
+        usuarioActualizado.setEmail("actualizado@test.com");
+        usuarioActualizado.setNombre("NombreActualizado");
+        usuarioActualizado.setApellido("ApellidoActualizado");
+        usuarioActualizado.setTelefono("0987654321");
+
+        given(usuarioService.actualizarUsuario(anyLong(), any(UsuarioDTO.class)))
+                .willReturn(usuarioActualizado);
+
+        mockMvc.perform(put("/api/usuarios/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {
+                          "email": "actualizado@test.com",
+                          "nombre": "NombreActualizado",
+                          "apellido": "ApellidoActualizado",
+                          "telefono": "0987654321",
+                          "rolId": 2
+                        }
+                    """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("actualizado@test.com"))
+                .andExpect(jsonPath("$.nombre").value("NombreActualizado"))
+                .andExpect(jsonPath("$.apellido").value("ApellidoActualizado"))
+                .andExpect(jsonPath("$.telefono").value("0987654321"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void eliminarUsuario_DeberiaRetornarNoContent() throws Exception {
+        mockMvc.perform(delete("/api/usuarios/1"))
+                .andExpect(status().isNoContent());
+
+        verify(usuarioService).eliminarUsuario(1L);
+    }
+
 
 }

@@ -79,7 +79,11 @@ class ContratoControllerTest {
         Contrato contrato = new Contrato();
         contrato.setId(1L);
 
+        ContratoDTO dtoEsperado = new ContratoDTO();
+        dtoEsperado.setId(1L);
+
         Mockito.when(contratoService.crearContrato(any(ContratoDTO.class))).thenReturn(contrato);
+        Mockito.when(contratoService.convertirAContratoDTO(eq(contrato))).thenReturn(dtoEsperado);
 
         mockMvc.perform(post("/api/contratos")
                         .header("Authorization", token)
@@ -89,19 +93,35 @@ class ContratoControllerTest {
                 .andExpect(jsonPath("$.id").value(1L));
     }
 
+
     @Test
     void testObtenerPorCliente() throws Exception {
         mockSecurityContext();
 
-        List<Contrato> contratos = Arrays.asList(new Contrato(), new Contrato());
+        Contrato contrato1 = new Contrato();
+        contrato1.setId(1L);
+        Contrato contrato2 = new Contrato();
+        contrato2.setId(2L);
 
-        Mockito.when(contratoService.obtenerContratosPorCliente(1L)).thenReturn(contratos);
+        ContratoDTO dto1 = new ContratoDTO();
+        dto1.setId(1L);
+        ContratoDTO dto2 = new ContratoDTO();
+        dto2.setId(2L);
+
+        Mockito.when(contratoService.obtenerContratosPorCliente(1L))
+                .thenReturn(Arrays.asList(contrato1, contrato2));
+
+        Mockito.when(contratoService.convertirAContratoDTO(contrato1)).thenReturn(dto1);
+        Mockito.when(contratoService.convertirAContratoDTO(contrato2)).thenReturn(dto2);
 
         mockMvc.perform(get("/api/contratos/cliente/1")
                         .header("Authorization", token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2));
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[1].id").value(2));
     }
+
 
     @Test
     void testObtenerPorVencer() throws Exception {
@@ -138,7 +158,12 @@ class ContratoControllerTest {
         contrato.setId(1L);
         contrato.setEstado(EstadoContrato.CANCELADO);
 
+        ContratoDTO dtoEsperado = new ContratoDTO();
+        dtoEsperado.setId(1L);
+        dtoEsperado.setEstado(EstadoContrato.CANCELADO);
+
         Mockito.when(contratoService.actualizarEstado(1L, EstadoContrato.CANCELADO)).thenReturn(contrato);
+        Mockito.when(contratoService.convertirAContratoDTO(contrato)).thenReturn(dtoEsperado);
 
         mockMvc.perform(put("/api/contratos/1/estado")
                         .header("Authorization", token)
@@ -147,7 +172,6 @@ class ContratoControllerTest {
                 .andExpect(jsonPath("$.estado").value("CANCELADO"));
     }
 
-    // Agrega estos tests al final de tu clase ContratoControllerTest
 
     @Test
     void testCrearContratoClienteNoEncontrado() throws Exception {
@@ -212,6 +236,62 @@ class ContratoControllerTest {
                         .param("dias", "15"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("Error en la búsqueda"));
+    }
+    @Test
+    void testActualizarContrato() throws Exception {
+        mockSecurityContext();
+
+        ContratoDTO dto = new ContratoDTO();
+        dto.setClienteId(1L);
+        dto.setAgenteId(2L);
+        dto.setSeguroId(3L);
+        dto.setFechaInicio(LocalDate.now());
+        dto.setFechaFin(LocalDate.now().plusDays(30));
+        dto.setFrecuenciaPago(FrecuenciaPago.ANUAL);
+        dto.setFirmaElectronica("firmaActualizada");
+
+        Contrato contratoActualizado = new Contrato();
+        contratoActualizado.setId(1L);
+
+        ContratoDTO respuestaDTO = new ContratoDTO();
+        respuestaDTO.setId(1L);
+        respuestaDTO.setFirmaElectronica("firmaActualizada");
+
+        Mockito.when(contratoService.actualizarContrato(eq(1L), any(ContratoDTO.class)))
+                .thenReturn(contratoActualizado);
+        Mockito.when(contratoService.convertirAContratoDTO(eq(contratoActualizado)))
+                .thenReturn(respuestaDTO);
+
+        mockMvc.perform(put("/api/contratos/1")
+                        .header("Authorization", token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.firmaElectronica").value("firmaActualizada"));
+    }
+    @Test
+    void testActualizarContratoNoExiste() throws Exception {
+        mockSecurityContext();
+
+        ContratoDTO dto = new ContratoDTO();
+        dto.setClienteId(1L);
+        dto.setAgenteId(2L);
+        dto.setSeguroId(3L);
+        dto.setFechaInicio(LocalDate.now());
+        dto.setFechaFin(LocalDate.now().plusDays(30));
+        dto.setFrecuenciaPago(FrecuenciaPago.ANUAL);
+        dto.setFirmaElectronica("firmaActualizada");
+
+        Mockito.when(contratoService.actualizarContrato(eq(1L), any(ContratoDTO.class)))
+                .thenThrow(new RuntimeException("Contrato no encontrado"));
+
+        mockMvc.perform(put("/api/contratos/1")
+                        .header("Authorization", token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Contrato no encontrado"));
     }
 
 }

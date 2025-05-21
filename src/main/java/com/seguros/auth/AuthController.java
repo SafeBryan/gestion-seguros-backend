@@ -5,7 +5,6 @@ import com.seguros.repository.UsuarioRepository;
 import com.seguros.security.JwtService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,17 +24,22 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
+    private final UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private JwtService jwtService;
-
-    @Autowired
-    private UserDetailsService userDetailsService;
-
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    public AuthController(
+            AuthenticationManager authenticationManager,
+            JwtService jwtService,
+            UserDetailsService userDetailsService,
+            UsuarioRepository usuarioRepository
+    ) {
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
+        this.usuarioRepository = usuarioRepository;
+    }
 
     @Operation(
             summary = "Iniciar sesión",
@@ -52,19 +56,20 @@ public class AuthController {
             if (authentication.isAuthenticated()) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
 
-                // Obtener el usuario completo desde DB
                 Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
                         .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-                // Extraer roles
                 List<String> roles = userDetails.getAuthorities()
                         .stream()
                         .map(GrantedAuthority::getAuthority)
                         .collect(Collectors.toList());
 
-                // Generar el token con datos personalizados
-                String token = jwtService.generateToken(userDetails, usuario.getId(), usuario.getNombre(), usuario.getApellido());
-
+                String token = jwtService.generateToken(
+                        userDetails,
+                        usuario.getId(),
+                        usuario.getNombre(),
+                        usuario.getApellido()
+                );
 
                 return ResponseEntity.ok(Map.of(
                         "token", token,
