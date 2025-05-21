@@ -20,7 +20,7 @@ class ContratoControllerSecurityTest {
     @Test
     void accesoDenegadoSinAutenticacion() throws Exception {
         mockMvc.perform(get("/api/contratos/cliente/1"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test
