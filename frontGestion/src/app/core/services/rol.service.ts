@@ -8,7 +8,7 @@ import { AuthService } from '../../services/auth.service';
   providedIn: 'root',
 })
 export class RolService {
-  private baseUrl = 'http://localhost:8080/api/roles';
+  private baseUrl = 'http://localhost:8082/api/roles';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 

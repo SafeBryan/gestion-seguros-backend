@@ -1,13 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, TemplateRef } from '@angular/core';
 import { Contrato } from '../../../models/contrato.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ContratosFormComponent } from '../contratos-form/contratos-form.component';
 import { ContratosListComponent } from '../contratos-list/contratos-list.component';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+
+// Material imports
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatDialogModule, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-contratos-page',
+  standalone: true,
   templateUrl: './contratos-page.component.html',
   styleUrls: ['./contratos-page.component.css'],
   imports: [
@@ -15,26 +25,61 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
     FormsModule,
     ContratosFormComponent,
     ContratosListComponent,
+    MatButtonModule,
+    MatIconModule,
+    MatCardModule,
+    MatDividerModule,
+    MatTabsModule,
+    MatDialogModule,
+    MatTooltipModule,
+    MatSnackBarModule
   ],
 })
 export class ContratosPageComponent {
-  mostrarFormulario = false;
   contratoAEditar?: Contrato;
+  dialogRef: MatDialogRef<any> | null = null;
+  
+  @ViewChild('formDialogTemplate') formDialogTemplate!: TemplateRef<any>;
+
+  constructor(private dialog: MatDialog) {}
 
   nuevoContrato() {
     this.contratoAEditar = undefined;
-    this.mostrarFormulario = true;
+    this.abrirModalFormulario();
   }
 
   editarContrato(contrato: Contrato) {
     this.contratoAEditar = contrato;
-    this.mostrarFormulario = true;
+    this.abrirModalFormulario();
+  }
+
+  abrirModalFormulario(): void {
+    this.dialogRef = this.dialog.open(this.formDialogTemplate, {
+      width: '800px',
+      disableClose: true,
+      data: {
+        contrato: this.contratoAEditar
+      }
+    });
+  }
+
+  cerrarModalFormulario(): void {
+    if (this.dialogRef) {
+      this.dialogRef.close();
+      this.dialogRef = null;
+    }
   }
 
   alGuardar() {
-    this.mostrarFormulario = false;
+    this.cerrarModalFormulario();
+    // Aquí podrías refrescar la lista de contratos
+    const listComponent = document.querySelector('app-contratos-list') as any;
+    if (listComponent && listComponent.cargarContratos) {
+      listComponent.cargarContratos();
+    }
   }
+  
   cancelarFormulario(): void {
-    this.mostrarFormulario = false;
+    this.cerrarModalFormulario();
   }
 }

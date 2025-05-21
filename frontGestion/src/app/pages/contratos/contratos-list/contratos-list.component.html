@@ -1,59 +1,91 @@
-<div class="container mt-4">
-  <h2>Historial de Contratos</h2>
-
-  <table
-    class="table table-bordered table-striped"
-    *ngIf="contratos.length > 0; else sinContratos"
-  >
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Seguro</th>
-        <th>Agente</th>
-        <th>Inicio</th>
-        <th>Fin</th>
-        <th>Pago</th>
-        <th>Estado</th>
-        <th>Beneficiarios</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let contrato of contratos; let i = index">
-        <td>{{ i + 1 }}</td>
-        <td>{{ contrato.seguro?.nombre || "Seguro desconocido" }}</td>
-        <td>{{ contrato.agente?.nombre }} {{ contrato.agente?.apellido }}</td>
-        <td>{{ contrato.fechaInicio }}</td>
-        <td>{{ contrato.fechaFin }}</td>
-        <td>{{ contrato.frecuenciaPago }}</td>
-        <td>{{ contrato.estado }}</td>
-        <td>
-          <ul>
-            <li *ngFor="let b of contrato.beneficiarios">
-              {{ b.nombre }} ({{ b.parentesco }}) - {{ b.porcentaje }}%
-            </li>
-          </ul>
-        </td>
-        <td>
-          <button
-            class="btn btn-warning btn-sm me-2"
-            (click)="editarContrato(contrato)"
-          >
-            Editar
-          </button>
-          <button
-            class="btn btn-danger btn-sm"
-            (click)="desactivarContrato(contrato.id!)"
-            [disabled]="contrato.estado === 'CANCELADO'"
-          >
-            Desactivar
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <ng-template #sinContratos>
-    <p class="text-muted">No hay contratos registrados.</p>
-  </ng-template>
+<div class="contratos-list-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Mis Contratos</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+      
+      <div *ngIf="!loading && contratos.length === 0" class="no-contratos">
+        <p>No tienes contratos registrados</p>
+        <mat-icon class="no-data-icon">description</mat-icon>
+      </div>
+      
+      <div class="table-container" *ngIf="contratos.length > 0">
+        <table mat-table [dataSource]="contratos" class="mat-elevation-z1 contratos-table">
+          <!-- ID Column -->
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>No.</th>
+            <td mat-cell *matCellDef="let contrato">{{ contrato.id }}</td>
+          </ng-container>
+          
+          <!-- Seguro Column -->
+          <ng-container matColumnDef="seguro">
+            <th mat-header-cell *matHeaderCellDef>Seguro</th>
+            <td mat-cell *matCellDef="let contrato">
+              <span class="seguro-info">{{ contrato.seguro?.nombre || 'N/A' }}</span>
+            </td>
+          </ng-container>
+          
+          <!-- Fecha Inicio Column -->
+          <ng-container matColumnDef="fechaInicio">
+            <th mat-header-cell *matHeaderCellDef>Inicio</th>
+            <td mat-cell *matCellDef="let contrato">{{ formatearFecha(contrato.fechaInicio) }}</td>
+          </ng-container>
+          
+          <!-- Fecha Fin Column -->
+          <ng-container matColumnDef="fechaFin">
+            <th mat-header-cell *matHeaderCellDef>Vencimiento</th>
+            <td mat-cell *matCellDef="let contrato">{{ formatearFecha(contrato.fechaFin) }}</td>
+          </ng-container>
+          
+          <!-- Estado Column -->
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <td mat-cell *matCellDef="let contrato">
+              <mat-chip [color]="getEstadoColor(contrato.estado)" selected>
+                {{ contrato.estado }}
+              </mat-chip>
+            </td>
+          </ng-container>
+          
+          <!-- Acciones Column -->
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let contrato">
+              <div class="action-buttons">
+                <button 
+                  mat-icon-button 
+                  color="primary" 
+                  matTooltip="Editar contrato"
+                  [disabled]="contrato.estado === 'CANCELADO'"
+                  (click)="editarContrato(contrato)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                
+                <button 
+                  mat-icon-button 
+                  color="warn" 
+                  matTooltip="Cancelar contrato"
+                  [disabled]="contrato.estado === 'CANCELADO'"
+                  (click)="desactivarContrato(contrato)">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+          
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr 
+            mat-row 
+            *matRowDef="let row; columns: displayedColumns;" 
+            [ngClass]="{'cancelled-row': row.estado === 'CANCELADO'}">
+          </tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
 </div>

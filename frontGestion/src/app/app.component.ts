@@ -44,5 +44,5 @@ export class AppComponent {
     return this.router.url === '/login';
   }
 
-  title = 'frontGestion';
+  title = 'Gestion de Seguros';
 }

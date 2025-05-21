@@ -1,140 +1,121 @@
-<!-- Fondo oscuro para el modal -->
-<div class="modal-backdrop" (click)="cancelar()"></div>
+<form #contratoForm="ngForm" (ngSubmit)="guardarContrato()" class="contrato-form">
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title>
+        {{ contrato?.id ? 'Editar Contrato #' + contrato?.id : 'Nuevo Contrato' }}
+      </mat-card-title>
+    </mat-card-header>
 
-<!-- Ventana modal centrada -->
-<div class="modal-container">
-  <h2>{{ contrato?.id ? "Editar Contrato" : "Contratar Seguro" }}</h2>
-
-  <form (ngSubmit)="guardarContrato()">
-    <!-- SEGURO -->
-    <div class="form-group">
-      <label for="seguro">Seguro</label>
-      <select
-        id="seguro"
-        [(ngModel)]="contrato!.seguroId"
-        name="seguroId"
-        required
-      >
-        <option *ngFor="let seguro of seguros" [value]="seguro.id">
-          {{ seguro.nombre }} - {{ seguro.tipo }}
-        </option>
-      </select>
-    </div>
-
-    <!-- AGENTE -->
-    <div class="form-group">
-      <label for="agente">Agente</label>
-      <select
-        id="agente"
-        [(ngModel)]="contrato!.agenteId"
-        name="agenteId"
-        required
-      >
-        <option *ngFor="let agente of agentes" [value]="agente.id">
-          {{ agente.nombre }} {{ agente.apellido }}
-        </option>
-      </select>
-    </div>
-
-    <!-- FECHAS -->
-    <div class="form-group">
-      <label for="fechaInicio">Fecha de Inicio</label>
-      <input
-        type="date"
-        id="fechaInicio"
-        [(ngModel)]="contrato!.fechaInicio"
-        name="fechaInicio"
-        required
-      />
-    </div>
-
-    <div class="form-group">
-      <label for="fechaFin">Fecha de Fin</label>
-      <input
-        type="date"
-        id="fechaFin"
-        [(ngModel)]="contrato!.fechaFin"
-        name="fechaFin"
-        required
-      />
-    </div>
-
-    <!-- FRECUENCIA DE PAGO -->
-    <div class="form-group">
-      <label for="frecuenciaPago">Frecuencia de Pago</label>
-      <select
-        id="frecuenciaPago"
-        [(ngModel)]="contrato!.frecuenciaPago"
-        name="frecuenciaPago"
-        required
-      >
-        <option value="MENSUAL">Mensual</option>
-        <option value="TRIMESTRAL">Trimestral</option>
-        <option value="ANUAL">Anual</option>
-      </select>
-    </div>
-
-    <!-- ESTADO -->
-    <div class="form-group" *ngIf="contrato?.id">
-      <label for="estado">Estado</label>
-      <select
-        id="estado"
-        [(ngModel)]="contrato!.estado"
-        name="estado"
-        [disabled]="contrato!.estado === 'ACTIVO'"
-      >
-        <option value="ACTIVO">Activo</option>
-        <option value="CANCELADO">Cancelado</option>
-      </select>
-    </div>
-
-    <!-- BENEFICIARIOS -->
-    <div class="form-group">
-      <label>Beneficiarios</label>
-      <div *ngFor="let b of contrato!.beneficiarios; let i = index">
-        <input
-          type="text"
-          [(ngModel)]="b.nombre"
-          name="beneficiarioNombre{{ i }}"
-          placeholder="Nombre"
-          required
-        />
-        <input
-          type="text"
-          [(ngModel)]="b.parentesco"
-          name="beneficiarioParentesco{{ i }}"
-          placeholder="Parentesco"
-          required
-        />
-        <input
-          type="number"
-          [(ngModel)]="b.porcentaje"
-          name="beneficiarioPorcentaje{{ i }}"
-          placeholder="%"
-          required
-        />
-        <button type="button" (click)="eliminarBeneficiario(i)">
-          Eliminar
-        </button>
+    <mat-card-content>
+      <div class="loading-overlay" *ngIf="loading">
+        <mat-spinner [diameter]="50"></mat-spinner>
       </div>
-      <button type="button" (click)="agregarBeneficiario()">
-        + Añadir Beneficiario
-      </button>
-    </div>
 
-    <!-- BOTONES -->
-    <div class="d-flex gap-2 mt-3 justify-content-end">
-      <button
-        type="submit"
-        class="btn"
-        [ngClass]="contrato?.id ? 'btn-primary' : 'btn-success'"
-      >
-        {{ contrato?.id ? "Actualizar Contrato" : "Contratar" }}
-      </button>
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Seguro</mat-label>
+          <mat-select [(ngModel)]="contrato!.seguroId" name="seguroId" required>
+            <mat-option *ngFor="let seguro of seguros" [value]="seguro.id">
+              {{ seguro.nombre }} - {{ seguro.descripcion }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix>policy</mat-icon>
+        </mat-form-field>
+      </div>
 
-      <button type="button" class="btn btn-secondary" (click)="cancelar()">
-        Cancelar
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Agente Asignado</mat-label>
+          <mat-select [(ngModel)]="contrato!.agenteId" name="agenteId" required>
+            <mat-option *ngFor="let agente of agentes" [value]="agente.id">
+              {{ agente.nombre }} {{ agente.apellido }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row date-container">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Fecha de Inicio</mat-label>
+          <input matInput [matDatepicker]="inicioDatePicker" [(ngModel)]="contrato!.fechaInicio" name="fechaInicio" required>
+          <mat-datepicker-toggle matSuffix [for]="inicioDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #inicioDatePicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Fecha de Fin</mat-label>
+          <input matInput [matDatepicker]="finDatePicker" [(ngModel)]="contrato!.fechaFin" name="fechaFin" required>
+          <mat-datepicker-toggle matSuffix [for]="finDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #finDatePicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Frecuencia de Pago</mat-label>
+          <mat-select [(ngModel)]="contrato!.frecuenciaPago" name="frecuenciaPago" required>
+            <mat-option value="MENSUAL">Mensual</mat-option>
+            <mat-option value="TRIMESTRAL">Trimestral</mat-option>
+            <mat-option value="SEMESTRAL">Semestral</mat-option>
+            <mat-option value="ANUAL">Anual</mat-option>
+          </mat-select>
+          <mat-icon matSuffix>calendar_today</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <mat-divider class="margin-y"></mat-divider>
+
+      <div class="beneficiarios-section">
+        <h3>Beneficiarios</h3>
+        <div *ngIf="contrato?.beneficiarios?.length === 0" class="no-beneficiarios">
+          <p>No hay beneficiarios registrados</p>
+        </div>
+
+        <div *ngFor="let beneficiario of contrato!.beneficiarios; let i = index" class="beneficiario-container">
+          <div class="beneficiario-header">
+            <h4>Beneficiario #{{i + 1}}</h4>
+            <button type="button" mat-icon-button color="warn" (click)="eliminarBeneficiario(i)" aria-label="Eliminar beneficiario">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+
+          <div class="form-row beneficiario-row">
+            <mat-form-field appearance="outline" class="beneficiario-field">
+              <mat-label>Nombre</mat-label>
+              <input matInput [(ngModel)]="beneficiario.nombre" name="nombre{{i}}" required>
+              <mat-icon matSuffix>person</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="beneficiario-field">
+              <mat-label>Parentesco</mat-label>
+              <input matInput [(ngModel)]="beneficiario.parentesco" name="parentesco{{i}}" required>
+              <mat-icon matSuffix>family_restroom</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="beneficiario-field beneficiario-porcentaje">
+              <mat-label>Porcentaje</mat-label>
+              <input matInput type="number" min="1" max="100" [(ngModel)]="beneficiario.porcentaje" name="porcentaje{{i}}" required>
+              <span matSuffix>%</span>
+            </mat-form-field>
+          </div>
+          
+          <mat-divider *ngIf="i < contrato!.beneficiarios.length - 1" class="margin-y"></mat-divider>
+        </div>
+
+        <div class="add-beneficiario">
+          <button type="button" mat-stroked-button color="primary" (click)="agregarBeneficiario()">
+            <mat-icon>add</mat-icon> Agregar Beneficiario
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <button type="button" mat-button color="warn" (click)="cancelar()">Cancelar</button>
+      <button type="submit" mat-raised-button color="primary" [disabled]="loading">
+        <mat-icon>save</mat-icon> Guardar
       </button>
-    </div>
-  </form>
-</div>
+    </mat-card-actions>
+  </mat-card>
+</form>

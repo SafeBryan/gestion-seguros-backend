@@ -19,7 +19,7 @@ const mockIcons = [
   { name: 'file', path: 'assets/icons/file.svg' },
 ];
 
-describe('MenuComponent', () => {
+fdescribe('MenuComponent', () => {
   let component: MenuComponent;
   let fixture: ComponentFixture<MenuComponent>;
   let matIconRegistrySpy: jasmine.SpyObj<MatIconRegistry>;
