@@ -1,57 +1,88 @@
-.container {
-  background-color: #ffffff;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+.contratos-list-container {
+  position: relative;
 }
 
-h2 {
-  font-size: 1.4rem;
-  margin-bottom: 1rem;
-  color: #333;
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
 }
 
-.table {
+.no-contratos {
+  text-align: center;
+  padding: 40px 0;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.no-data-icon {
+  font-size: 48px;
+  height: 48px;
+  width: 48px;
+  margin-top: 16px;
+  opacity: 0.6;
+}
+
+.table-container {
+  overflow-x: auto;
+  margin-top: 16px;
+}
+
+.contratos-table {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
 }
 
-.table thead {
-  background-color: #004085;
-  color: white;
+.action-buttons {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 }
 
-.table th,
-.table td {
-  padding: 0.75rem;
-  text-align: left;
-  border: 1px solid #dee2e6;
+.action-buttons button {
+  margin-right: 8px;
 }
 
-ul {
-  padding-left: 1.2rem;
-  margin: 0;
+.seguro-info {
+  font-weight: 500;
 }
 
-.btn-sm {
-  padding: 0.3rem 0.6rem;
-  font-size: 0.85rem;
-  border-radius: 4px;
+.cancelled-row {
+  background-color: rgba(0, 0, 0, 0.04);
+  opacity: 0.8;
 }
 
-.btn-warning {
-  background-color: #ffc107;
-  border: none;
-  color: black;
+mat-chip {
+  min-height: 24px;
+  font-size: 12px;
 }
 
-.btn-danger {
-  background-color: #dc3545;
-  border: none;
-  color: white;
+/* Responsive styles */
+@media (max-width: 768px) {
+  .contratos-table .mat-column-id,
+  .contratos-table .mat-column-fechaInicio {
+    max-width: 80px;
+  }
+  
+  .contratos-table .mat-column-acciones {
+    max-width: 100px;
+  }
 }
 
-.text-muted {
-  color: #6c757d;
+@media (max-width: 576px) {
+  .contratos-table .mat-column-id,
+  .contratos-table .mat-column-fechaInicio,
+  .contratos-table .mat-column-fechaFin {
+    max-width: 70px;
+    padding: 0 8px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .action-buttons button {
+    margin-right: 0;
+    margin-bottom: 4px;
+  }
 }

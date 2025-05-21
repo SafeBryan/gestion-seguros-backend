@@ -217,6 +217,8 @@ table {
 .form-row {
   display: flex;
   gap: 16px;
+  padding-bottom: 10px;
+  padding-top: 5px;
 }
 
 .form-row mat-form-field {

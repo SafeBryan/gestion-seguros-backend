@@ -1,110 +1,117 @@
-/* Modal Backdrop */
-.modal-backdrop {
-  position: fixed;
+.contrato-form {
+  position: relative;
+
+}
+
+.form-card {
+  margin-bottom: 20px;
+  position: relative;
+
+}
+
+.loading-overlay {
+  position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
-  z-index: 1000;
-}
-
-/* Modal Box */
-.modal-container {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #f8f9fa;
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-  width: 90%;
-  max-width: 600px;
-  z-index: 1001;
-}
-
-h2 {
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
-  color: #004085;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 0.3rem;
-  color: #333;
-}
-
-input[type='text'],
-input[type='number'],
-input[type='date'],
-select {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  font-size: 0.95rem;
-}
-
-button {
-  padding: 0.45rem 1rem;
-  border-radius: 4px;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-button.btn-success {
-  background-color: #28a745;
-  color: white;
-  border: none;
-}
-
-button.btn-primary {
-  background-color: #007bff;
-  color: white;
-  border: none;
-}
-
-button.btn-secondary {
-  background-color: #6c757d;
-  color: white;
-  border: none;
-}
-
-button[type='button'] {
-  margin-top: 0.5rem;
-}
-
-.d-flex {
+  right: 0;
+  bottom: 0;
   display: flex;
-  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 10;
 }
 
-.justify-content-end {
-  justify-content: flex-end;
+.form-row {
+  margin-bottom: 16px;
 }
-.modal-container {
-  position: fixed;
-  top: 5%;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #f8f9fa;
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-  width: 90%;
-  max-width: 600px;
-  max-height: 90vh; /* 👈 límite de altura en pantallas pequeñas */
-  overflow-y: auto;  /* 👈 agrega scroll interno */
-  z-index: 1001;
+
+.full-width {
+  width: 100%;
 }
-body, html {
-  height: 100%;
-  overflow: hidden; /* opcional: evitar scroll de fondo */
+
+.date-container {
+  display: flex;
+  gap: 16px;
+}
+
+.half-width {
+  width: 50%;
+}
+
+.margin-y {
+  margin: 24px 0;
+}
+
+.beneficiarios-section {
+  margin-top: 16px;
+}
+
+.no-beneficiarios {
+  font-style: italic;
+  color: rgba(0, 0, 0, 0.54);
+  text-align: center;
+  padding: 16px 0;
+}
+
+.beneficiario-container {
+  margin-bottom: 16px;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.beneficiario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.beneficiario-header h4 {
+  margin: 0;
+}
+
+.beneficiario-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.beneficiario-field {
+  flex: 1;
+  min-width: 120px;
+}
+
+.beneficiario-porcentaje {
+  max-width: 100px;
+}
+
+.add-beneficiario {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+mat-card-actions {
+  padding: 16px;
+}
+
+@media (max-width: 600px) {
+  .date-container {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .half-width {
+    width: 100%;
+  }
+  
+  .beneficiario-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .beneficiario-porcentaje {
+    max-width: 100%;
+  }
 }
