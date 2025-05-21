@@ -49,6 +49,9 @@ import { MatBadgeModule } from '@angular/material/badge';
   styleUrls: ['./seguros.component.css'],
 })
 export class SegurosComponent implements OnInit {
+  /*mostrarModal(mostrarModal: any) {
+    throw new Error('Method not implemented.');
+  }*/
   seguros: Seguro[] = [];
   segurosActivos: Seguro[] = [];
   segurosInactivos: Seguro[] = [];
@@ -59,6 +62,7 @@ export class SegurosComponent implements OnInit {
   dialogRef: MatDialogRef<any> | null = null;
   
   @ViewChild('dialogTemplate') dialogTemplate!: TemplateRef<any>;
+  nuevoSeguro: any;
 
   constructor(
     private seguroService: SeguroService,

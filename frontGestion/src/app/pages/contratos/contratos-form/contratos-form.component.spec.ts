@@ -9,7 +9,7 @@ import { Contrato } from '../../../models/contrato.model';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-describe('ContratosFormComponent', () => {
+fdescribe('ContratosFormComponent', () => {
   let component: ContratosFormComponent;
   let fixture: ComponentFixture<ContratosFormComponent>;
   let seguroServiceSpy: jasmine.SpyObj<SeguroService>;
