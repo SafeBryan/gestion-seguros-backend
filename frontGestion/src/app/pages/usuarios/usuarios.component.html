@@ -1,0 +1,100 @@
+<div class="container mt-5  mb-5 p-3">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Usuarios</h2>
+    <button class="btn btn-primary" (click)="crearUsuario()">Nuevo Usuario</button>
+  </div>
+
+  <div *ngIf="loading" class="text-center">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p>Cargando usuarios...</p>
+  </div>
+
+  <table *ngIf="!loading && usuarios.length > 0" class="table table-striped table-bordered">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>Email</th>
+        <th>Teléfono</th>
+        <th>Rol</th>
+        <th>Activo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let usuario of usuarios; trackBy: trackByUsuarioId">
+        <td>{{ usuario.id }}</td>
+        <td>{{ usuario.nombre }}</td>
+        <td>{{ usuario.apellido }}</td>
+        <td>{{ usuario.email }}</td>
+        <td>{{ usuario.telefono }}</td>
+        <td>{{ usuario.rolNombre }}</td>
+        <td>
+          <span class="badge" [ngClass]="usuario.activo ? 'bg-success' : 'bg-secondary'">
+            {{ usuario.activo ? 'Activo' : 'Inactivo' }}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-sm btn-warning me-2" (click)="editarUsuario(usuario)">
+            Editar
+          </button>
+          <button class="btn btn-sm btn-danger" (click)="eliminarUsuario(usuario)">
+            Eliminar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Modal para crear usuario -->
+  <div class="modal fade show d-block" tabindex="-1" role="dialog" *ngIf="mostrarModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ modoEdicion ? 'Editar Usuario' : 'Nuevo Usuario' }}</h5>
+          <button type="button" class="btn-close" aria-label="Close" (click)="cerrarModal()"></button>
+        </div>
+        <div class="modal-body">
+          <form #form="ngForm">
+            <div class="mb-3">
+              <label>Email</label>
+              <input class="form-control" [(ngModel)]="nuevoUsuario.email" name="email" required />
+            </div>
+            <div class="mb-3">
+              <label>Contraseña{{ !modoEdicion ? '*' : ' (dejar en blanco para mantener)' }}</label>
+              <input type="password" class="form-control" [(ngModel)]="nuevoUsuario.password" 
+                     name="password" [required]="!modoEdicion" />
+            </div>
+            <div class="mb-3">
+              <label>Nombre</label>
+              <input class="form-control" [(ngModel)]="nuevoUsuario.nombre" name="nombre" required />
+            </div>
+            <div class="mb-3">
+              <label>Apellido</label>
+              <input class="form-control" [(ngModel)]="nuevoUsuario.apellido" name="apellido" required />
+            </div>
+            <div class="mb-3">
+              <label>Teléfono</label>
+              <input class="form-control" [(ngModel)]="nuevoUsuario.telefono" name="telefono" />
+            </div>
+            <div class="mb-3">
+              <label>Rol</label>
+              <select class="form-select" [(ngModel)]="nuevoUsuario.rolId" name="rolId" required>
+                <option [ngValue]="0" disabled>Seleccione un rol</option>
+                <option *ngFor="let rol of roles" [ngValue]="rol.id">{{ rol.nombre }}</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+          <button class="btn btn-primary" (click)="guardarUsuario()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fondo oscuro del modal -->
+  <div class="modal-backdrop fade show" *ngIf="mostrarModal"></div>
+</div>

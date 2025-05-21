@@ -1,0 +1,68 @@
+/* Establecer tamaño completo y eliminar márgenes */
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden; /* Evita scroll innecesario */
+  }
+  
+  /* Contenedor principal */
+  .drawer-container {
+    height: 100vh; /* 100% del alto de la pantalla */
+    width: 100vw;  /* 100% del ancho de la pantalla */
+    display: flex;
+  }
+  
+  /* Menú lateral (Drawer) */
+  .drawer {
+    width: 280px; /* Ancho fijo del drawer */
+    max-width: 280px;
+    background: #3fa0bdcd; /* Color de fondo del menú */
+    position: fixed;
+    top: 64px; /* Se coloca debajo del header */
+    height: calc(100vh - 64px); /* Ocupa el resto de la pantalla */
+    overflow-y: auto; /* Permite scroll si el menú es muy largo */
+    border-radius: 0; /* Evita bordes redondeados */
+    z-index: 1001; /* Asegura que esté sobre el contenido */
+    align-items: stretch; /* Alinea los elementos para ocupar todo el ancho */
+  }
+  
+  /* Contenido principal */
+  mat-drawer-content {
+    flex: 1;
+    overflow-y: auto;
+    margin-top: 64px;
+    padding: 1rem; /* Agrega algo de espacio interno */
+  
+    /* REMUEVE: display, justify-content, align-items, height */
+    background-color: rgba(255, 255, 255, 0.589);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    image-rendering: crisp-edges;
+  }
+  
+  
+  /* Estilos del encabezado de opciones en el menú */
+  .opciones {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 24px;
+    background-color: #004c67b5;
+    color: white    ;
+    height: 64px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  /* Estilo del texto en opciones */
+  .opciones h3 {
+    margin: 0;
+    line-height: 64px;
+  }
+  
+  /* Ajuste general para mejorar la visualización */
+  button {
+    cursor: pointer;
+  }
+  

@@ -41,7 +41,9 @@ public class SeguroService {
     public List<Seguro> obtenerSegurosActivos() {
         return seguroRepository.findByActivoTrue();
     }
-
+    public List<Seguro> obtenerTodosLosSeguros() {
+        return seguroRepository.findAll();
+    }
     public List<Seguro> obtenerSegurosPorTipo(Seguro.TipoSeguro tipo) {
         return seguroRepository.findByTipo(tipo);
     }

@@ -85,4 +85,39 @@ public class UsuarioService {
         return usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
+    @Transactional
+    public Usuario actualizarUsuario(Long usuarioId, UsuarioDTO usuarioDTO) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        usuario.setNombre(usuarioDTO.getNombre());
+        usuario.setApellido(usuarioDTO.getApellido());
+        usuario.setTelefono(usuarioDTO.getTelefono());
+
+        // Actualizar el email solo si es diferente y no existe en otro usuario
+        if (!usuario.getEmail().equals(usuarioDTO.getEmail())) {
+            if (usuarioRepository.existsByEmail(usuarioDTO.getEmail())) {
+                throw new RuntimeException("El email ya está registrado");
+            }
+            usuario.setEmail(usuarioDTO.getEmail());
+        }
+
+        // Actualizar el rol si es necesario
+        if (!usuario.getRol().getId().equals(usuarioDTO.getRolId())) {
+            Rol rol = rolRepository.findById(usuarioDTO.getRolId())
+                    .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
+            usuario.setRol(rol);
+        }
+
+        return usuarioRepository.save(usuario);
+    }
+
+    @Transactional
+    public void eliminarUsuario(Long usuarioId) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        // Opción 2: Eliminación lógica (desactivar el usuario)
+         usuario.setActivo(false);
+         usuarioRepository.save(usuario);
+    }
 }
