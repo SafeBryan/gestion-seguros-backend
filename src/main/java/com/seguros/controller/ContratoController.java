@@ -62,4 +62,8 @@ public class ContratoController {
         return ResponseEntity.ok(dto);
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
 }
