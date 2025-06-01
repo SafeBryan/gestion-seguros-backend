@@ -6,6 +6,7 @@ import { SegurosComponent } from './pages/seguros/seguros.component';
 import { UsuariosComponent } from './pages/usuarios/usuarios.component';
 import { ContratosListComponent } from './pages/contratos/contratos-list/contratos-list.component';
 import { ContratosPageComponent } from './pages/contratos/contratos-page/contratos-page.component';
+import { ClientesListComponent } from './pages/clientes/clientes-list/clientes-list.component';
 
 export const routes: Routes = [
   {
@@ -35,6 +36,11 @@ export const routes: Routes = [
   {
     path: 'contratos',
     component: ContratosPageComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'clientes',
+    component: ClientesListComponent,
     canActivate: [authGuard],
   },
   {
