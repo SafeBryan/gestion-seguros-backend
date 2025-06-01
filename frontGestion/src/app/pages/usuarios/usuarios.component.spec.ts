@@ -1,33 +1,52 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of, throwError } from 'rxjs';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
 import { UsuariosComponent } from './usuarios.component';
 import { UsuarioService } from '../../core/services/usuario.service';
 import { RolService } from '../../core/services/rol.service';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { of, throwError } from 'rxjs';
 import { Usuario } from '../../models/usuario.model';
-import { Rol } from '../../models/rol.model';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
 
 describe('UsuariosComponent', () => {
   let component: UsuariosComponent;
   let fixture: ComponentFixture<UsuariosComponent>;
   let mockUsuarioService: jasmine.SpyObj<UsuarioService>;
   let mockRolService: jasmine.SpyObj<RolService>;
+  let mockDialog: jasmine.SpyObj<MatDialog>;
+  let mockSnackBar: jasmine.SpyObj<MatSnackBar>;
 
-  const mockUsuario: Usuario = {
-    id: 1,
-    email: 'test@test.com',
-    nombre: 'Bryan',
-    apellido: 'Pazmiño',
-    telefono: '123456789',
-    rolId: 2,
-    rolNombre: 'CLIENTE',
-    activo: true,
-  };
+  const usuariosMock: Usuario[] = [
+    {
+      id: 1,
+      nombre: 'Juan',
+      apellido: 'Pérez',
+      email: 'juan@test.com',
+      telefono: '123',
+      rolId: 1,
+      rolNombre: 'Admin',
+      activo: true,
+    },
+    {
+      id: 2,
+      nombre: 'Ana',
+      apellido: 'Gómez',
+      email: 'ana@test.com',
+      telefono: '456',
+      rolId: 2,
+      rolNombre: 'Usuario',
+      activo: true,
+    },
+  ];
 
-  const mockRol: Rol = {
-    id: 2,
-    nombre: 'CLIENTE',
-  };
+  const rolesMock = [
+    { id: 1, nombre: 'Admin' },
+    { id: 2, nombre: 'Usuario' },
+  ];
 
   beforeEach(async () => {
     mockUsuarioService = jasmine.createSpyObj('UsuarioService', [
@@ -36,201 +55,263 @@ describe('UsuariosComponent', () => {
       'editar',
       'eliminar',
     ]);
+
     mockRolService = jasmine.createSpyObj('RolService', ['obtenerTodos']);
+
+    mockDialog = {
+      open: jasmine
+        .createSpy('open')
+        .and.returnValue({ afterClosed: () => of(null) } as any),
+      closeAll: jasmine.createSpy('closeAll'), // ahora es un espía seguro
+    } as jasmine.SpyObj<MatDialog>;
+
+    mockSnackBar = jasmine.createSpyObj('MatSnackBar', ['open']);
 
     await TestBed.configureTestingModule({
       imports: [UsuariosComponent],
       providers: [
         { provide: UsuarioService, useValue: mockUsuarioService },
         { provide: RolService, useValue: mockRolService },
+        { provide: MatDialog, useValue: mockDialog },
+        { provide: MatSnackBar, useValue: mockSnackBar },
       ],
-      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(UsuariosComponent);
     component = fixture.componentInstance;
   });
 
-  it('debería crearse correctamente', () => {
+  it('debe crear el componente', () => {
     expect(component).toBeTruthy();
   });
 
-  it('debería cargar usuarios y roles en ngOnInit', () => {
-    mockUsuarioService.obtenerTodos.and.returnValue(of([mockUsuario]));
-    mockRolService.obtenerTodos.and.returnValue(of([mockRol]));
-    fixture.detectChanges();
+  it('debe cargar usuarios y roles al iniciar', fakeAsync(() => {
+    mockUsuarioService.obtenerTodos.and.returnValue(of(usuariosMock));
+    mockRolService.obtenerTodos.and.returnValue(of(rolesMock));
 
-    expect(component.usuarios.length).toBe(1);
-    expect(component.roles.length).toBe(1);
-    expect(component.loading).toBeFalse();
-  });
+    component.ngOnInit();
+    tick();
 
-  it('debería manejar error al cargar usuarios', () => {
+    expect(mockUsuarioService.obtenerTodos).toHaveBeenCalled();
+    expect(mockRolService.obtenerTodos).toHaveBeenCalled();
+    expect(component.usuarios.length).toBe(2);
+    expect(component.roles.length).toBe(2);
+  }));
+
+  it('debe manejar error al cargar usuarios', fakeAsync(() => {
     spyOn(console, 'error');
+    const notificacionSpy = spyOn(component as any, 'mostrarNotificacion');
+
     mockUsuarioService.obtenerTodos.and.returnValue(
-      throwError(() => new Error('Error usuarios'))
+      throwError(() => new Error('Error de red'))
     );
-    component.cargarUsuarios();
-    expect(console.error).toHaveBeenCalled();
+    mockRolService.obtenerTodos.and.returnValue(of([]));
+
+    component.ngOnInit();
+    tick();
+
     expect(component.loading).toBeFalse();
-  });
-
-  it('debería manejar error al cargar roles', () => {
-    spyOn(console, 'error');
-    mockRolService.obtenerTodos.and.returnValue(
-      throwError(() => new Error('Error roles'))
+    expect(notificacionSpy).toHaveBeenCalledWith(
+      'Error al cargar usuarios',
+      'error'
     );
-    component.cargarRoles();
-    expect(console.error).toHaveBeenCalled();
+  }));
+
+  it('debe aplicar filtro correctamente', () => {
+    component.dataSource.data = usuariosMock;
+    const inputEvent = { target: { value: 'juan' } } as unknown as Event;
+    component.applyFilter(inputEvent);
+    expect(component.dataSource.filter).toBe('juan');
   });
 
-  it('debería devolver el id en trackByUsuarioId', () => {
-    expect(component.trackByUsuarioId(0, mockUsuario)).toBe(1);
+  it('debe configurar modo de edición y abrir diálogo al editar', () => {
+    const usuario = usuariosMock[0];
+    spyOn(component as any, 'abrirDialog');
+
+    component.editarUsuario(usuario);
+
+    expect(component.modoEdicion).toBeTrue();
+    expect(component.usuarioEditando).toEqual(usuario);
+    expect(component['abrirDialog']).toHaveBeenCalled();
   });
 
-  it('debería preparar la vista para crear un nuevo usuario', () => {
+  it('debe retornar el id del usuario en trackByUsuarioId', () => {
+    const id = component.trackByUsuarioId(0, usuariosMock[0]);
+    expect(id).toBe(1);
+  });
+
+  it('debe reiniciar el formulario y abrir diálogo al crear usuario', () => {
+    spyOn(component as any, 'abrirDialog');
+
     component.crearUsuario();
-    expect(component.mostrarModal).toBeTrue();
+
     expect(component.modoEdicion).toBeFalse();
     expect(component.usuarioEditando).toBeNull();
+    expect(component.nuevoUsuario.email).toBe('');
+    expect(component['abrirDialog']).toHaveBeenCalled();
   });
 
-  it('debería cerrar el modal y resetear los datos al cerrarModal()', () => {
-    component.mostrarModal = true;
-    component.modoEdicion = true;
-    component.usuarioEditando = mockUsuario;
-
-    component.cerrarModal();
-
-    expect(component.mostrarModal).toBeFalse();
-    expect(component.modoEdicion).toBeFalse();
-    expect(component.usuarioEditando).toBeNull();
+  it('debe retornar clases correctas según el rol', () => {
+    expect(component.getRoleClass('Admin')).toBe('role-admin');
+    expect(component.getRoleClass('Medico')).toBe('role-medico');
+    expect(component.getRoleClass('Usuario')).toBe('role-usuario');
+    expect(component.getRoleClass('Otro')).toBe('role-default');
+    expect(component.getRoleClass('')).toBe('role-default');
   });
 
-  it('debería crear un usuario nuevo', () => {
-    spyOn(window, 'alert');
-    mockUsuarioService.crear.and.returnValue(of(mockUsuario));
-    mockUsuarioService.obtenerTodos.and.returnValue(of([mockUsuario]));
+  it('debe crear usuario correctamente y mostrar notificación', fakeAsync(() => {
+    mockUsuarioService.crear.and.returnValue(of(usuariosMock[0]));
+    const notificacionSpy = spyOn(component as any, 'mostrarNotificacion');
+    spyOn(component, 'cargarUsuarios');
 
+    // 💡 Sustituir método `closeAll` directamente
+    component['dialog'].closeAll = jasmine.createSpy('closeAll');
+
+    component.modoEdicion = false;
     component.nuevoUsuario = {
-      email: 'nuevo@test.com',
-      password: '123456',
-      nombre: 'Nuevo',
-      apellido: 'User',
-      telefono: '000000',
-      rolId: 2,
+      email: usuariosMock[0].email,
+      password: '123',
+      nombre: usuariosMock[0].nombre,
+      apellido: usuariosMock[0].apellido,
+      telefono: usuariosMock[0].telefono || '',
+      rolId: usuariosMock[0].rolId,
     };
 
     component.guardarUsuario();
+    tick();
 
     expect(mockUsuarioService.crear).toHaveBeenCalled();
-    expect(window.alert).toHaveBeenCalledWith('Usuario creado correctamente');
-  });
+    expect(component.cargarUsuarios).toHaveBeenCalled();
+    expect(component['dialog'].closeAll).toHaveBeenCalled();
+    expect(notificacionSpy).toHaveBeenCalledWith(
+      'Usuario creado correctamente',
+      'success'
+    );
+  }));
 
-  it('debería manejar error al crear usuario', () => {
-    spyOn(console, 'error');
-    spyOn(window, 'alert');
+  it('debe manejar error al crear usuario', fakeAsync(() => {
     mockUsuarioService.crear.and.returnValue(
-      throwError(() => new Error('Error'))
+      throwError(() => new Error('Falló'))
     );
-    component.guardarUsuario();
-    expect(console.error).toHaveBeenCalled();
-    expect(window.alert).toHaveBeenCalledWith('Error al crear usuario');
-  });
+    const notificacionSpy = spyOn(component as any, 'mostrarNotificacion');
 
-  it('debería editar un usuario existente', () => {
-    spyOn(window, 'alert');
-    mockUsuarioService.editar.and.returnValue(of(mockUsuario));
-    mockUsuarioService.obtenerTodos.and.returnValue(of([mockUsuario]));
-
-    component.modoEdicion = true;
-    component.usuarioEditando = mockUsuario;
+    component.modoEdicion = false;
     component.nuevoUsuario = {
-      email: 'editado@test.com',
-      password: '',
-      nombre: 'Editado',
-      apellido: 'User',
-      telefono: '111111',
-      rolId: 2,
+      email: usuariosMock[0].email,
+      password: '123',
+      nombre: usuariosMock[0].nombre,
+      apellido: usuariosMock[0].apellido,
+      telefono: usuariosMock[0].telefono || '',
+      rolId: usuariosMock[0].rolId,
     };
 
     component.guardarUsuario();
+    tick();
 
-    expect(mockUsuarioService.editar).toHaveBeenCalled();
-    expect(window.alert).toHaveBeenCalledWith(
-      'Usuario actualizado correctamente'
+    expect(notificacionSpy).toHaveBeenCalledWith(
+      'Error al crear usuario',
+      'error'
+    );
+  }));
+  it('debe llamar snackBar.open al mostrarNotificacion()', () => {
+    component['snackBar'].open = jasmine.createSpy('open');
+    component['mostrarNotificacion']('Mensaje prueba', 'error');
+
+    expect(component['snackBar'].open).toHaveBeenCalledWith(
+      'Mensaje prueba',
+      'Cerrar',
+      {
+        duration: 3000,
+        panelClass: ['error-snackbar'],
+      }
     );
   });
+  it('debe usar clase correcta para notificación success', () => {
+    component['snackBar'].open = jasmine.createSpy('open');
+    component['mostrarNotificacion']('Creado con éxito', 'success');
 
-  it('debería manejar error al editar usuario', () => {
-    spyOn(console, 'error');
-    spyOn(window, 'alert');
+    expect(component['snackBar'].open).toHaveBeenCalledWith(
+      'Creado con éxito',
+      'Cerrar',
+      {
+        duration: 3000,
+        panelClass: ['success-snackbar'],
+      }
+    );
+  });
+  it('debe ejecutar guardarUsuario si el resultado es "save" al cerrar el diálogo', () => {
+    const guardarSpy = spyOn(component, 'guardarUsuario');
+
+    // Simula dialog.open().afterClosed() → "save"
+    const dialogRefMock = {
+      afterClosed: () => of('save'),
+    } as any;
+
+    component['dialogTemplate'] = {} as any;
+    component['dialog'] = {
+      open: jasmine.createSpy().and.returnValue(dialogRefMock),
+    } as any;
+
+    component['abrirDialog']();
+
+    expect(component['dialog'].open).toHaveBeenCalled();
+    expect(guardarSpy).toHaveBeenCalled();
+  });
+  it('debe editar usuario correctamente', fakeAsync(() => {
+    mockUsuarioService.editar.and.returnValue(of(usuariosMock[0]));
+    const notificacionSpy = spyOn(component as any, 'mostrarNotificacion');
+    spyOn(component, 'cargarUsuarios');
+    component['dialog'].closeAll = jasmine.createSpy();
 
     component.modoEdicion = true;
-    component.usuarioEditando = mockUsuario;
+    component.usuarioEditando = usuariosMock[0];
     component.nuevoUsuario = {
-      email: 'editado@test.com',
-      password: '',
-      nombre: 'Editado',
-      apellido: 'User',
-      telefono: '111111',
-      rolId: 2,
+      email: usuariosMock[0].email,
+      password: '123',
+      nombre: usuariosMock[0].nombre,
+      apellido: usuariosMock[0].apellido,
+      telefono: usuariosMock[0].telefono!,
+      rolId: usuariosMock[0].rolId,
     };
 
+    component.guardarUsuario();
+    tick();
+
+    expect(mockUsuarioService.editar).toHaveBeenCalledWith(
+      1,
+      jasmine.any(Object)
+    );
+    expect(component.cargarUsuarios).toHaveBeenCalled();
+    expect(component['dialog'].closeAll).toHaveBeenCalled();
+    expect(notificacionSpy).toHaveBeenCalledWith(
+      'Usuario editado correctamente',
+      'success'
+    );
+  }));
+  it('debe manejar error al editar usuario', fakeAsync(() => {
     mockUsuarioService.editar.and.returnValue(
-      throwError(() => new Error('Error'))
+      throwError(() => new Error('Fallo'))
     );
+    const notificacionSpy = spyOn(component as any, 'mostrarNotificacion');
+    component.modoEdicion = true;
+    component.usuarioEditando = usuariosMock[0];
+    component.nuevoUsuario = {
+      email: usuariosMock[0].email,
+      password: '123',
+      nombre: usuariosMock[0].nombre,
+      apellido: usuariosMock[0].apellido,
+      telefono: usuariosMock[0].telefono!,
+      rolId: usuariosMock[0].rolId,
+    };
+
     component.guardarUsuario();
+    tick();
 
-    expect(console.error).toHaveBeenCalled();
-    expect(window.alert).toHaveBeenCalledWith('Error al actualizar usuario');
-  });
-
-  it('debería preparar datos para editar usuario', () => {
-    component.editarUsuario(mockUsuario);
-    expect(component.modoEdicion).toBeTrue();
-    expect(component.usuarioEditando).toEqual(mockUsuario);
-    expect(component.mostrarModal).toBeTrue();
-    expect(component.nuevoUsuario.email).toBe(mockUsuario.email);
-  });
-
-  it('debería eliminar un usuario con confirmación', () => {
-    spyOn(window, 'confirm').and.returnValue(true);
-    spyOn(window, 'alert');
-    mockUsuarioService.eliminar.and.returnValue(of(void 0));
-    mockUsuarioService.obtenerTodos.and.returnValue(of([]));
-
-    component.eliminarUsuario(mockUsuario);
-
-    expect(mockUsuarioService.eliminar).toHaveBeenCalledWith(1);
-    expect(window.alert).toHaveBeenCalledWith(
-      'Usuario eliminado correctamente'
+    expect(notificacionSpy).toHaveBeenCalledWith(
+      'Error al editar usuario',
+      'error'
     );
-  });
+  }));
 
-  it('no debería eliminar usuario si se cancela confirmación', () => {
-    spyOn(window, 'confirm').and.returnValue(false);
-    component.eliminarUsuario(mockUsuario);
-    expect(mockUsuarioService.eliminar).not.toHaveBeenCalled();
-  });
-
-  it('debería manejar error al eliminar usuario', () => {
-    spyOn(window, 'confirm').and.returnValue(true);
-    spyOn(console, 'error');
-    spyOn(window, 'alert');
-
-    mockUsuarioService.eliminar.and.returnValue(
-      throwError(() => new Error('Error'))
-    );
-    component.eliminarUsuario(mockUsuario);
-
-    expect(console.error).toHaveBeenCalled();
-    expect(window.alert).toHaveBeenCalledWith('Error al eliminar usuario');
-  });
-
-  it('debería asignar "" a telefono si no está definido al editar usuario', () => {
-    const usuarioSinTelefono = { ...mockUsuario, telefono: undefined };
-    component.editarUsuario(usuarioSinTelefono);
-    expect(component.nuevoUsuario.telefono).toBe('');
-  });
+  
 });

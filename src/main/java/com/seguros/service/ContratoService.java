@@ -10,6 +10,7 @@ import com.seguros.model.*;
 import com.seguros.repository.ContratoRepository;
 import com.seguros.repository.SeguroRepository;
 import com.seguros.repository.UsuarioRepository;
+import com.seguros.util.MensajesError;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
@@ -186,7 +187,8 @@ public class ContratoService {
     @Transactional
     public Contrato actualizarContrato(Long id, ContratoDTO dto) {
         Contrato contrato = contratoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Contrato no encontrado"));
+                .orElseThrow(() -> new RuntimeException(MensajesError.CONTRATO_NO_ENCONTRADO));
+
 
         // Solo permitir editar el estado si el contrato ya está CANCELADO
         if (contrato.getEstado() != Contrato.EstadoContrato.ACTIVO && dto.getEstado() != null) {
@@ -194,11 +196,13 @@ public class ContratoService {
         }
 
         Usuario cliente = usuarioRepository.findById(dto.getClienteId())
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+                .orElseThrow(() -> new RuntimeException(MensajesError.CLIENTE_NO_ENCONTRADO));
         Usuario agente = usuarioRepository.findById(dto.getAgenteId())
-                .orElseThrow(() -> new RuntimeException("Agente no encontrado"));
+                .orElseThrow(() -> new RuntimeException(MensajesError.AGENTE_NO_ENCONTRADO));
+
         Seguro seguro = seguroRepository.findById(dto.getSeguroId())
-                .orElseThrow(() -> new RuntimeException("Seguro no encontrado"));
+                .orElseThrow(() -> new RuntimeException(MensajesError.SEGURO_NO_ENCONTRADO));
+
 
         contrato.setCliente(cliente);
         contrato.setAgente(agente);
@@ -237,6 +241,7 @@ public class ContratoService {
 
         return contratoRepository.save(contrato);
     }
+
 
 
 

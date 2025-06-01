@@ -1,40 +1,86 @@
-import { Component } from '@angular/core';
-import { Contrato } from '../../../models/contrato.model';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ContratosFormComponent } from '../contratos-form/contratos-form.component';
-import { ContratosListComponent } from '../contratos-list/contratos-list.component';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { Component, ViewChild, TemplateRef } from '@angular/core'; 
+import { Contrato } from '../../../models/contrato.model'; 
+import { CommonModule } from '@angular/common'; 
+import { FormsModule } from '@angular/forms'; 
+import { ContratosFormComponent } from '../contratos-form/contratos-form.component'; 
+import { ContratosListComponent } from '../contratos-list/contratos-list.component';  
 
-@Component({
-  selector: 'app-contratos-page',
-  templateUrl: './contratos-page.component.html',
-  styleUrls: ['./contratos-page.component.css'],
-  imports: [
-    CommonModule,
-    FormsModule,
-    ContratosFormComponent,
-    ContratosListComponent,
-  ],
+// Material imports 
+import { MatButtonModule } from '@angular/material/button'; 
+import { MatIconModule } from '@angular/material/icon'; 
+import { MatCardModule } from '@angular/material/card'; 
+import { MatDividerModule } from '@angular/material/divider'; 
+import { MatTabsModule } from '@angular/material/tabs'; 
+import { MatDialogModule, MatDialog, MatDialogRef } from '@angular/material/dialog'; 
+import { MatTooltipModule } from '@angular/material/tooltip'; 
+import { MatSnackBarModule } from '@angular/material/snack-bar';  
+
+@Component({   
+  selector: 'app-contratos-page',   
+  standalone: true,   
+  templateUrl: './contratos-page.component.html',   
+  styleUrls: ['./contratos-page.component.css'],   
+  imports: [     
+    CommonModule,     
+    FormsModule,     
+    ContratosFormComponent,     
+    ContratosListComponent,     
+    MatButtonModule,     
+    MatIconModule,     
+    MatCardModule,     
+    MatDividerModule,     
+    MatTabsModule,     
+    MatDialogModule,     
+    MatTooltipModule,     
+    MatSnackBarModule   
+  ], 
 })
-export class ContratosPageComponent {
-  mostrarFormulario = false;
-  contratoAEditar?: Contrato;
+export class ContratosPageComponent {   
+  contratoAEditar?: Contrato;   
+  dialogRef: MatDialogRef<any> | null = null;      
+  
+  // Use ViewChild to access the ContratosListComponent directly
+  @ViewChild(ContratosListComponent) contratosListComponent!: ContratosListComponent;
+  @ViewChild('formDialogTemplate') formDialogTemplate!: TemplateRef<any>;    
 
-  nuevoContrato() {
-    this.contratoAEditar = undefined;
-    this.mostrarFormulario = true;
-  }
+  constructor(private dialog: MatDialog) {}    
 
-  editarContrato(contrato: Contrato) {
-    this.contratoAEditar = contrato;
-    this.mostrarFormulario = true;
-  }
+  nuevoContrato() {     
+    this.contratoAEditar = undefined;     
+    this.abrirModalFormulario();   
+  }    
 
-  alGuardar() {
-    this.mostrarFormulario = false;
-  }
-  cancelarFormulario(): void {
-    this.mostrarFormulario = false;
-  }
+  editarContrato(contrato: Contrato) {     
+    this.contratoAEditar = contrato;     
+    this.abrirModalFormulario();   
+  }    
+
+  abrirModalFormulario(): void {     
+    this.dialogRef = this.dialog.open(this.formDialogTemplate, {       
+      width: '800px',       
+      disableClose: true,       
+      data: {         
+        contrato: this.contratoAEditar       
+      }     
+    });   
+  }    
+
+  cerrarModalFormulario(): void {     
+    if (this.dialogRef) {       
+      this.dialogRef.close();       
+      this.dialogRef = null;     
+    }   
+  }    
+
+  alGuardar() {     
+    this.cerrarModalFormulario();     
+    // Properly refresh the list of contracts using ViewChild
+    if (this.contratosListComponent) {
+      this.contratosListComponent.cargarContratos();
+    }
+  }      
+
+  cancelarFormulario(): void {     
+    this.cerrarModalFormulario();   
+  } 
 }

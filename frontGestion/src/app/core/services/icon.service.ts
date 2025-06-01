@@ -1,9 +1,6 @@
 import { Injectable } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { MatIconRegistry } from '@angular/material/icon';
 
 interface IIcon {
-
   name: string;
   path: string;
 }
@@ -13,33 +10,19 @@ interface IIcon {
 })
 export class IconService {
   private icons: IIcon[] = [
-    { name: 'user', path: 'assets/icons/user.svg' },
-    { name: 'seguro', path: 'assets/icons/seguro.svg' }
+    {name: 'home', path: 'assets/icons/logo.svg'},       // Quita la barra inicial '/'
+    {name: 'user', path: 'assets/icons/agent.svg'},      // Quita la barra inicial '/'
+    {name: 'seguro', path: 'assets/icons/client.svg'},   // Quita la barra inicial '/'
+    {name: 'contrato', path: 'assets/icons/contact.svg'} // Quita la barra inicial '/'
   ];
 
-  constructor(
-    private matIconRegistry: MatIconRegistry,
-    private domSanitizer: DomSanitizer
-  ) {
-    this.registerIcons();
-  }
-
-  private registerIcons() {
-    this.icons.forEach(icon => {
-      this.matIconRegistry.addSvgIcon(
-        icon.name,
-        this.domSanitizer.bypassSecurityTrustResourceUrl(icon.path)
-      );
-    });
-  }
+  constructor() {}
 
   getIcon() {
     return [...this.icons];
   }
 
   getIconByName(name: string): IIcon {
-    return this.icons.find(
-      icon => icon.name.toLowerCase() === name.toLowerCase()
-    ) as IIcon;
+    return this.icons.find(icon => icon.name.toLowerCase() === name.toLowerCase()) as IIcon;
   }
 }

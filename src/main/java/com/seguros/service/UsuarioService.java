@@ -6,6 +6,7 @@ import com.seguros.model.Rol;
 import com.seguros.model.Usuario;
 import com.seguros.repository.RolRepository;
 import com.seguros.repository.UsuarioRepository;
+import com.seguros.util.MensajesError;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,7 +64,7 @@ public class UsuarioService {
     @Transactional
     public Usuario actualizarEstado(Long usuarioId, boolean activo) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new RuntimeException(MensajesError.USUARIO_NO_ENCONTRADO));
         usuario.setActivo(activo);
         return usuarioRepository.save(usuario);
     }
@@ -83,12 +84,12 @@ public class UsuarioService {
 
     public Usuario obtenerUsuario(Long usuarioId) {
         return usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new RuntimeException(MensajesError.USUARIO_NO_ENCONTRADO));
     }
     @Transactional
     public Usuario actualizarUsuario(Long usuarioId, UsuarioDTO usuarioDTO) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new RuntimeException(MensajesError.USUARIO_NO_ENCONTRADO));
 
         usuario.setNombre(usuarioDTO.getNombre());
         usuario.setApellido(usuarioDTO.getApellido());
@@ -115,7 +116,7 @@ public class UsuarioService {
     @Transactional
     public void eliminarUsuario(Long usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new RuntimeException(MensajesError.USUARIO_NO_ENCONTRADO));
         // Opción 2: Eliminación lógica (desactivar el usuario)
          usuario.setActivo(false);
          usuarioRepository.save(usuario);

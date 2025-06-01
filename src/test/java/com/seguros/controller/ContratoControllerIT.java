@@ -30,7 +30,7 @@
     @SpringBootTest
     @AutoConfigureMockMvc
     @Transactional
-    public class ContratoControllerIT {
+     class ContratoControllerIT {
 
         @Autowired
         private MockMvc mockMvc;

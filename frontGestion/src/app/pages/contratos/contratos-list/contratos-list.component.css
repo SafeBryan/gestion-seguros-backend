@@ -1,57 +1,92 @@
-.container {
-  background-color: #ffffff;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-}
-
-h2 {
-  font-size: 1.4rem;
-  margin-bottom: 1rem;
-  color: #333;
-}
-
-.table {
+.contratos-list-container {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 0.95rem;
+  padding: 16px;
 }
 
-.table thead {
-  background-color: #004085;
-  color: white;
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
 }
 
-.table th,
-.table td {
-  padding: 0.75rem;
-  text-align: left;
-  border: 1px solid #dee2e6;
+.filtros-container {
+  margin-bottom: 16px;
 }
 
-ul {
-  padding-left: 1.2rem;
-  margin: 0;
+.contratos-table {
+  width: 100%;
 }
 
-.btn-sm {
-  padding: 0.3rem 0.6rem;
-  font-size: 0.85rem;
+.contratos-table .mat-mdc-row:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.cancelled-row {
+  background-color: rgba(244, 67, 54, 0.1); /* Fondo rojo claro para contratos cancelados */
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.expired-row {
+  background-color: rgba(255, 152, 0, 0.1); /* Fondo naranja claro para contratos vencidos */
+}
+
+.expanded-row {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.detail-row {
+  height: 0;
+}
+
+.beneficiarios-detail {
+  overflow: hidden;
+}
+
+.beneficiarios-wrapper {
+  padding: 16px;
+  background-color: #f5f5f5;
   border-radius: 4px;
 }
 
-.btn-warning {
-  background-color: #ffc107;
-  border: none;
-  color: black;
+.beneficiarios-table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.btn-danger {
-  background-color: #dc3545;
-  border: none;
-  color: white;
+.beneficiarios-table th,
+.beneficiarios-table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
 }
 
-.text-muted {
-  color: #6c757d;
+.beneficiarios-table th {
+  background-color: #eee;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.no-contratos, .no-beneficiarios {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.no-data-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-top: 16px;
+}
+
+.seguro-info {
+  font-weight: 500;
 }

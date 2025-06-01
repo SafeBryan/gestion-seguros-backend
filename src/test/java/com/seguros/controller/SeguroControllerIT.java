@@ -1,8 +1,6 @@
 package com.seguros.controller;
 
 import com.seguros.model.Rol;
-import com.seguros.model.Seguro;
-import com.seguros.model.Seguro.TipoSeguro;
 import com.seguros.model.SeguroVida;
 import com.seguros.model.Usuario;
 import com.seguros.repository.RolRepository;
@@ -42,7 +40,6 @@ public class SeguroControllerIT {
     private UsuarioRepository usuarioRepository;
 
     private Usuario creador;
-    private Seguro seguroExistente;
 
     @BeforeEach
     void setUp() {
@@ -73,7 +70,7 @@ public class SeguroControllerIT {
         seguroVida.setMontoCobertura(new BigDecimal("50000")); // campo obligatorio
         seguroVida.setCreadoPor(creador);
 
-        seguroExistente = seguroRepository.save(seguroVida);
+        seguroRepository.save(seguroVida);
     }
 
 

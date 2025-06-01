@@ -12,9 +12,9 @@ export interface IMenu {
 export class MenuService {
   private listMenu: IMenu[] = [
     { title: 'Inicio', url: '/home', icon: 'home' },
-    { title: 'Usuario', url: '/usuarios', icon: 'user' },
-    { title: 'Seguros', url: '/seguros', icon: 'seguro' },
-    { title: 'Contratos', url: '/contratos', icon: 'contrato' },
+    { title: 'Usuario', url: '/usuarios', icon: 'person' }, // Cambio de 'user' a 'person'
+    { title: 'Seguros', url: '/seguros', icon: 'security' }, // Cambio de 'seguro' a 'security'
+    { title: 'Contratos', url: '/contratos', icon: 'description' }, // Cambio de 'contrato' a 'description'
   ];
 
   constructor() {}
@@ -23,9 +23,9 @@ export class MenuService {
     return [...this.listMenu];
   }
 
-  getMenuByUrl(url: string): IMenu | undefined {
+  getMenuByUrl(url: string): IMenu {
     return this.listMenu.find(
-      (menu) => menu.url.toLowerCase() === url.toLowerCase()
-    );
+      (menu) => menu.url.toLowerCase() === url.toLocaleLowerCase()
+    ) as IMenu;
   }
 }

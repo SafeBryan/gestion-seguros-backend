@@ -1,30 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { IconService } from './icon.service';
-import { MatIconRegistry } from '@angular/material/icon';
-import { DomSanitizer } from '@angular/platform-browser';
 
 describe('IconService', () => {
   let service: IconService;
-  let matIconRegistrySpy: jasmine.SpyObj<MatIconRegistry>;
-  let sanitizerSpy: jasmine.SpyObj<DomSanitizer>;
 
   beforeEach(() => {
-    matIconRegistrySpy = jasmine.createSpyObj('MatIconRegistry', [
-      'addSvgIcon',
-    ]);
-    sanitizerSpy = jasmine.createSpyObj('DomSanitizer', [
-      'bypassSecurityTrustResourceUrl',
-    ]);
-    sanitizerSpy.bypassSecurityTrustResourceUrl.and.callFake((url) => url); // devuélvelo tal cual
-
-    TestBed.configureTestingModule({
-      providers: [
-        IconService,
-        { provide: MatIconRegistry, useValue: matIconRegistrySpy },
-        { provide: DomSanitizer, useValue: sanitizerSpy },
-      ],
-    });
-
+    TestBed.configureTestingModule({});
     service = TestBed.inject(IconService);
   });
 
@@ -32,36 +13,25 @@ describe('IconService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('debería registrar los íconos al crearse', () => {
-    expect(sanitizerSpy.bypassSecurityTrustResourceUrl).toHaveBeenCalledWith(
-      'assets/icons/user.svg'
-    );
-    expect(sanitizerSpy.bypassSecurityTrustResourceUrl).toHaveBeenCalledWith(
-      'assets/icons/seguro.svg'
-    );
-    expect(matIconRegistrySpy.addSvgIcon).toHaveBeenCalledWith(
-      'user',
-      'assets/icons/user.svg'
-    );
-    expect(matIconRegistrySpy.addSvgIcon).toHaveBeenCalledWith(
-      'seguro',
-      'assets/icons/seguro.svg'
-    );
-  });
-
   it('debería devolver una copia de los íconos con getIcon()', () => {
     const icons = service.getIcon();
-    expect(icons.length).toBe(2);
-    expect(icons[0].name).toBe('user');
+    expect(icons.length).toBe(4); // ✅ ahora sí son 4
+
+    expect(icons[0].name).toBe('home'); // ✅ ajustado al orden real
 
     // Verifica que sea una copia, no la referencia original
-    icons.push({ name: 'otro', path: 'otro.svg' });
-    expect(service.getIcon().length).toBe(2);
+    icons.push({ name: 'nuevo', path: 'nuevo.svg' });
+    expect(service.getIcon().length).toBe(4); // ✅ aún deben ser 4, no 5
   });
 
   it('debería devolver un ícono por nombre con getIconByName()', () => {
-    const icon = service.getIconByName('Seguro');
+    const icon = service.getIconByName('Seguro'); // prueba con mayúscula
     expect(icon).toBeTruthy();
-    expect(icon.name).toBe('seguro');
+    expect(icon.name).toBe('seguro'); // case insensitive
+  });
+
+  it('debería devolver undefined si no existe el ícono', () => {
+    const icon = service.getIconByName('inexistente');
+    expect(icon).toBeUndefined();
   });
 });

@@ -8,6 +8,7 @@ import { of, throwError } from 'rxjs';
 import { Contrato } from '../../../models/contrato.model';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 describe('ContratosFormComponent', () => {
   let component: ContratosFormComponent;
@@ -16,6 +17,7 @@ describe('ContratosFormComponent', () => {
   let usuarioServiceSpy: jasmine.SpyObj<UsuarioService>;
   let contratoServiceSpy: jasmine.SpyObj<ContratoService>;
   let authServiceSpy: jasmine.SpyObj<AuthService>;
+  let snackBarSpy: jasmine.SpyObj<MatSnackBar>; // ✅
 
   beforeEach(async () => {
     seguroServiceSpy = jasmine.createSpyObj('SeguroService', [
@@ -29,6 +31,7 @@ describe('ContratosFormComponent', () => {
       'actualizarContrato',
     ]);
     authServiceSpy = jasmine.createSpyObj('AuthService', ['getUsuarioId']);
+    snackBarSpy = jasmine.createSpyObj('MatSnackBar', ['open']); // ✅
 
     await TestBed.configureTestingModule({
       imports: [ContratosFormComponent, HttpClientTestingModule],
@@ -37,6 +40,7 @@ describe('ContratosFormComponent', () => {
         { provide: UsuarioService, useValue: usuarioServiceSpy },
         { provide: ContratoService, useValue: contratoServiceSpy },
         { provide: AuthService, useValue: authServiceSpy },
+        { provide: MatSnackBar, useValue: snackBarSpy }, // ✅
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -90,22 +94,21 @@ describe('ContratosFormComponent', () => {
           id: 1,
           nombre: 'Seguro',
           tipo: 'VIDA',
-          descripcion: 'Cobertura test',
-          cobertura: 'Todo riesgo',
-          precioAnual: 500,
+          descripcion: '',
+          cobertura: '',
+          precioAnual: 100,
           activo: true,
         },
       ])
     );
-
     usuarioServiceSpy.obtenerPorRol.and.returnValue(
       of([
         {
           id: 1,
           nombre: 'Agente',
           apellido: 'Pérez',
-          email: 'agente@test.com',
-          telefono: '123456789',
+          email: '',
+          telefono: '',
           rolId: 2,
           rolNombre: 'AGENTE',
           activo: true,
@@ -123,7 +126,6 @@ describe('ContratosFormComponent', () => {
     component.contrato = component.getNuevoContrato();
     component.agregarBeneficiario();
     expect(component.contrato.beneficiarios.length).toBe(1);
-
     component.eliminarBeneficiario(0);
     expect(component.contrato.beneficiarios.length).toBe(0);
   });
@@ -135,59 +137,73 @@ describe('ContratosFormComponent', () => {
   });
 
   it('debería crear un nuevo contrato y emitir evento', () => {
+    spyOn(component.guardado, 'emit');
+
     const contrato: Contrato = {
       clienteId: 1,
+      seguroId: 2,
+      agenteId: 3,
       fechaInicio: '2024-01-01',
       fechaFin: '2024-12-31',
       frecuenciaPago: 'MENSUAL',
       estado: 'ACTIVO',
       beneficiarios: [],
     };
+
     component.contrato = contrato;
-    spyOn(window, 'alert');
-    spyOn(component.guardado, 'emit');
     contratoServiceSpy.crearContrato.and.returnValue(
       of({ ...contrato, id: 1 })
     );
 
     component.guardarContrato();
 
-    expect(contratoServiceSpy.crearContrato).toHaveBeenCalled();
-    expect(window.alert).toHaveBeenCalledWith('Contrato creado con éxito');
+    expect(snackBarSpy.open).toHaveBeenCalledWith(
+      'Contrato creado exitosamente',
+      'Cerrar',
+      { duration: 3000 }
+    );
     expect(component.guardado.emit).toHaveBeenCalled();
   });
-
   it('debería actualizar un contrato existente y emitir evento', () => {
+    spyOn(component.guardado, 'emit');
+
     const contrato: Contrato = {
       id: 1,
       clienteId: 1,
+      seguroId: 2,
+      agenteId: 3,
       fechaInicio: '2024-01-01',
       fechaFin: '2024-12-31',
       frecuenciaPago: 'MENSUAL',
       estado: 'ACTIVO',
       beneficiarios: [],
     };
+
     component.contrato = contrato;
-    spyOn(window, 'alert');
-    spyOn(component.guardado, 'emit');
     contratoServiceSpy.actualizarContrato.and.returnValue(of(contrato));
 
     component.guardarContrato();
 
-    expect(contratoServiceSpy.actualizarContrato).toHaveBeenCalled();
-    expect(window.alert).toHaveBeenCalledWith('Contrato actualizado con éxito');
+    expect(snackBarSpy.open).toHaveBeenCalledWith(
+      'Contrato actualizado exitosamente',
+      'Cerrar',
+      { duration: 3000 }
+    );
     expect(component.guardado.emit).toHaveBeenCalled();
   });
 
   it('debería manejar error al guardar contrato', () => {
     const contrato: Contrato = {
       clienteId: 1,
+      seguroId: 2,
+      agenteId: 3,
       fechaInicio: '2024-01-01',
       fechaFin: '2024-12-31',
       frecuenciaPago: 'MENSUAL',
       estado: 'ACTIVO',
       beneficiarios: [],
     };
+
     component.contrato = contrato;
     spyOn(console, 'error');
     contratoServiceSpy.crearContrato.and.returnValue(

@@ -1,3 +1,5 @@
+// Actualización del ContratoService para asegurar que se devuelven todos los contratos sin filtrar
+
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -23,7 +25,8 @@ export class ContratoService {
   }
 
   obtenerPorCliente(clienteId: number): Observable<Contrato[]> {
-    return this.http.get<Contrato[]>(`${this.baseUrl}/cliente/${clienteId}`, {
+    // Asegurarnos de que estamos solicitando todos los contratos sin filtrar por estado
+    return this.http.get<Contrato[]>(`${this.baseUrl}/cliente/${clienteId}?todos=true`, {
       headers: this.getAuthHeaders(),
     });
   }

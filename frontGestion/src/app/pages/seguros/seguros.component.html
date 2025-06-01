@@ -1,270 +1,373 @@
-<!-- BOTÓN AGREGAR -->
-<div class="d-flex justify-content-end mb-3">
-  <button
-    name="crear"
-    class="btn btn-primary d-flex align-items-center gap-2"
-    (click)="crearSeguro()"
-  >
-    <i class="bi bi-plus-lg"></i> Agregar
-  </button>
-</div>
+<div class="seguros-container mat-elevation-z2">
+  <!-- Encabezado con título y botón de agregar -->
+  <div class="header-container">
+    <div class="title-section">
+      <mat-icon class="header-icon">shield</mat-icon>
+      <h1 class="header-title">Gestión de Seguros</h1>
+    </div>
+    <button mat-raised-button color="primary" class="add-button" (click)="crearSeguro()">
+      <mat-icon>add</mat-icon>
+      <span>Nuevo Seguro</span>
+    </button>
+  </div>
 
-<!-- MODAL DE CREACIÓN -->
-<div *ngIf="mostrarModal" class="modal-overlay">
-  <div class="modal-content">
-    <h3>Crear Nuevo Seguro</h3>
-    <form (ngSubmit)="guardarSeguro()">
-      <div class="form-group">
-        <label for="nombre">Nombre</label>
-        <input
-          id="nombre"
-          type="text"
-          [(ngModel)]="nuevoSeguro.nombre"
-          name="nombre"
-          required
-        />
-      </div>
+  <!-- Spinner de carga -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p class="loading-text">Cargando seguros...</p>
+  </div>
 
-      <div class="form-group">
-        <label for="tipo">Tipo</label>
-        <select id="tipo" [(ngModel)]="nuevoSeguro.tipo" name="tipo" required>
-          <option value="VIDA">VIDA</option>
-          <option value="SALUD">SALUD</option>
-        </select>
-      </div>
+  <!-- Contenido principal con tabs -->
+  <div *ngIf="!loading" class="content-container">
+    <mat-tab-group class="seguros-tabs" dynamicHeight>
+      <!-- TAB SEGUROS ACTIVOS -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">check_circle</mat-icon>
+          <span>Seguros Activos</span>
+          <span matBadge="{{ segurosActivos.length }}" matBadgeColor="primary" class="tab-badge"></span>
+        </ng-template>
 
-      <div class="form-group">
-        <label for="descripcion">Descripción</label>
-        <textarea
-          id="descripcion"
-          [(ngModel)]="nuevoSeguro.descripcion"
-          name="descripcion"
-          rows="2"
-          required
-        ></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="cobertura">Cobertura</label>
-        <textarea
-          id="cobertura"
-          [(ngModel)]="nuevoSeguro.cobertura"
-          name="cobertura"
-          rows="2"
-          required
-        ></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="precio">Precio Anual</label>
-        <input
-          id="precio"
-          type="number"
-          [(ngModel)]="nuevoSeguro.precioAnual"
-          name="precioAnual"
-          required
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="activo">Activo</label>
-        <select
-          id="activo"
-          [(ngModel)]="nuevoSeguro.activo"
-          name="activo"
-          required
-        >
-          <option [ngValue]="true">Sí</option>
-          <option [ngValue]="false">No</option>
-        </select>
-      </div>
-
-      <!-- CAMPOS VIDA -->
-      <div *ngIf="nuevoSeguro.tipo === 'VIDA'">
-        <div class="form-group">
-          <label for="montoCobertura">Monto de Cobertura</label>
-          <input
-            id="montoCobertura"
-            type="number"
-            [(ngModel)]="nuevoSeguro.montoCobertura"
-            name="montoCobertura"
-          />
-        </div>
-      </div>
-
-      <!-- CAMPOS SALUD -->
-      <div *ngIf="nuevoSeguro.tipo === 'SALUD'">
-        <div class="form-group">
-          <label for="hospitalesConvenio">Hospitales en convenio</label>
-          <input
-            id="hospitalesConvenio"
-            type="text"
-            [(ngModel)]="nuevoSeguro.hospitalesConvenio"
-            name="hospitalesConvenio"
-          />
+        <!-- Mensaje si no hay seguros activos -->
+        <div *ngIf="segurosActivos.length === 0" class="no-data-container">
+          <mat-icon class="no-data-icon">shield</mat-icon>
+          <p class="no-data-text">No hay seguros activos</p>
+          <button mat-stroked-button color="primary" (click)="crearSeguro()">
+            <mat-icon>add</mat-icon> Crear seguro
+          </button>
         </div>
 
-        <div class="form-group">
-          <label for="numeroConsultas">Consultas incluidas</label>
-          <input
-            id="numeroConsultas"
-            type="number"
-            [(ngModel)]="nuevoSeguro.numeroConsultasIncluidas"
-            name="numeroConsultasIncluidas"
-          />
-        </div>
-      </div>
+        <!-- Grid de tarjetas de seguros activos -->
+        <div *ngIf="segurosActivos.length > 0" class="seguros-grid">
+          <mat-card 
+            *ngFor="let seguro of segurosActivos; trackBy: trackBySeguroId"
+            class="seguro-card"
+            appearance="outlined">
+            
+            <mat-card-header>
+              <div mat-card-avatar class="card-avatar">
+                <mat-icon>{{ seguro.tipo === 'VIDA' ? 'favorite' : 'local_hospital' }}</mat-icon>
+              </div>
+              <mat-card-title>{{ seguro.nombre }}</mat-card-title>
+              <mat-card-subtitle>
+                <mat-chip-set>
+                  <mat-chip [color]="getTipoColor(seguro.tipo)" selected>
+                    {{ seguro.tipo }}
+                  </mat-chip>
+                </mat-chip-set>
+              </mat-card-subtitle>
+              
+              <!-- Botones de acción -->
+              <div class="card-actions">
+                <button 
+                  mat-icon-button 
+                  color="primary"
+                  (click)="editarSeguro(seguro)"
+                  matTooltip="Editar seguro">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button 
+                  mat-icon-button 
+                  color="warn"
+                  (click)="eliminarSeguro(seguro)"
+                  matTooltip="Desactivar seguro">
+                  <mat-icon>visibility_off</mat-icon>
+                </button>
+              </div>
+            </mat-card-header>
 
-      <div class="form-buttons">
-        <button name="guardar" class="btn btn-success" type="submit">
-          Guardar
-        </button>
-        <button
-          name="cancelar"
-          class="btn btn-secondary"
-          type="button"
-          (click)="cerrarModal()"
-        >
-          Cancelar
-        </button>
-      </div>
-    </form>
+            <mat-card-content class="card-content">
+              <div class="info-item">
+                <mat-icon class="info-icon">description</mat-icon>
+                <div>
+                  <span class="info-label">Descripción:</span>
+                  <p class="info-value">{{ seguro.descripcion }}</p>
+                </div>
+              </div>
+
+              <div class="info-item">
+                <mat-icon class="info-icon">security</mat-icon>
+                <div>
+                  <span class="info-label">Cobertura:</span>
+                  <p class="info-value">{{ seguro.cobertura }}</p>
+                </div>
+              </div>
+
+              <div class="info-item price-item">
+                <mat-icon class="info-icon">euro_symbol</mat-icon>
+                <div>
+                  <span class="info-label">Precio Anual:</span>
+                  <span class="price-value">{{ formatearPrecio(seguro.precioAnual) }}</span>
+                </div>
+              </div>
+
+              <!-- Información específica del tipo -->
+              <div *ngIf="seguro.tipo === 'VIDA'" class="specific-info">
+                <div class="info-item" *ngIf="seguro.beneficiarios">
+                  <mat-icon class="info-icon">people</mat-icon>
+                  <div>
+                    <span class="info-label">Beneficiarios:</span>
+                    <span class="info-value">{{ seguro.beneficiarios }}</span>
+                  </div>
+                </div>
+                
+                <div class="info-item" *ngIf="seguro.montoCobertura">
+                  <mat-icon class="info-icon">account_balance</mat-icon>
+                  <div>
+                    <span class="info-label">Monto de Cobertura:</span>
+                    <span class="info-value">{{ formatearPrecio(seguro.montoCobertura) }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="seguro.tipo === 'SALUD'" class="specific-info">
+                <div class="info-item" *ngIf="seguro.hospitalesConvenio">
+                  <mat-icon class="info-icon">local_hospital</mat-icon>
+                  <div>
+                    <span class="info-label">Hospitales en Convenio:</span>
+                    <span class="info-value">{{ seguro.hospitalesConvenio }}</span>
+                  </div>
+                </div>
+                
+                <div class="info-item" *ngIf="seguro.numeroConsultasIncluidas">
+                  <mat-icon class="info-icon">medical_services</mat-icon>
+                  <div>
+                    <span class="info-label">Consultas Incluidas:</span>
+                    <span class="info-value">{{ seguro.numeroConsultasIncluidas }}</span>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+
+      <!-- TAB SEGUROS INACTIVOS -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">cancel</mat-icon>
+          <span>Seguros Inactivos</span>
+          <span matBadge="{{ segurosInactivos.length }}" matBadgeColor="warn" class="tab-badge"></span>
+        </ng-template>
+
+        <!-- Mensaje si no hay seguros inactivos -->
+        <div *ngIf="segurosInactivos.length === 0" class="no-data-container">
+          <mat-icon class="no-data-icon">check_circle</mat-icon>
+          <p class="no-data-text">Todos los seguros están activos</p>
+          <p>No hay seguros inactivos en este momento</p>
+        </div>
+
+        <!-- Grid de tarjetas de seguros inactivos -->
+        <div *ngIf="segurosInactivos.length > 0" class="seguros-grid">
+          <mat-card 
+            *ngFor="let seguro of segurosInactivos; trackBy: trackBySeguroId"
+            class="seguro-card inactive-card"
+            appearance="outlined">
+            
+            <mat-card-header>
+              <div mat-card-avatar class="card-avatar inactive-avatar">
+                <mat-icon>{{ seguro.tipo === 'VIDA' ? 'favorite' : 'local_hospital' }}</mat-icon>
+              </div>
+              <mat-card-title>{{ seguro.nombre }}</mat-card-title>
+              <mat-card-subtitle>
+                <mat-chip-set>
+                  <mat-chip color="warn" selected>
+                    {{ seguro.tipo }} - INACTIVO
+                  </mat-chip>
+                </mat-chip-set>
+              </mat-card-subtitle>
+              
+              <!-- Botones de acción -->
+              <div class="card-actions">
+                <button 
+                  mat-icon-button 
+                  color="primary"
+                  (click)="editarSeguro(seguro)"
+                  matTooltip="Editar seguro">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button 
+                  mat-icon-button 
+                  color="accent"
+                  (click)="activarSeguro(seguro)"
+                  matTooltip="Activar seguro">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+              </div>
+            </mat-card-header>
+
+            <mat-card-content class="card-content">
+              <div class="info-item">
+                <mat-icon class="info-icon">description</mat-icon>
+                <div>
+                  <span class="info-label">Descripción:</span>
+                  <p class="info-value">{{ seguro.descripcion }}</p>
+                </div>
+              </div>
+
+              <div class="info-item">
+                <mat-icon class="info-icon">security</mat-icon>
+                <div>
+                  <span class="info-label">Cobertura:</span>
+                  <p class="info-value">{{ seguro.cobertura }}</p>
+                </div>
+              </div>
+
+              <div class="info-item price-item">
+                <mat-icon class="info-icon">euro_symbol</mat-icon>
+                <div>
+                  <span class="info-label">Precio Anual:</span>
+                  <span class="price-value">{{ formatearPrecio(seguro.precioAnual) }}</span>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
   </div>
 </div>
 
-<!-- SEGUROS ACTIVOS -->
-<h2 class="seguros-title">Seguros Activos</h2>
+<!-- Modal para crear/editar seguro usando Angular Material Dialog -->
+<ng-template #dialogTemplate>
+  <div class="dialog-container">
+    <h2 mat-dialog-title>
+      <mat-icon>{{ editMode ? 'edit' : 'add_circle' }}</mat-icon>
+      {{ editMode ? 'Editar Seguro' : 'Nuevo Seguro' }}
+    </h2>
+    
+    <mat-dialog-content class="dialog-content">
+      <form [formGroup]="seguroForm" class="seguro-form">
+        <!-- Información Básica -->
+        <h3 class="section-title">Formulario Aseguramiento</h3>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre del Seguro</mat-label>
+            <input matInput formControlName="nombre" placeholder="Ej: Seguro de Vida Premium">
+            <mat-icon matSuffix>badge</mat-icon>
+            <mat-error *ngIf="nombre?.errors?.['required']">El nombre es requerido</mat-error>
+            <mat-error *ngIf="nombre?.errors?.['minlength']">Mínimo 3 caracteres</mat-error>
+          </mat-form-field>
+        </div>
 
-<mat-progress-spinner
-  *ngIf="loading"
-  mode="indeterminate"
-  diameter="40"
-  class="seguro-spinner"
->
-</mat-progress-spinner>
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Tipo de Seguro</mat-label>
+            <mat-select formControlName="tipo">
+              <mat-option value="VIDA">
+                <mat-icon>favorite</mat-icon>
+                Seguro de Vida
+              </mat-option>
+              <mat-option value="SALUD">
+                <mat-icon>local_hospital</mat-icon>
+                Seguro de Salud
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
 
-<div *ngIf="!loading && segurosActivos.length > 0" class="seguros-container">
-  <mat-card
-    class="seguro-card position-relative"
-    *ngFor="let seguro of segurosActivos; trackBy: trackBySeguroId"
-    [ngClass]="{ 'seguro-activo': seguro.activo }"
-  >
-    <div class="btn-group btn-group-sm position-absolute top-0 end-0 m-2">
-      <button
-        class="btn btn-info text-white rounded p-1"
-        (click)="editarSeguro(seguro)"
-      >
-        <i class="bi bi-pencil fs-2"></i>
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Precio Anual</mat-label>
+            <input matInput type="number" formControlName="precioAnual" placeholder="0">
+            <span matPrefix>€&nbsp;</span>
+            <mat-error *ngIf="precioAnual?.errors?.['required']">El precio es requerido</mat-error>
+            <mat-error *ngIf="precioAnual?.errors?.['min']">Debe ser mayor a 0</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Descripción</mat-label>
+            <textarea 
+              matInput 
+              formControlName="descripcion" 
+              rows="3"
+              placeholder="Describe las características principales del seguro">
+            </textarea>
+            <mat-error *ngIf="descripcion?.errors?.['required']">La descripción es requerida</mat-error>
+            <mat-error *ngIf="descripcion?.errors?.['minlength']">Mínimo 10 caracteres</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Cobertura</mat-label>
+            <textarea 
+              matInput 
+              formControlName="cobertura" 
+              rows="3"
+              placeholder="Detalla qué cubre este seguro">
+            </textarea>
+            <mat-error *ngIf="cobertura?.errors?.['required']">La cobertura es requerida</mat-error>
+            <mat-error *ngIf="cobertura?.errors?.['minlength']">Mínimo 10 caracteres</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-slide-toggle formControlName="activo" color="primary">
+            Seguro Activo
+          </mat-slide-toggle>
+        </div>
+
+        <!-- Campos específicos según el tipo -->
+        <div *ngIf="seguroForm.get('tipo')?.value === 'VIDA'">
+          <h3 class="section-title">
+            <mat-icon>favorite</mat-icon>
+            Información de Seguro de Vida
+          </h3>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Beneficiarios</mat-label>
+              <input matInput formControlName="beneficiarios" placeholder="Ej: Cónyuge, Hijos">
+              <mat-icon matSuffix>people</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Monto de Cobertura</mat-label>
+              <input matInput type="number" formControlName="montoCobertura" placeholder="0">
+              <span matPrefix>€&nbsp;</span>
+              <mat-icon matSuffix>euro_symbol</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div *ngIf="seguroForm.get('tipo')?.value === 'SALUD'">
+          <h3 class="section-title">
+            <mat-icon>local_hospital</mat-icon>
+            Información de Seguro de Salud
+          </h3>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Hospitales en Convenio</mat-label>
+              <input matInput formControlName="hospitalesConvenio" placeholder="Ej: Hospital Central, Clínica Norte">
+              <mat-icon matSuffix>local_hospital</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Consultas Incluidas</mat-label>
+              <input matInput type="number" formControlName="numeroConsultasIncluidas" placeholder="0">
+              <mat-icon matSuffix>medical_services</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+      </form>
+    </mat-dialog-content>
+    
+    <mat-dialog-actions align="end">
+      <button mat-button mat-dialog-close (click)="cerrarModal()">
+        <mat-icon>cancel</mat-icon>
+        Cancelar
       </button>
-      <button
-        class="btn btn-danger text-white rounded p-1 ms-2"
-        (click)="eliminarSeguro(seguro)"
-        name="borrar"
-      >
-        <i class="bi bi-trash fs-2"></i>
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="guardarSeguro()" 
+        [disabled]="seguroForm.invalid">
+        <mat-icon>{{ editMode ? 'save' : 'add_circle' }}</mat-icon>
+        {{ editMode ? 'Actualizar' : 'Crear' }} Seguro
       </button>
-    </div>
-
-    <mat-card-header>
-      <mat-card-title>{{ seguro.nombre }}</mat-card-title>
-      <mat-card-subtitle>Tipo: {{ seguro.tipo }}</mat-card-subtitle>
-    </mat-card-header>
-
-    <mat-card-content>
-      <p><strong>Descripción:</strong> {{ seguro.descripcion }}</p>
-      <p><strong>Cobertura:</strong> {{ seguro.cobertura }}</p>
-      <p><strong>Precio anual:</strong> ${{ seguro.precioAnual }}</p>
-
-      <!-- Campos específicos -->
-      <ng-container *ngIf="seguro.tipo === 'VIDA'">
-        <p>
-          <strong>Beneficiarios:</strong> {{ seguro.beneficiarios || "N/A" }}
-        </p>
-        <p>
-          <strong>Monto de cobertura:</strong> ${{ seguro.montoCobertura || 0 }}
-        </p>
-      </ng-container>
-
-      <ng-container *ngIf="seguro.tipo === 'SALUD'">
-        <p>
-          <strong>Hospitales convenio:</strong>
-          {{ seguro.hospitalesConvenio || "N/A" }}
-        </p>
-        <p>
-          <strong>Consultas incluidas:</strong>
-          {{ seguro.numeroConsultasIncluidas || 0 }}
-        </p>
-      </ng-container>
-
-      <p><strong>Activo:</strong> Sí</p>
-    </mat-card-content>
-  </mat-card>
-</div>
-
-<div *ngIf="!loading && segurosActivos.length === 0" class="no-seguros">
-  <p>No hay seguros activos disponibles.</p>
-</div>
-
-<!-- SEGUROS INACTIVOS -->
-<h2 class="seguros-title">Seguros Inactivos</h2>
-
-<div *ngIf="!loading && segurosInactivos.length > 0" class="seguros-container">
-  <mat-card
-    class="seguro-card position-relative"
-    *ngFor="let seguro of segurosInactivos; trackBy: trackBySeguroId"
-    [ngClass]="{ 'seguro-inactivo': true }"
-  >
-    <div class="btn-group btn-group-sm position-absolute top-0 end-0 m-2">
-      <button
-        class="btn btn-info text-white rounded p-1"
-        (click)="editarSeguro(seguro)"
-      >
-        <i class="bi bi-pencil fs-2"></i>
-      </button>
-      <button
-        class="btn btn-danger text-white rounded p-1 ms-2"
-        (click)="eliminarSeguro(seguro)"
-      >
-        <i class="bi bi-trash fs-2"></i>
-      </button>
-    </div>
-
-    <mat-card-header>
-      <mat-card-title>{{ seguro.nombre }}</mat-card-title>
-      <mat-card-subtitle>Tipo: {{ seguro.tipo }}</mat-card-subtitle>
-    </mat-card-header>
-
-    <mat-card-content>
-      <p><strong>Descripción:</strong> {{ seguro.descripcion }}</p>
-      <p><strong>Cobertura:</strong> {{ seguro.cobertura }}</p>
-      <p><strong>Precio anual:</strong> ${{ seguro.precioAnual }}</p>
-
-      <!-- Campos específicos -->
-      <ng-container *ngIf="seguro.tipo === 'VIDA'">
-        <p>
-          <strong>Beneficiarios:</strong> {{ seguro.beneficiarios || "N/A" }}
-        </p>
-        <p>
-          <strong>Monto de cobertura:</strong> ${{ seguro.montoCobertura || 0 }}
-        </p>
-      </ng-container>
-
-      <ng-container *ngIf="seguro.tipo === 'SALUD'">
-        <p>
-          <strong>Hospitales convenio:</strong>
-          {{ seguro.hospitalesConvenio || "N/A" }}
-        </p>
-        <p>
-          <strong>Consultas incluidas:</strong>
-          {{ seguro.numeroConsultasIncluidas || 0 }}
-        </p>
-      </ng-container>
-
-      <p><strong>Activo:</strong> No</p>
-    </mat-card-content>
-  </mat-card>
-</div>
-
-<div *ngIf="!loading && segurosInactivos.length === 0" class="no-seguros">
-  <p>No hay seguros inactivos disponibles.</p>
-</div>
+    </mat-dialog-actions>
+  </div>
+</ng-template>
