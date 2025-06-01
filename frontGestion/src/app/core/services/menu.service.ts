@@ -15,6 +15,7 @@ export class MenuService {
     { title: 'Usuario', url: '/usuarios', icon: 'person' }, // Cambio de 'user' a 'person'
     { title: 'Seguros', url: '/seguros', icon: 'security' }, // Cambio de 'seguro' a 'security'
     { title: 'Contratos', url: '/contratos', icon: 'description' }, // Cambio de 'contrato' a 'description'
+    { title: 'Clientes', url: '/clientes', icon: 'description' }, // Cambio de 'contrato' a 'description'
   ];
 
   constructor() {}

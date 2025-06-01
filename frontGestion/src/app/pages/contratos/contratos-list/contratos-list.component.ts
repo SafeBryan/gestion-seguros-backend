@@ -4,7 +4,13 @@ import { ContratoService } from '../../../core/services/contrato.service';
 import { AuthService } from '../../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { trigger, state, style, transition, animate } from '@angular/animations';
+import {
+  trigger,
+  state,
+  style,
+  transition,
+  animate,
+} from '@angular/animations';
 
 // Material imports
 import { MatTableModule } from '@angular/material/table';
@@ -27,9 +33,12 @@ import { MatSelectModule } from '@angular/material/select';
   styleUrls: ['./contratos-list.component.css'],
   animations: [
     trigger('detailExpand', [
-      state('collapsed', style({height: '0px', minHeight: '0'})),
-      state('expanded', style({height: '*'})),
-      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+      state('collapsed', style({ height: '0px', minHeight: '0' })),
+      state('expanded', style({ height: '*' })),
+      transition(
+        'expanded <=> collapsed',
+        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')
+      ),
     ]),
   ],
   imports: [
@@ -46,19 +55,32 @@ import { MatSelectModule } from '@angular/material/select';
     MatCardModule,
     MatSnackBarModule,
     MatDialogModule,
-    MatSelectModule
+    MatSelectModule,
   ],
 })
 export class ContratosListComponent implements OnInit {
   contratos: Contrato[] = [];
   contratosFiltrados: Contrato[] = [];
   loading = false;
-  displayedColumns: string[] = ['id', 'seguro', 'fechaInicio', 'fechaFin', 'estado', 'acciones'];
+  displayedColumns: string[] = [
+    'id',
+    'seguro',
+    'fechaInicio',
+    'fechaFin',
+    'estado',
+    'acciones',
+  ];
   expandedContrato: Contrato | null = null;
   filtroEstado: string = 'TODOS';
-  
+
   // Estados disponibles para filtrar
-  estadosDisponibles: string[] = ['TODOS', 'ACTIVO', 'PENDIENTE', 'VENCIDO', 'CANCELADO'];
+  estadosDisponibles: string[] = [
+    'TODOS',
+    'ACTIVO',
+    'PENDIENTE',
+    'VENCIDO',
+    'CANCELADO',
+  ];
 
   @Output() editar = new EventEmitter<Contrato>();
 
@@ -80,31 +102,39 @@ export class ContratosListComponent implements OnInit {
       .subscribe({
         next: (data) => {
           console.log('Datos recibidos del servidor:', data);
-          
+
           // Almacenar todos los contratos sin filtrar
           this.contratos = data;
-          
+
           // Debug: Mostrar los estados únicos que vienen del servidor
-          const estadosUnicos = [...new Set(this.contratos.map(c => c.estado))];
+          const estadosUnicos = [
+            ...new Set(this.contratos.map((c) => c.estado)),
+          ];
           console.log('Estados únicos recibidos del servidor:', estadosUnicos);
-          
+
           // Normalizar los estados para garantizar consistencia
           this.normalizarEstadosContratos();
-          
+
           // Aplicar filtro inicial (mostrar todos por defecto)
           this.filtroEstado = 'TODOS';
-          
+
           // Aplicar filtro y mostrar todos los contratos inicialmente
           this.aplicarFiltro();
-          
+
           // Verificar contratos vencidos
           this.verificarContratosVencidos();
-          
+
           this.loading = false;
-          
+
           // Verificar que se obtuvieron contratos
-          console.log(`Contratos cargados: ${this.contratos.length}`, this.contratos);
-          console.log(`Contratos filtrados: ${this.contratosFiltrados.length}`, this.contratosFiltrados);
+          console.log(
+            `Contratos cargados: ${this.contratos.length}`,
+            this.contratos
+          );
+          console.log(
+            `Contratos filtrados: ${this.contratosFiltrados.length}`,
+            this.contratosFiltrados
+          );
         },
         error: (err) => {
           console.error('Error al cargar contratos', err);
@@ -115,51 +145,55 @@ export class ContratosListComponent implements OnInit {
         },
       });
   }
-  
+
   // Método para normalizar los estados de todos los contratos
   normalizarEstadosContratos(): void {
-    this.contratos.forEach(contrato => {
+    this.contratos.forEach((contrato) => {
       if (!contrato.estado) {
-        console.log(`Contrato ${contrato.id} no tiene estado, asignando ACTIVO por defecto`);
+        console.log(
+          `Contrato ${contrato.id} no tiene estado, asignando ACTIVO por defecto`
+        );
         contrato.estado = 'ACTIVO';
       } else {
         // Convertir a mayúsculas y normalizar los estados
         const estadoNormalizado = this.normalizarEstado(contrato.estado);
         if (contrato.estado !== estadoNormalizado) {
-          console.log(`Normalizando estado: ${contrato.estado} -> ${estadoNormalizado}`);
+          console.log(
+            `Normalizando estado: ${contrato.estado} -> ${estadoNormalizado}`
+          );
           contrato.estado = estadoNormalizado as EstadoContrato;
         }
       }
     });
   }
-  
+
   // Método para normalizar un estado
   normalizarEstado(estado: string): string {
     if (!estado) return 'ACTIVO'; // Estado por defecto si no existe
-    
+
     // Convertir a mayúsculas y eliminar espacios
     const estadoLimpio = estado.toUpperCase().trim();
-    
+
     // Mapear posibles variaciones a los estados estándar
-    const mapa: {[key: string]: string} = {
-      'ACTIVO': 'ACTIVO',
-      'ACTIVOS': 'ACTIVO',
-      'ACTIVE': 'ACTIVO',
-      
-      'PENDIENTE': 'PENDIENTE',
-      'PENDIENTES': 'PENDIENTE',
-      'PENDING': 'PENDIENTE',
-      
-      'VENCIDO': 'VENCIDO',
-      'VENCIDOS': 'VENCIDO',
-      'EXPIRED': 'VENCIDO',
-      
-      'CANCELADO': 'CANCELADO',
-      'CANCELADOS': 'CANCELADO',
-      'CANCELED': 'CANCELADO',
-      'CANCELLED': 'CANCELADO'
+    const mapa: { [key: string]: string } = {
+      ACTIVO: 'ACTIVO',
+      ACTIVOS: 'ACTIVO',
+      ACTIVE: 'ACTIVO',
+
+      PENDIENTE: 'PENDIENTE',
+      PENDIENTES: 'PENDIENTE',
+      PENDING: 'PENDIENTE',
+
+      VENCIDO: 'VENCIDO',
+      VENCIDOS: 'VENCIDO',
+      EXPIRED: 'VENCIDO',
+
+      CANCELADO: 'CANCELADO',
+      CANCELADOS: 'CANCELADO',
+      CANCELED: 'CANCELADO',
+      CANCELLED: 'CANCELADO',
     };
-    
+
     return mapa[estadoLimpio] || estadoLimpio;
   }
 
@@ -167,20 +201,32 @@ export class ContratosListComponent implements OnInit {
   aplicarFiltro(): void {
     console.log('Aplicando filtro:', this.filtroEstado);
     console.log('Total de contratos antes de filtrar:', this.contratos.length);
-    console.log('Estados disponibles:', [...new Set(this.contratos.map(c => c.estado))]);
-    
+    console.log('Estados disponibles:', [
+      ...new Set(this.contratos.map((c) => c.estado)),
+    ]);
+
     if (this.filtroEstado === 'TODOS') {
       this.contratosFiltrados = [...this.contratos];
-      console.log('Mostrando todos los contratos:', this.contratosFiltrados.length);
+      console.log(
+        'Mostrando todos los contratos:',
+        this.contratosFiltrados.length
+      );
     } else {
       // Filtrar por estado exacto (ya normalizado)
-      this.contratosFiltrados = this.contratos.filter(c => c.estado === this.filtroEstado);
-      console.log(`Contratos con estado "${this.filtroEstado}":`, this.contratosFiltrados.length);
+      this.contratosFiltrados = this.contratos.filter(
+        (c) => c.estado === this.filtroEstado
+      );
+      console.log(
+        `Contratos con estado "${this.filtroEstado}":`,
+        this.contratosFiltrados.length
+      );
     }
-    
+
     // Si no hay contratos filtrados y hay contratos disponibles, mostrar mensaje
     if (this.contratosFiltrados.length === 0 && this.contratos.length > 0) {
-      console.warn(`No hay contratos que coincidan con el filtro "${this.filtroEstado}"`);
+      console.warn(
+        `No hay contratos que coincidan con el filtro "${this.filtroEstado}"`
+      );
     }
   }
 
@@ -195,23 +241,25 @@ export class ContratosListComponent implements OnInit {
   verificarContratosVencidos(): void {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0); // Establecer a inicio del día
-    
+
     // Verifica si hay contratos que estén vencidos pero no tengan el estado VENCIDO
     let contratosModificados = false;
-    
-    this.contratos.forEach(contrato => {
+
+    this.contratos.forEach((contrato) => {
       if (contrato.estado !== 'CANCELADO' && contrato.estado !== 'VENCIDO') {
         const fechaFin = new Date(contrato.fechaFin);
         fechaFin.setHours(0, 0, 0, 0);
-        
+
         if (fechaFin < hoy) {
-          console.log(`Contrato ${contrato.id} está vencido: ${fechaFin} < ${hoy}`);
+          console.log(
+            `Contrato ${contrato.id} está vencido: ${fechaFin} < ${hoy}`
+          );
           this.actualizarEstadoVencido(contrato);
           contratosModificados = true;
         }
       }
     });
-    
+
     // Si se modificaron contratos, volver a aplicar el filtro
     if (contratosModificados) {
       setTimeout(() => this.aplicarFiltro(), 500);
@@ -221,9 +269,9 @@ export class ContratosListComponent implements OnInit {
   // Método para actualizar el estado de un contrato a VENCIDO
   actualizarEstadoVencido(contrato: Contrato): void {
     if (!contrato?.id) return;
-    
+
     console.log(`Actualizando contrato ${contrato.id} a estado VENCIDO`);
-    
+
     this.contratoService.actualizarEstado(contrato.id, 'VENCIDO').subscribe({
       next: (contratoActualizado) => {
         console.log(`Contrato ${contrato.id} actualizado a VENCIDO con éxito`);
@@ -233,8 +281,11 @@ export class ContratosListComponent implements OnInit {
         this.aplicarFiltro();
       },
       error: (err) => {
-        console.error(`Error al actualizar estado del contrato ${contrato.id}`, err);
-      }
+        console.error(
+          `Error al actualizar estado del contrato ${contrato.id}`,
+          err
+        );
+      },
     });
   }
 
@@ -250,9 +301,11 @@ export class ContratosListComponent implements OnInit {
     this.loading = true;
     this.contratoService.actualizarEstado(contrato.id, 'CANCELADO').subscribe({
       next: () => {
-        this.snackBar.open('Contrato cancelado exitosamente', 'Cerrar', { duration: 3000 });
+        this.snackBar.open('Contrato cancelado exitosamente', 'Cerrar', {
+          duration: 3000,
+        });
         // Actualizar el estado en la lista local en lugar de recargar todos
-        const index = this.contratos.findIndex(c => c.id === contrato.id);
+        const index = this.contratos.findIndex((c) => c.id === contrato.id);
         if (index >= 0) {
           this.contratos[index].estado = 'CANCELADO';
           // Volver a aplicar el filtro después de la actualización
@@ -315,10 +368,14 @@ export class ContratosListComponent implements OnInit {
 
   // Methods to handle row expansion for beneficiaries
   expandRow(contrato: Contrato): void {
-    this.expandedContrato = this.expandedContrato === contrato ? null : contrato;
+    this.expandedContrato =
+      this.expandedContrato === contrato ? null : contrato;
   }
 
   isExpanded(contrato: Contrato): boolean {
     return this.expandedContrato === contrato;
   }
+  isExpandable = (index: number, row: any) => {
+    return row.detalles && row.detalles.length > 0;
+  };
 }

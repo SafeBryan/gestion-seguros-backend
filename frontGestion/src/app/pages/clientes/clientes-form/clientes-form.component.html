@@ -1,0 +1,85 @@
+<div class="admin-container">
+  <h2 class="admin-title">
+    {{ isEditando ? "Editar Cliente" : "Crear Cliente" }}
+  </h2>
+
+  <form (ngSubmit)="guardar()" #clienteForm="ngForm">
+    <div *ngIf="!isEditando">
+      <label>Usuario:</label>
+      <select [(ngModel)]="cliente.usuarioId" name="usuarioId" required>
+        <option
+          *ngFor="let usuario of usuariosClienteDisponibles"
+          [value]="usuario.id"
+        >
+          {{ usuario.nombre }} {{ usuario.apellido }} - {{ usuario.email }}
+        </option>
+      </select>
+    </div>
+
+    <label>Tipo de identificación:</label>
+    <select
+      [(ngModel)]="cliente.tipoIdentificacion"
+      name="tipoIdentificacion"
+      required
+    >
+      <option value="Cédula">Cédula</option>
+      <option value="Pasaporte">Pasaporte</option>
+    </select>
+
+    <label>Número de identificación:</label>
+    <input
+      type="text"
+      [(ngModel)]="cliente.numeroIdentificacion"
+      name="numeroIdentificacion"
+      required
+    />
+
+    <label>Fecha de nacimiento:</label>
+    <input
+      type="date"
+      [(ngModel)]="cliente.fechaNacimiento"
+      name="fechaNacimiento"
+      required
+    />
+
+    <label>Nacionalidad:</label>
+    <input type="text" [(ngModel)]="cliente.nacionalidad" name="nacionalidad" />
+
+    <label>Estado civil:</label>
+    <select [(ngModel)]="cliente.estadoCivil" name="estadoCivil">
+      <option>Soltero</option>
+      <option>Casado</option>
+      <option>Divorciado</option>
+      <option>Viudo</option>
+    </select>
+
+    <label>Sexo:</label>
+    <select [(ngModel)]="cliente.sexo" name="sexo">
+      <option>Masculino</option>
+      <option>Femenino</option>
+    </select>
+
+    <label>Lugar de nacimiento:</label>
+    <input
+      type="text"
+      [(ngModel)]="cliente.lugarNacimiento"
+      name="lugarNacimiento"
+    />
+
+    <label>Estatura (m):</label>
+    <input
+      type="number"
+      step="0.01"
+      [(ngModel)]="cliente.estatura"
+      name="estatura"
+    />
+
+    <label>Peso (kg):</label>
+    <input type="number" step="0.1" [(ngModel)]="cliente.peso" name="peso" />
+
+    <label>Dirección:</label>
+    <textarea [(ngModel)]="cliente.direccion" name="direccion"></textarea>
+
+    <button type="submit">Guardar</button>
+  </form>
+</div>
