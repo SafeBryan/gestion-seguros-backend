@@ -135,3 +135,20 @@ body {
   margin-top: 5px;
   text-align: center;
 }
+body.cypress-mode .container .center {
+  opacity: 1 !important;
+  transition-delay: 0s !important;
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+}
+
+body.cypress-mode .container .top:before,
+body.cypress-mode .container .top:after,
+body.cypress-mode .container .bottom:before,
+body.cypress-mode .container .bottom:after {
+  margin-left: 200px !important;
+  transform-origin: -200px 50% !important;
+  transition-delay: 0s !important;
+}
+
+

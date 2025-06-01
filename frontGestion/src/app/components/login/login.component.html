@@ -1,6 +1,6 @@
 <div class="container">
-  <div class="top"></div>
-  <div class="bottom"></div>
+  <div *ngIf="!isTestEnv" class="top"></div>
+  <div *ngIf="!isTestEnv" class="bottom"></div>
 
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
     <div class="center">
@@ -8,10 +8,10 @@
 
       <input
         type="email"
+        name="email"
         placeholder="Correo electrónico"
         formControlName="email"
         required
-        name="email"
       />
       <div
         *ngIf="f['email'].invalid && f['email'].touched"
@@ -25,10 +25,10 @@
 
       <input
         type="password"
+        name="password"
         placeholder="Contraseña"
         formControlName="password"
         required
-        name="password"
       />
       <div
         *ngIf="f['password'].invalid && f['password'].touched"
