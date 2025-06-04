@@ -7,6 +7,8 @@ import { UsuariosComponent } from './pages/usuarios/usuarios.component';
 import { ContratosListComponent } from './pages/contratos/contratos-list/contratos-list.component';
 import { ContratosPageComponent } from './pages/contratos/contratos-page/contratos-page.component';
 import { ClientesListComponent } from './pages/clientes/clientes-list/clientes-list.component';
+import { PagoComponent } from './pages/pago/pago.component';
+
 
 export const routes: Routes = [
   {
@@ -43,8 +45,15 @@ export const routes: Routes = [
     component: ClientesListComponent,
     canActivate: [authGuard],
   },
+    {
+  path: 'pagos',
+  component: PagoComponent,
+},
   {
     path: '**',
     redirectTo: 'login',
   },
+
+
+
 ];
