@@ -6,7 +6,9 @@ import com.seguros.model.*;
 import com.seguros.repository.ContratoRepository;
 import com.seguros.repository.SeguroRepository;
 import com.seguros.repository.UsuarioRepository;
+import io.qameta.allure.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -47,6 +49,11 @@ class ContratoServiceTest {
         return dto;
     }
 
+    @Epic("Gestión de Contratos")
+    @Feature("Creación de contratos")
+    @Story("Contrato válido con beneficiarios")
+    @Severity(SeverityLevel.CRITICAL)
+    @DisplayName("Debe crear contrato correctamente con cliente, agente y seguro")
     @Test
     void testCrearContrato() {
         Usuario cliente = new Usuario(); cliente.setId(1L);

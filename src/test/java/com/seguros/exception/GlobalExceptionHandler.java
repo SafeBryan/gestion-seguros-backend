@@ -16,14 +16,21 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
-        if (ex.getMessage().toLowerCase().contains("no encontrado")) {
+        String mensaje = ex.getMessage().toLowerCase();
+
+        if (mensaje.contains("no encontrado")) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
         }
-        if (ex.getMessage().toLowerCase().contains("ya existe")) {
+        if (mensaje.contains("ya existe")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
+        if (mensaje.contains("error al crear beneficiario")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error inesperado");
     }
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
@@ -42,4 +49,5 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleAccessDenied(Exception ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado");
     }
+
 }
