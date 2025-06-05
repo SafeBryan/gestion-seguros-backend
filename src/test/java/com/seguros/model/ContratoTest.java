@@ -57,5 +57,4 @@ class ContratoTest {
         assertEquals(createdAt, contrato.getCreatedAt());
         assertTrue(contrato.isActivo());
     }
-
 }
