@@ -4,6 +4,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
+import { UserProfile } from '../models/profile-user.interface';
 
 interface LoginRequest {
   email: string;
@@ -27,6 +28,7 @@ interface JwtPayload {
 })
 export class AuthService {
   private apiUrl = 'http://localhost:8080/api/auth';
+  private tokenUserProfile = 'UserProfile';
   private tokenKey = 'jwtToken';
   private loggedIn = new BehaviorSubject<boolean>(false);
 
@@ -44,6 +46,7 @@ export class AuthService {
         tap((response) => {
           if (this.isBrowser()) {
             localStorage.setItem(this.tokenKey, response.token);
+            localStorage.setItem(this.tokenUserProfile, JSON.stringify(response))
             this.loggedIn.next(true);
           }
         })
@@ -95,6 +98,15 @@ export class AuthService {
       console.error('Error al decodificar el token:', e);
       throw new Error('Token inválido');
     }
+  }
+
+
+  getUsuarioPerfil(): UserProfile | null{
+    if (this.isBrowser()) {
+      const userProfile = localStorage.getItem(this.tokenUserProfile);
+      return userProfile ? JSON.parse(userProfile) : null;
+    }
+    return null;
   }
 
   // Check if the token exists in localStorage
