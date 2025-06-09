@@ -1,0 +1,47 @@
+<div class="container">
+  <div *ngIf="!isTestEnv" class="top"></div>
+  <div *ngIf="!isTestEnv" class="bottom"></div>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="center">
+      <h2>Iniciar sesión</h2>
+
+      <input
+        type="email"
+        name="email"
+        placeholder="Correo electrónico"
+        formControlName="email"
+        required
+      />
+      <div
+        *ngIf="f['email'].invalid && f['email'].touched"
+        class="error-message"
+      >
+        <span *ngIf="f['email'].errors?.['required']"
+          >El correo es obligatorio.</span
+        >
+        <span *ngIf="f['email'].errors?.['email']">Formato inválido.</span>
+      </div>
+
+      <input
+        type="password"
+        name="password"
+        placeholder="Contraseña"
+        formControlName="password"
+        required
+      />
+      <div
+        *ngIf="f['password'].invalid && f['password'].touched"
+        class="error-message"
+      >
+        <span>La contraseña es obligatoria.</span>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+      <button type="submit" [disabled]="loginForm.invalid" class="login-button">
+        Iniciar
+      </button>
+    </div>
+  </form>
+</div>

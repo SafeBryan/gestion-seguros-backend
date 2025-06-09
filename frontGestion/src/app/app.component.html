@@ -1,0 +1,34 @@
+<!-- Nota: este HTML se mantiene igual, pero se añade esta recomendación -->
+<!-- Solo renderizamos el layout completo si no estamos en /login -->
+<ng-container *ngIf="!isLoginRoute(); else loginOnly">
+  <mat-drawer-container autosize="true" class="drawer-container">
+    <mat-drawer
+      mode="side"
+      [(opened)]="isSidenavOpen"
+      class="drawer"
+      fixedInViewport="true"
+      *ngIf="isLoggedIn | async"
+    >
+      <div class="opciones">
+        <h3>Opciones</h3>
+      </div>
+      <div>
+        <app-menu></app-menu>
+      </div>
+    </mat-drawer>
+    
+    <mat-drawer-content autosize="">
+      <app-header
+        *ngIf="isLoggedIn | async"
+        (toggleSidenav)="toggleSidenav()">
+      </app-header>
+              
+      <router-outlet></router-outlet>
+    </mat-drawer-content>
+  </mat-drawer-container>
+</ng-container>
+
+<!-- Template que renderiza el login sin drawer ni header -->
+<ng-template #loginOnly>
+  <router-outlet></router-outlet>
+</ng-template>

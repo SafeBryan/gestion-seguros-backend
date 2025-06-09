@@ -1,0 +1,205 @@
+.contrato-form {
+  position: relative;
+  padding: 16px;
+}
+
+.form-card {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 10;
+}
+
+.form-row {
+  margin-bottom: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.date-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.half-width {
+  width: 50%;
+}
+
+.margin-y {
+  margin: 24px 0;
+}
+
+.beneficiarios-section,
+.dependientes-section {
+  margin-top: 16px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.porcentaje-total {
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 16px;
+  white-space: nowrap;
+}
+
+.porcentaje-completo {
+  background-color: #c8e6c9;
+  color: #2e7d32;
+}
+
+.porcentaje-incompleto {
+  background-color: #ffcdd2;
+  color: #c62828;
+}
+
+.no-beneficiarios,
+.no-dependientes {
+  font-style: italic;
+  color: rgba(0, 0, 0, 0.54);
+  text-align: center;
+  padding: 16px 0;
+}
+
+.beneficiario-container,
+.dependiente-container {
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.beneficiario-header,
+.dependiente-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.beneficiario-header h4,
+.dependiente-header h4 {
+  margin: 0;
+  color: #3f51b5;
+}
+
+.beneficiario-row,
+.dependiente-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.beneficiario-field,
+.dependiente-field {
+  flex: 1 1 200px;
+  min-width: 150px;
+}
+
+.beneficiario-porcentaje {
+  max-width: 120px;
+  min-width: 100px;
+}
+
+.add-beneficiario,
+.add-dependiente {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+mat-card-actions {
+  padding: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.discapacidad-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 16px 0;
+  gap: 12px;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin: 8px 0;
+}
+
+.checkbox-input {
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.checkbox-label {
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  user-select: none;
+}
+
+.checkbox-input:checked {
+  accent-color: #1976d2;
+}
+
+.checkbox-container:hover .checkbox-label {
+  color: #1976d2;
+}
+
+/* ✅ Estilos responsivos */
+@media (max-width: 600px) {
+  .date-container,
+  .beneficiario-row,
+  .dependiente-row,
+  .discapacidad-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .half-width,
+  .beneficiario-porcentaje {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .porcentaje-total {
+    margin-top: 8px;
+  }
+
+  mat-card-actions {
+    justify-content: center;
+  }
+}

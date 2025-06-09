@@ -1,0 +1,33 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.profile {
+  height: 100%;
+}
+
+mat-toolbar img {
+  width: 40px;
+  max-height: 40px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+}
+
+mat-toolbar {
+  display: flex;
+  justify-content: space-between;
+  background: #0077B6; /* azul médico */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  height: 64px;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+}

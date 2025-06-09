@@ -1,0 +1,7 @@
+"BROKEN","EPIC","FAILED","FEATURE","PASSED","SKIPPED","STORY","UNKNOWN"
+"0","","1","Autenticación","1","0","Inicio y cierre de sesión exitoso","0"
+"0","","0","Autenticación","1","0","Inicio fallido","0"
+"0","","1","Autenticación","0","0","Inicio de sesión fallido","0"
+"0","","0","Dashboard","1","0","Carga de estadísticas y últimas entradas","0"
+"0","","1","","2","0","","0"
+"0","","0","Contratos","1","0","Flujo completo: crear, editar y cancelar","0"

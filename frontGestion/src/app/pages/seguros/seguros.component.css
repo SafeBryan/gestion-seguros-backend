@@ -1,0 +1,200 @@
+/* Estilos para el contenedor principal */
+.seguros-container {
+padding: 20px;
+margin: 20px;
+background-color: white;
+border-radius: 8px;
+}
+/* Estilos para el encabezado */
+.header-container {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 24px;
+}
+.title-section {
+display: flex;
+align-items: center;
+}
+.header-icon {
+font-size: 36px;
+height: 36px;
+width: 36px;
+margin-right: 12px;
+color: #3f51b5;
+}
+.header-title {
+  margin: 0;
+  font-weight: 500;
+  color: #023E8A;
+  font-size: 24px;
+}
+.add-button {
+height: 40px;
+padding: 0 16px;
+}
+/* Estilos para el spinner de carga */
+.loading-container {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+padding: 40px 0;
+}
+.loading-text {
+margin-top: 16px;
+font-size: 16px;
+color: #666;
+}
+/* Estilos para mensaje de no datos */
+.no-data-container {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+padding: 40px 0;
+color: #666;
+}
+.no-data-icon {
+font-size: 64px;
+height: 64px;
+width: 64px;
+margin-bottom: 16px;
+color: #ccc;
+}
+.no-data-text {
+font-size: 18px;
+margin-bottom: 16px;
+}
+/* Estilos para las pestañas */
+.seguros-tabs {
+margin-top: 16px;
+}
+.tab-icon {
+margin-right: 8px;
+}
+.tab-badge {
+margin-left: 20px;
+}
+/* Estilos para la cuadrícula de tarjetas */
+.seguros-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+gap: 20px;
+padding: 16px;
+}
+/* Estilos para las tarjetas */
+.seguro-card {
+transition: transform 0.2s, box-shadow 0.2s;
+overflow: hidden;
+}
+.seguro-card:hover {
+transform: translateY(-3px);
+box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+.card-avatar {
+display: flex;
+align-items: center;
+justify-content: center;
+background-color: #3f51b5;
+color: white;
+}
+.inactive-avatar {
+background-color: #f44336;
+}
+.card-actions {
+display: flex;
+margin-left: auto;
+}
+.card-content {
+padding: 16px;
+}
+/* Estilos para los elementos de información */
+.info-item {
+display: flex;
+margin-bottom: 12px;
+}
+.info-icon {
+margin-right: 12px;
+color: #666;
+}
+.info-label {
+font-weight: 500;
+margin-right: 8px;
+color: #555;
+}
+.info-value {
+margin: 4px 0;
+color: #333;
+}
+.price-item {
+margin-top: 16px;
+border-top: 1px solid #eee;
+padding-top: 16px;
+}
+.price-value {
+font-size: 18px;
+font-weight: 500;
+color: #3f51b5;
+}
+.specific-info {
+margin-top: 16px;
+border-top: 1px solid #eee;
+padding-top: 16px;
+}
+/* Estilos para el diálogo */
+.dialog-container {
+padding: 0;
+}
+.dialog-content {
+padding: 0 24px;
+max-height: 70vh;
+overflow-y: auto;
+}
+/* Estilos para el formulario */
+.seguro-form {
+display: flex;
+flex-direction: column;
+gap: 16px;
+}
+.section-title {
+margin: 16px 0 0;
+font-size: 16px;
+font-weight: 500;
+color: #3f51b5;
+display: flex;
+align-items: center;
+}
+.section-title mat-icon {
+margin-right: 8px;
+}
+.form-row {
+display: flex;
+gap: 16px;
+}
+.full-width {
+width: 100%;
+}
+.half-width {
+width: 50%;
+}
+/* Media queries para responsividad */
+@media screen and (max-width: 768px) {
+.header-container {
+flex-direction: column;
+align-items: flex-start;
+}
+.add-button {
+margin-top: 16px;
+align-self: flex-end;
+}
+.seguros-grid {
+grid-template-columns: 1fr;
+}
+.form-row {
+flex-direction: column;
+}
+.half-width {
+width: 100%;
+}
+}
