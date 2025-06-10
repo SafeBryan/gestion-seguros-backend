@@ -1,13 +1,13 @@
 export interface PagoResponseDTO {
   id: number;
   contratoId: number;
-  contratoReferencia?: string;
-  clienteNombre?: string;
+  contratoReferencia?: string;  
+  clienteNombre?: string;       
   monto: number;
-  fechaPago: string;
+  fechaPago: string;           
   metodo: string;
   referencia?: string;
   comprobante?: string;
-  estado: string;
+  estado: 'COMPLETADO' | 'REVERTIDO' | string;
   observaciones?: string;
 }

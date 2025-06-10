@@ -1,38 +1,101 @@
 .pago-container {
-  max-width: 600px;
-  margin: auto;
-  padding: 1rem;
+    max-width: 500px;
+    margin: 30px auto;
+    padding: 25px;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
 
   h2 {
     text-align: center;
-    margin-bottom: 1rem;
+    margin-bottom: 20px;
+    color: #333;
   }
 
-  form {
-    display: grid;
-    gap: 1rem;
-
-    label {
-      display: block;
-      font-weight: bold;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      padding: 0.5rem;
-    }
-
-    button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-
-      &:disabled {
-        background-color: #999;
-        cursor: not-allowed;
-      }
-    }
+  .form-group {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
   }
-}
+
+  label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #444;
+  }
+
+  .required {
+    color: #d93025;
+    margin-left: 2px;
+  }
+
+  input[type="number"],
+  input[type="text"],
+  input[type="date"],
+  select,
+  textarea {
+    padding: 10px;
+    border: 1.8px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+  }
+
+  input[type="number"]:focus,
+  input[type="text"]:focus,
+  input[type="date"]:focus,
+  select:focus,
+  textarea:focus {
+    border-color: #0066cc;
+    outline: none;
+  }
+
+  input.invalid,
+  select.invalid,
+  textarea.invalid {
+    border-color: #d93025;
+    background-color: #ffe6e6;
+  }
+
+  .error {
+    color: #d93025;
+    font-size: 0.85rem;
+    margin-top: 4px;
+  }
+
+  .file-name {
+    margin-top: 4px;
+    font-size: 0.9rem;
+    color: #555;
+  }
+
+  .btn-submit {
+    width: 100%;
+    padding: 12px;
+    background-color: #0066cc;
+    color: white;
+    border: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .btn-submit:disabled {
+    background-color: #9cb4d8;
+    cursor: not-allowed;
+  }
+
+  .btn-submit:not(:disabled):hover {
+    background-color: #004a99;
+  }
+
+  .mensaje {
+    margin-top: 15px;
+    text-align: center;
+    font-weight: 600;
+    color: #006600;
+  }

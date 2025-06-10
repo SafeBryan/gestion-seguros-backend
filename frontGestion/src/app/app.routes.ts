@@ -48,6 +48,7 @@ export const routes: Routes = [
     {
   path: 'pagos',
   component: PagoComponent,
+  canActivate: [authGuard],
 },
   {
     path: '**',

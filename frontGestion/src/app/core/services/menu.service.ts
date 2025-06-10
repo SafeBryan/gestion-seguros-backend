@@ -16,6 +16,7 @@ export class MenuService {
     { title: 'Seguros', url: '/seguros', icon: 'security' }, // Cambio de 'seguro' a 'security'
     { title: 'Contratos', url: '/contratos', icon: 'description' }, // Cambio de 'contrato' a 'description'
     { title: 'Clientes', url: '/clientes', icon: 'description' }, // Cambio de 'contrato' a 'description'
+    { title: 'Pagos', url: '/pagos', icon: 'money' }, // Cambio de 'contrato' a 'description'
   ];
 
   constructor() {}
