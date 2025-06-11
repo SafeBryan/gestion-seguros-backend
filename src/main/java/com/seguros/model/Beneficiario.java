@@ -42,7 +42,7 @@ public class Beneficiario {
 
     @PrePersist
     @PreUpdate
-    private void validarPorcentaje() {
+     void validarPorcentaje() {
         if (porcentaje.compareTo(BigDecimal.ZERO) <= 0 || porcentaje.compareTo(new BigDecimal("100")) > 0) {
             throw new IllegalArgumentException("El porcentaje debe estar entre 0 y 100");
         }

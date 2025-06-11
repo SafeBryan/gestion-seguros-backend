@@ -52,7 +52,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
   margin-bottom: 16px;
 }
 
@@ -60,7 +59,6 @@
   font-weight: bold;
   padding: 6px 12px;
   border-radius: 16px;
-  white-space: nowrap;
 }
 
 .porcentaje-completo {
@@ -94,7 +92,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
   margin-bottom: 12px;
 }
 
@@ -114,8 +111,8 @@
 
 .beneficiario-field,
 .dependiente-field {
-  flex: 1 1 200px;
-  min-width: 150px;
+  flex: 1;
+  min-width: 120px;
 }
 
 .beneficiario-porcentaje {
@@ -132,18 +129,47 @@
 
 mat-card-actions {
   padding: 16px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: flex-end;
 }
 
 .discapacidad-container {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
   margin: 16px 0;
-  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .date-container,
+  .beneficiario-row,
+  .dependiente-row,
+  .discapacidad-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .half-width,
+  .beneficiario-porcentaje {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .beneficiario-row,
+  .dependiente-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .beneficiario-porcentaje {
+    max-width: 100%;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .porcentaje-total {
+    margin-top: 8px;
+  }
 }
 
 .checkbox-container {
@@ -167,39 +193,9 @@ mat-card-actions {
 }
 
 .checkbox-input:checked {
-  accent-color: #1976d2;
+  accent-color: #1976d2; /* Color azul similar a Material */
 }
 
 .checkbox-container:hover .checkbox-label {
   color: #1976d2;
-}
-
-/* ✅ Estilos responsivos */
-@media (max-width: 600px) {
-  .date-container,
-  .beneficiario-row,
-  .dependiente-row,
-  .discapacidad-container {
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .half-width,
-  .beneficiario-porcentaje {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .section-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .porcentaje-total {
-    margin-top: 8px;
-  }
-
-  mat-card-actions {
-    justify-content: center;
-  }
 }
