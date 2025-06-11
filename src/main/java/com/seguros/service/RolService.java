@@ -5,6 +5,7 @@ import com.seguros.model.Rol;
 import com.seguros.repository.RolRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,12 @@ public class RolService {
                 .collect(Collectors.toList());
     }
 
+    public RolDTO obtenerRolPorId(Long id) {
+        Rol rol = rolRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
+        return convertirADTO(rol);
+    }
+
     @Transactional
     public Rol actualizarRol(Long id, RolDTO rolDTO) {
         Rol rol = rolRepository.findById(id)
@@ -50,6 +57,14 @@ public class RolService {
 
         rol.setDescripcion(rolDTO.getDescripcion());
         return rolRepository.save(rol);
+    }
+
+    @Transactional
+    public void eliminarRol(Long id) {
+        if (!rolRepository.existsById(id)) {
+            throw new RuntimeException("Rol no encontrado");
+        }
+        rolRepository.deleteById(id);
     }
 
     private RolDTO convertirADTO(Rol rol) {

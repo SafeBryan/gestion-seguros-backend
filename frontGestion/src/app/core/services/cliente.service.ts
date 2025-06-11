@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ClienteRequestDTO } from '../../models/cliente-request.dto';
 import { ClienteResponseDTO } from '../../models/cliente-response.dto';
-import { Observable, tap } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',

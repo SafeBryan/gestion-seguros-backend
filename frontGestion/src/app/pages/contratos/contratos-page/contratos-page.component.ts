@@ -1,4 +1,4 @@
-import { Component, ViewChild, TemplateRef, inject } from '@angular/core'; 
+import { Component, ViewChild, TemplateRef } from '@angular/core'; 
 import { Contrato } from '../../../models/contrato.model'; 
 import { CommonModule } from '@angular/common'; 
 import { FormsModule } from '@angular/forms'; 
@@ -14,7 +14,6 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialogModule, MatDialog, MatDialogRef } from '@angular/material/dialog'; 
 import { MatTooltipModule } from '@angular/material/tooltip'; 
 import { MatSnackBarModule } from '@angular/material/snack-bar';  
-import { AuthService } from '../../../services/auth.service';
 
 @Component({   
   selector: 'app-contratos-page',   
@@ -39,19 +38,12 @@ import { AuthService } from '../../../services/auth.service';
 export class ContratosPageComponent {   
   contratoAEditar?: Contrato;   
   dialogRef: MatDialogRef<any> | null = null;      
-  authService = inject(AuthService); // Inject AuthService if needed
-  esCliente: boolean = false;
-  
   
   // Use ViewChild to access the ContratosListComponent directly
   @ViewChild(ContratosListComponent) contratosListComponent!: ContratosListComponent;
   @ViewChild('formDialogTemplate') formDialogTemplate!: TemplateRef<any>;    
 
-  constructor(private dialog: MatDialog) {
-    const perfil = this.authService.getUsuarioPerfil();
-    const roles: string[] = perfil && Array.isArray((perfil as any).roles) ? (perfil as any).roles : [];
-    this.esCliente = roles.includes('ROLE_USER');
-  }    
+  constructor(private dialog: MatDialog) {}    
 
   nuevoContrato() {     
     this.contratoAEditar = undefined;     

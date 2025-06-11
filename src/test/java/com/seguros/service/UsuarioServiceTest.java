@@ -189,4 +189,90 @@ class UsuarioServiceTest {
             () -> usuarioService.obtenerUsuario(999L));
         assertEquals("Usuario no encontrado", ex.getMessage());
     }
+
+    @Test
+    void testActualizarUsuario_exito() {
+        Usuario usuarioExistente = crearUsuario(1L, "original@mail.com", "Luis", "Pérez", "123456789", "USER");
+        UsuarioDTO dto = new UsuarioDTO();
+        dto.setEmail("nuevo@mail.com");
+        dto.setNombre("Luis");
+        dto.setApellido("Pérez");
+        dto.setTelefono("987654321");
+        dto.setRolId(2L);
+
+        Rol nuevoRol = new Rol();
+        nuevoRol.setId(2L);
+        nuevoRol.setNombre("ADMIN");
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioExistente));
+        when(usuarioRepository.existsByEmail("nuevo@mail.com")).thenReturn(false);
+        when(rolRepository.findById(2L)).thenReturn(Optional.of(nuevoRol));
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(i -> i.getArgument(0));
+
+        Usuario actualizado = usuarioService.actualizarUsuario(1L, dto);
+
+        assertEquals("nuevo@mail.com", actualizado.getEmail());
+        assertEquals("987654321", actualizado.getTelefono());
+        assertEquals("ADMIN", actualizado.getRol().getNombre());
+    }
+
+    @Test
+    void testActualizarUsuario_emailYaRegistrado() {
+        Usuario usuarioExistente = crearUsuario(1L, "actual@mail.com", "Luis", "Pérez", "123456789", "USER");
+        UsuarioDTO dto = new UsuarioDTO();
+        dto.setEmail("nuevo@mail.com");
+        dto.setNombre("Luis");
+        dto.setApellido("Pérez");
+        dto.setTelefono("987654321");
+        dto.setRolId(1L); // igual al actual para que no cambie
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioExistente));
+        when(usuarioRepository.existsByEmail("nuevo@mail.com")).thenReturn(true);
+
+        RuntimeException ex = assertThrows(RuntimeException.class,
+                () -> usuarioService.actualizarUsuario(1L, dto));
+        assertEquals("El email ya está registrado", ex.getMessage());
+    }
+
+    @Test
+    void testActualizarUsuario_rolNoExiste() {
+        Usuario usuarioExistente = crearUsuario(1L, "actual@mail.com", "Luis", "Pérez", "123456789", "USER");
+        UsuarioDTO dto = new UsuarioDTO();
+        dto.setEmail("actual@mail.com"); // para no cambiar email
+        dto.setNombre("Luis");
+        dto.setApellido("Pérez");
+        dto.setTelefono("987654321");
+        dto.setRolId(2L); // diferente para disparar búsqueda de rol
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioExistente));
+        when(rolRepository.findById(2L)).thenReturn(Optional.empty());
+
+        RuntimeException ex = assertThrows(RuntimeException.class,
+                () -> usuarioService.actualizarUsuario(1L, dto));
+        assertEquals("Rol no encontrado", ex.getMessage());
+    }
+
+    @Test
+    void testEliminarUsuario_exito() {
+        Usuario usuario = crearUsuario(1L, "usuario@mail.com", "Luis", "Pérez", "123456789", "USER");
+        usuario.setActivo(true);
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(usuarioRepository.save(any())).thenAnswer(i -> i.getArgument(0));
+
+        usuarioService.eliminarUsuario(1L);
+
+        assertFalse(usuario.isActivo());
+        verify(usuarioRepository).save(usuario);
+    }
+
+    @Test
+    void testEliminarUsuario_noEncontrado() {
+        when(usuarioRepository.findById(999L)).thenReturn(Optional.empty());
+
+        RuntimeException ex = assertThrows(RuntimeException.class,
+                () -> usuarioService.eliminarUsuario(999L));
+        assertEquals("Usuario no encontrado", ex.getMessage());
+    }
+
 }

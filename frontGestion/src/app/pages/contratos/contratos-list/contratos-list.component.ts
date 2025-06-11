@@ -25,7 +25,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
-import { MatDivider } from '@angular/material/divider';
 
 @Component({
   selector: 'app-contratos-list',
@@ -57,21 +56,12 @@ import { MatDivider } from '@angular/material/divider';
     MatSnackBarModule,
     MatDialogModule,
     MatSelectModule,
-    MatDivider
   ],
 })
 export class ContratosListComponent implements OnInit {
   contratos: Contrato[] = [];
   contratosFiltrados: Contrato[] = [];
   loading = false;
-  contratoActivoParaFirmar: Contrato | null = null;
-  mostrarModalFirma: boolean = false;
-  aceptando: boolean = false;
-  rechazando: boolean = false;
-  fechaFirma: string = '';
-  motivoRechazo: string = '';
-  esAdmin: boolean = false;
-  esCliente: boolean = false;
   displayedColumns: string[] = [
     'id',
     'seguro',
@@ -99,16 +89,7 @@ export class ContratosListComponent implements OnInit {
     private authService: AuthService,
     private snackBar: MatSnackBar,
     private dialog: MatDialog
-  ) {
-    const perfil = this.authService.getUsuarioPerfil();
-    const roles: string[] = perfil && Array.isArray((perfil as any).roles) ? (perfil as any).roles : [];
-    this.esCliente = roles.includes('ROLE_CLIENTE');
-    this.esAdmin = roles.includes('ROLE_ADMIN');
-    console.log("Perfil:",perfil)
-    
-    console.log("Admin:",this.esAdmin)
-    console.log("Cliente:",this.esCliente)
-  }
+  ) {}
 
   ngOnInit(): void {
     this.cargarContratos();
@@ -116,39 +97,53 @@ export class ContratosListComponent implements OnInit {
 
   cargarContratos(): void {
     this.loading = true;
+    this.contratoService
+      .obtenerPorCliente(this.authService.getUsuarioId())
+      .subscribe({
+        next: (data) => {
+          console.log('Datos recibidos del servidor:', data);
 
-    const obs = this.esCliente
-      ? this.contratoService.obtenerPorCliente(this.authService.getUsuarioId())
-      : this.contratoService.obtenerTodosLosContratos();
-    obs.subscribe({
-      next: (data) => {
-        this.contratos = data;
-        this.normalizarEstadosContratos();
-        this.filtroEstado = 'TODOS';
-        this.aplicarFiltro();
-        this.verificarContratosVencidos();
-        this.loading = false;
-        // Buscar contrato ACTIVO para firma
-        if (this.esCliente) {
-          const contratoActivo = this.contratos.find(c => c.estado === 'ACTIVO');
-          if (contratoActivo) {
-            this.contratoActivoParaFirmar = contratoActivo;
-            this.mostrarModalFirma = true;
-          } else {
-            this.mostrarModalFirma = false;
-            this.contratoActivoParaFirmar = null;
-          }
-        }
-      },
-      error: (err) => {
-        this.snackBar.open('Error al cargar los contratos', 'Cerrar', { duration: 3000 });
-        this.loading = false;
-      },
-    });
-  }
+          // Almacenar todos los contratos sin filtrar
+          this.contratos = data;
 
-  cargarContratosPorId(){
-    
+          // Debug: Mostrar los estados únicos que vienen del servidor
+          const estadosUnicos = [
+            ...new Set(this.contratos.map((c) => c.estado)),
+          ];
+          console.log('Estados únicos recibidos del servidor:', estadosUnicos);
+
+          // Normalizar los estados para garantizar consistencia
+          this.normalizarEstadosContratos();
+
+          // Aplicar filtro inicial (mostrar todos por defecto)
+          this.filtroEstado = 'TODOS';
+
+          // Aplicar filtro y mostrar todos los contratos inicialmente
+          this.aplicarFiltro();
+
+          // Verificar contratos vencidos
+          this.verificarContratosVencidos();
+
+          this.loading = false;
+
+          // Verificar que se obtuvieron contratos
+          console.log(
+            `Contratos cargados: ${this.contratos.length}`,
+            this.contratos
+          );
+          console.log(
+            `Contratos filtrados: ${this.contratosFiltrados.length}`,
+            this.contratosFiltrados
+          );
+        },
+        error: (err) => {
+          console.error('Error al cargar contratos', err);
+          this.snackBar.open('Error al cargar los contratos', 'Cerrar', {
+            duration: 3000,
+          });
+          this.loading = false;
+        },
+      });
   }
 
   // Método para normalizar los estados de todos los contratos
@@ -329,48 +324,7 @@ export class ContratosListComponent implements OnInit {
   }
 
   editarContrato(contrato: Contrato): void {
-    if ((contrato.estado as string) === 'ACEPTADO' || (contrato.estado as string) === 'RECHAZADO') return;
     this.editar.emit({ ...contrato });
-  }
-
-  aceptarContrato(): void {
-    if (!this.contratoActivoParaFirmar?.id) return;
-    
-    this.aceptando = true;
-    
-    this.contratoService.actualizarEstado(this.contratoActivoParaFirmar.id, 'ACEPTADO').subscribe({
-      next: (contrato) => {
-        this.snackBar.open('Contrato aceptado exitosamente', 'Cerrar', { duration: 3000 });
-        this.aceptando = false;
-        this.mostrarModalFirma = false;
-        this.cargarContratos();
-      },
-      error: (err) => {
-        console.error('Error al aceptar el contrato:', err);
-        this.snackBar.open('Error al aceptar el contrato', 'Cerrar', { duration: 3000 });
-        this.aceptando = false;
-      }
-    });
-  }
-  
-  rechazarContrato(): void {
-    if (!this.contratoActivoParaFirmar?.id) return;
-    
-    this.rechazando = true;
-    
-    this.contratoService.actualizarEstado(this.contratoActivoParaFirmar.id, 'RECHAZADO').subscribe({
-      next: (contrato) => {
-        this.snackBar.open('Contrato rechazado', 'Cerrar', { duration: 3000 });
-        this.rechazando = false;
-        this.mostrarModalFirma = false;
-        this.cargarContratos();
-      },
-      error: (err) => {
-        console.error('Error al rechazar el contrato:', err);
-        this.snackBar.open('Error al rechazar el contrato', 'Cerrar', { duration: 3000 });
-        this.rechazando = false;
-      }
-    });
   }
 
   getEstadoColor(estado: string): string {
