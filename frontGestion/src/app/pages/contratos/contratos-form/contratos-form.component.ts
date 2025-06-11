@@ -264,7 +264,7 @@ export class ContratosFormComponent implements OnInit {
           nombre: beneficiario.nombre,
           parentesco: beneficiario.parentesco,
           porcentaje: beneficiario.porcentaje,
-          esPrincipal: beneficiario.esPrincipal ? 1 : 0,
+          esPrincipal: !!beneficiario.esPrincipal, 
           documentoIdentidad: beneficiario.numeroIdentificacion,
           email: beneficiario.email || '',
           telefono: beneficiario.telefono || '',

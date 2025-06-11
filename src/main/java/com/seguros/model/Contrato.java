@@ -54,6 +54,10 @@ public class Contrato {
 
     @OneToMany(mappedBy = "contrato")
     private List<Reembolso> reembolsos;
+    
+    @OneToMany(mappedBy = "contrato", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Dependiente> dependientes;
+
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

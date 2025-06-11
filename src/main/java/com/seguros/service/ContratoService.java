@@ -241,8 +241,7 @@ public class ContratoService {
 
         return contratoRepository.save(contrato);
     }
-
-
-
-
+    public List<Contrato> obtenerTodos() {
+        return contratoRepository.findAll();
+    }
 }

@@ -66,4 +66,14 @@ public class ContratoController {
     public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
+
+    @GetMapping
+    public ResponseEntity<List<ContratoDTO>> obtenerTodos() {
+        List<Contrato> contratos = contratoService.obtenerTodos();
+        List<ContratoDTO> dtos = contratos.stream()
+                .map(contratoService::convertirAContratoDTO)
+                .toList();
+        return ResponseEntity.ok(dtos);
+    }
+
 }
