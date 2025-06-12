@@ -38,11 +38,16 @@ public class JwtService {
                 .compact();
     }
 
-
-
+    // ✅ Verificación por username
     public boolean isTokenValid(String token, String username) {
         final String tokenUsername = extractUsername(token);
         return tokenUsername.equals(username) && !isTokenExpired(token);
+    }
+
+    // ✅ Verificación por UserDetails (para filtros)
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {

@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-@Data
 public class ReembolsoResponseDTO {
     private Long id;
     private Long contratoId;

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
+  FormControl,
   FormGroup,
   ReactiveFormsModule,
   Validators,
@@ -15,6 +16,9 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ReembolsoService } from '../../../core/services/reembolso.service';
 import { ContratoService } from '../../../core/services/contrato.service';
 import { AuthService } from '../../../services/auth.service';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-reembolso-crear',
@@ -27,6 +31,9 @@ import { AuthService } from '../../../services/auth.service';
     MatInputModule,
     MatButtonModule,
     MatSnackBarModule,
+    MatCheckboxModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
   ],
   templateUrl: './reembolso-crear.component.html',
   styleUrls: ['./reembolso-crear.component.css'],
@@ -35,6 +42,13 @@ export class ReembolsoCrearComponent implements OnInit {
   form: FormGroup;
   contratos: any[] = [];
   archivoSeleccionado: File | null = null;
+
+  get esAccidente(): boolean {
+    return this.form.get('esAccidente')?.value;
+  }
+  get esAccidenteControl(): FormControl {
+    return this.form.get('esAccidente') as FormControl;
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -47,6 +61,13 @@ export class ReembolsoCrearComponent implements OnInit {
       contratoId: ['', Validators.required],
       descripcion: ['', Validators.required],
       monto: ['', [Validators.required, Validators.min(0.01)]],
+      nombreMedico: [''],
+      motivoConsulta: [''],
+      cie10: [''],
+      fechaAtencion: [''],
+      inicioSintomas: [''],
+      esAccidente: [false],
+      detalleAccidente: [''],
     });
   }
 
@@ -72,14 +93,27 @@ export class ReembolsoCrearComponent implements OnInit {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('clienteId', clienteId.toString());
-    formData.append('contratoId', this.form.value.contratoId);
-    formData.append('descripcion', this.form.value.descripcion);
-    formData.append('monto', this.form.value.monto);
-    formData.append('archivo', this.archivoSeleccionado);
+    const datos = {
+      contratoId: this.form.value.contratoId,
+      descripcion: this.form.value.descripcion,
+      monto: this.form.value.monto,
+      nombreMedico: this.form.value.nombreMedico,
+      motivoConsulta: this.form.value.motivoConsulta,
+      cie10: this.form.value.cie10,
+      fechaAtencion: this.form.value.fechaAtencion,
+      inicioSintomas: this.form.value.inicioSintomas,
+      esAccidente: this.form.value.esAccidente,
+      detalleAccidente: this.form.value.detalleAccidente,
+    };
 
-    this.reembolsoService.crearReembolso(formData).subscribe({
+    const formData = new FormData();
+    formData.append(
+      'datos',
+      new Blob([JSON.stringify(datos)], { type: 'application/json' })
+    );
+    formData.append('archivos', this.archivoSeleccionado);
+
+    this.reembolsoService.crearReembolsoConArchivos(formData).subscribe({
       next: () =>
         this.snackBar.open('Reembolso enviado', 'Cerrar', { duration: 3000 }),
       error: () => this.snackBar.open('Error al enviar solicitud', 'Cerrar'),

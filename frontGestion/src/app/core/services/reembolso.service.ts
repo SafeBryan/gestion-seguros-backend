@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-import { ReembolsoRequest } from '../../models/reembolso-request.model';
 import { ReembolsoResponse } from '../../models/reembolso-response.model';
 import { AuthService } from '../../services/auth.service';
 
@@ -17,30 +16,30 @@ export class ReembolsoService {
     return this.authService.getAuthHeaders();
   }
 
-  crearReembolso(reembolso: ReembolsoRequest): Observable<ReembolsoResponse> {
-    return this.http.post<ReembolsoResponse>(this.apiUrl, reembolso, {
-      headers: this.getAuthHeaders(),
+  // ✅ Nuevo método para enviar FormData (con archivos adjuntos)
+  crearReembolsoConArchivos(formData: FormData): Observable<ReembolsoResponse> {
+    return this.http.post<ReembolsoResponse>(this.apiUrl, formData, {
+      headers: this.getAuthHeaders().delete('Content-Type'), // ⚠️ deja que el navegador genere el boundary
     });
   }
 
+  // ✅ Consulta reembolsos por cliente
   obtenerMisReembolsos(clienteId: number): Observable<ReembolsoResponse[]> {
     return this.http
       .get<ReembolsoResponse[]>(`${this.apiUrl}/cliente/${clienteId}`, {
         headers: this.getAuthHeaders(),
       })
-      .pipe(
-        tap((data) => {
-          console.log('Reembolsos cliente:', data);
-        })
-      );
+      .pipe(tap((data) => console.log('Reembolsos cliente:', data)));
   }
 
+  // ✅ Consulta todos los reembolsos pendientes
   obtenerPendientes(): Observable<ReembolsoResponse[]> {
     return this.http.get<ReembolsoResponse[]>(`${this.apiUrl}/pendientes`, {
       headers: this.getAuthHeaders(),
     });
   }
 
+  // ✅ Procesa un reembolso (admin/agente)
   procesarReembolso(
     id: number,
     aprobar: boolean,
@@ -50,7 +49,7 @@ export class ReembolsoService {
       headers: this.getAuthHeaders(),
       params: {
         aprobar: aprobar.toString(),
-        comentario: comentario,
+        comentario,
       },
     });
   }
