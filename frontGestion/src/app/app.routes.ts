@@ -8,6 +8,7 @@ import { ContratosListComponent } from './pages/contratos/contratos-list/contrat
 import { ContratosPageComponent } from './pages/contratos/contratos-page/contratos-page.component';
 import { ClientesListComponent } from './pages/clientes/clientes-list/clientes-list.component';
 import { ReembolsoCrearComponent } from './pages/reembolsos/reembolso-crear/reembolso-crear.component';
+import { ReembolsoHistorialComponent } from './pages/reembolsos/reembolso-historial/reembolso-historial.component';
 
 export const routes: Routes = [
   {
@@ -47,6 +48,11 @@ export const routes: Routes = [
   {
     path: 'reembolsos/crear',
     component: ReembolsoCrearComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'reembolsos',
+    component: ReembolsoHistorialComponent,
     canActivate: [authGuard],
   },
   {

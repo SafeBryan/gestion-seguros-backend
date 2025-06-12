@@ -23,7 +23,7 @@ export class MenuService {
     { title: 'Inicio', url: '/home', icon: 'home' },
     { title: 'Mis Contratos', url: '/mis-contratos', icon: 'assignment' },
     {
-      title: 'Solicitar Reembolso',
+      title: 'Pedir Reembolso',
       url: '/reembolsos/crear',
       icon: 'request_quote',
     },

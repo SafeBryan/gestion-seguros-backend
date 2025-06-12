@@ -53,4 +53,9 @@ export class ReembolsoService {
       },
     });
   }
+  obtenerPorCliente(clienteId: number): Observable<ReembolsoResponse[]> {
+    return this.http.get<ReembolsoResponse[]>(
+      `${this.apiUrl}/cliente/${clienteId}`
+    );
+  }
 }
