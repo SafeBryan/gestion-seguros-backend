@@ -1,0 +1,21 @@
+<h2>Mis Reembolsos</h2>
+
+<div *ngIf="cargando" class="spinner-container">
+  <mat-spinner></mat-spinner>
+</div>
+
+<div *ngIf="!cargando && reembolsos.length === 0">
+  <p>No tienes solicitudes de reembolso aún.</p>
+</div>
+
+<mat-card *ngFor="let r of reembolsos" class="reembolso-card">
+  <mat-card-title>
+    <mat-icon>receipt</mat-icon> {{ r.descripcion }}
+  </mat-card-title>
+  <mat-card-content>
+    <p><strong>Monto:</strong> ${{ r.monto }}</p>
+    <p><strong>Estado:</strong> {{ r.estado }}</p>
+    <p><strong>Contrato ID:</strong> {{ r.contratoId }}</p>
+    <p><strong>Fecha Solicitud:</strong> {{ r.fechaSolicitud | date }}</p>
+  </mat-card-content>
+</mat-card>

@@ -10,23 +10,35 @@ export interface IMenu {
   providedIn: 'root',
 })
 export class MenuService {
-  private listMenu: IMenu[] = [
+  private adminMenu: IMenu[] = [
     { title: 'Inicio', url: '/home', icon: 'home' },
-    { title: 'Usuario', url: '/usuarios', icon: 'person' }, // Cambio de 'user' a 'person'
-    { title: 'Seguros', url: '/seguros', icon: 'security' }, // Cambio de 'seguro' a 'security'
-    { title: 'Contratos', url: '/contratos', icon: 'description' }, // Cambio de 'contrato' a 'description'
-    { title: 'Clientes', url: '/clientes', icon: 'description' }, // Cambio de 'contrato' a 'description'
+    { title: 'Usuario', url: '/usuarios', icon: 'person' },
+    { title: 'Seguros', url: '/seguros', icon: 'security' },
+    { title: 'Contratos', url: '/contratos', icon: 'description' },
+    { title: 'Clientes', url: '/clientes', icon: 'people' },
+    { title: 'Reembolsos', url: '/reembolsos/pendientes', icon: 'receipt' },
   ];
 
-  constructor() {}
+  private clienteMenu: IMenu[] = [
+    { title: 'Inicio', url: '/home', icon: 'home' },
+    { title: 'Mis Contratos', url: '/mis-contratos', icon: 'assignment' },
+    {
+      title: 'Pedir Reembolso',
+      url: '/reembolsos/crear',
+      icon: 'request_quote',
+    },
+    { title: 'Mis Reembolsos', url: '/reembolsos', icon: 'receipt_long' },
+  ];
 
-  getMenu() {
-    return [...this.listMenu];
-  }
-
-  getMenuByUrl(url: string): IMenu {
-    return this.listMenu.find(
-      (menu) => menu.url.toLowerCase() === url.toLocaleLowerCase()
-    ) as IMenu;
+  getMenuByRol(rol: string): IMenu[] {
+    switch (rol.toUpperCase()) {
+      case 'ADMIN':
+      case 'AGENTE':
+        return [...this.adminMenu];
+      case 'CLIENTE':
+        return [...this.clienteMenu];
+      default:
+        return [{ title: 'Inicio', url: '/home', icon: 'home' }];
+    }
   }
 }

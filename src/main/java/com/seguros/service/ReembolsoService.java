@@ -1,12 +1,14 @@
 package com.seguros.service;
 
-import com.seguros.dto.ReembolsoDTO;
+import com.seguros.dto.ReembolsoRequestDTO;
+import com.seguros.dto.ReembolsoResponseDTO;
 import com.seguros.model.*;
 import com.seguros.repository.ReembolsoRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReembolsoService {
@@ -15,7 +17,6 @@ public class ReembolsoService {
     private final ContratoService contratoService;
     private final UsuarioService usuarioService;
 
-    // Constructor manual para inyección de dependencias
     public ReembolsoService(ReembolsoRepository reembolsoRepository,
                             ContratoService contratoService,
                             UsuarioService usuarioService) {
@@ -25,9 +26,9 @@ public class ReembolsoService {
     }
 
     @Transactional
-    public Reembolso solicitarReembolso(ReembolsoDTO reembolsoDTO) {
-        Contrato contrato = contratoService.obtenerContratoValido(reembolsoDTO.getContratoId());
-        Usuario cliente = usuarioService.obtenerUsuario(reembolsoDTO.getClienteId());
+    public Reembolso solicitarReembolso(ReembolsoRequestDTO dto, Long clienteId) {
+        Contrato contrato = contratoService.obtenerContratoValido(dto.getContratoId());
+        Usuario cliente = usuarioService.obtenerUsuario(clienteId);
 
         if (!contrato.getCliente().getId().equals(cliente.getId())) {
             throw new RuntimeException("El contrato no pertenece al cliente");
@@ -35,8 +36,18 @@ public class ReembolsoService {
 
         Reembolso reembolso = new Reembolso();
         reembolso.setContrato(contrato);
-        reembolso.setMonto(reembolsoDTO.getMonto());
-        reembolso.setDescripcion(reembolsoDTO.getDescripcion());
+        reembolso.setMonto(dto.getMonto());
+        reembolso.setDescripcion(dto.getDescripcion());
+        reembolso.setArchivos(dto.getArchivos() != null ? dto.getArchivos().toString() : null);
+
+        // Info médica y de accidente si aplica
+        reembolso.setNombreMedico(dto.getNombreMedico());
+        reembolso.setMotivoConsulta(dto.getMotivoConsulta());
+        reembolso.setCie10(dto.getCie10());
+        reembolso.setFechaAtencion(dto.getFechaAtencion());
+        reembolso.setInicioSintomas(dto.getInicioSintomas());
+        reembolso.setEsAccidente(dto.getEsAccidente() != null && dto.getEsAccidente());
+        reembolso.setDetalleAccidente(dto.getDetalleAccidente());
 
         return reembolsoRepository.save(reembolso);
     }
@@ -68,6 +79,10 @@ public class ReembolsoService {
     public List<Reembolso> obtenerReembolsosPorCliente(Long clienteId) {
         Usuario cliente = usuarioService.obtenerUsuario(clienteId);
         return reembolsoRepository.findByContrato_Cliente(cliente);
+    }
+
+    public Optional<Reembolso> buscarPorId(Long id) {
+        return reembolsoRepository.findById(id);
     }
 
 }

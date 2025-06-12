@@ -10,25 +10,31 @@ import { CommonModule } from '@angular/common';
   selector: 'app-menu',
   standalone: true,
   imports: [
-    MatListModule, 
-    RouterModule, 
+    MatListModule,
+    RouterModule,
     MatButtonModule,
     CommonModule,
-    MatIconModule
+    MatIconModule,
   ],
   templateUrl: './menu.component.html',
-  styleUrl: './menu.component.css'
+  styleUrl: './menu.component.css',
 })
 export class MenuComponent implements OnInit {
-  listMenu: IMenu[];
-  
+  listMenu: IMenu[] = [];
   private menuSrv = inject(MenuService);
-  
-  constructor() {
-    this.listMenu = this.menuSrv.getMenu();
-  }
-  
+
   ngOnInit(): void {
-    // Ya no necesitamos registrar SVGs personalizados
+    const usuarioStr = localStorage.getItem('UserProfile');
+
+    if (!usuarioStr) {
+      this.listMenu = [];
+      return;
+    }
+
+    const usuario = JSON.parse(usuarioStr);
+    const rawRol = usuario?.roles?.[0] ?? 'ROLE_INVITADO';
+    const rol = rawRol.replace('ROLE_', '');
+
+    this.listMenu = this.menuSrv.getMenuByRol(rol);
   }
 }
