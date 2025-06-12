@@ -7,6 +7,7 @@ import { UsuariosComponent } from './pages/usuarios/usuarios.component';
 import { ContratosListComponent } from './pages/contratos/contratos-list/contratos-list.component';
 import { ContratosPageComponent } from './pages/contratos/contratos-page/contratos-page.component';
 import { ClientesListComponent } from './pages/clientes/clientes-list/clientes-list.component';
+import { ReembolsoCrearComponent } from './pages/reembolsos/reembolso-crear/reembolso-crear.component';
 
 export const routes: Routes = [
   {
@@ -41,6 +42,11 @@ export const routes: Routes = [
   {
     path: 'clientes',
     component: ClientesListComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'reembolsos/crear',
+    component: ReembolsoCrearComponent,
     canActivate: [authGuard],
   },
   {

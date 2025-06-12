@@ -16,9 +16,11 @@ interface LoginResponse {
 }
 
 interface JwtPayload {
-  id: number; // 👈 Aquí está el ID real
-  rol: string;
-  sub: string; // usuario o email
+  id: number;
+  nombre: string;
+  apellido: string;
+  roles: string[];
+  sub: string;
   iat: number;
   exp: number;
 }
@@ -46,7 +48,22 @@ export class AuthService {
         tap((response) => {
           if (this.isBrowser()) {
             localStorage.setItem(this.tokenKey, response.token);
-            localStorage.setItem(this.tokenUserProfile, JSON.stringify(response))
+
+            // Decodificamos el token para obtener datos del usuario
+            const decoded = jwtDecode<any>(response.token);
+
+            const userProfile: UserProfile = {
+              id: decoded.id,
+              nombre: decoded.nombre,
+              apellido: decoded.apellido,
+              roles: decoded.roles,
+              token: response.token,
+            };
+
+            localStorage.setItem(
+              this.tokenUserProfile,
+              JSON.stringify(userProfile)
+            );
             this.loggedIn.next(true);
           }
         })
@@ -100,8 +117,7 @@ export class AuthService {
     }
   }
 
-
-  getUsuarioPerfil(): UserProfile | null{
+  getUsuarioPerfil(): UserProfile | null {
     if (this.isBrowser()) {
       const userProfile = localStorage.getItem(this.tokenUserProfile);
       return userProfile ? JSON.parse(userProfile) : null;
