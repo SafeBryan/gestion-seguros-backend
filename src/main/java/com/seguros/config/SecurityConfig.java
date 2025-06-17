@@ -31,6 +31,9 @@ public class SecurityConfig {
                 .cors() // 🔥 ESTO activa tu configuración CorsConfig
                 .and()
                 .csrf(AbstractHttpConfigurer::disable)
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.disable()) // 🔥 Esto es clave
+                )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
@@ -38,7 +41,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/swagger-ui.html/api/auth/**"
+                                "/swagger-ui.html/api/auth/**",
+                                "/uploads/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
