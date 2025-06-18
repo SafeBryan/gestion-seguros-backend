@@ -77,18 +77,19 @@ public class SeguroControllerIT {
 
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(username = "admin@test.com", roles = "ADMIN") // 👈 Coincide con el email del usuario creado
     void crearSeguro_IntegrationTest() throws Exception {
-        String seguroJson = String.format("""
+        String seguroJson = """
         {
             "nombre": "Seguro Salud",
             "descripcion": "Cobertura completa de salud",
             "tipo": "SALUD",
             "precioAnual": 250.0,
             "activo": true,
-            "creadoPorId": %d
+            "hospitalesConvenio": "Clínica Ambato, Hospital Central",
+            "numeroConsultasIncluidas": 5
         }
-        """, creador.getId());
+        """;
 
         mockMvc.perform(post("/api/seguros")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -96,6 +97,7 @@ public class SeguroControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nombre").value("Seguro Salud"));
     }
+
 
 
     @Test

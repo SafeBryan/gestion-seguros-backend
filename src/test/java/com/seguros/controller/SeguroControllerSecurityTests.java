@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class SeguroControllerSecurityTest {
+public class SeguroControllerSecurityTests {
 
     @Autowired
     private MockMvc mockMvc;

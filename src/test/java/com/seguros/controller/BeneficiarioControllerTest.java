@@ -54,10 +54,12 @@ public class BeneficiarioControllerTest {
                 "password",
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
         );
-        Mockito.when(jwtService.extractUsername(any())).thenReturn(mockUser.getUsername());
-        Mockito.when(jwtService.isTokenValid(any(), any())).thenReturn(true);
-        Mockito.when(userDetailsService.loadUserByUsername(any())).thenReturn(mockUser);
+        Mockito.when(jwtService.extractUsername(any(String.class))).thenReturn(mockUser.getUsername());
+        Mockito.when(jwtService.isTokenValid(any(String.class), any(UserDetails.class))).thenReturn(true); // ✅ Línea corregida
+        Mockito.when(userDetailsService.loadUserByUsername(any(String.class))).thenReturn(mockUser);
     }
+
+
 
     @Test
     void testCrearBeneficiario() throws Exception {
