@@ -6,6 +6,7 @@ import com.seguros.model.*;
 import com.seguros.repository.ReembolsoRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,7 @@ public class ReembolsoService {
         this.usuarioService = usuarioService;
     }
 
+
     @Transactional
     public Reembolso solicitarReembolso(ReembolsoRequestDTO dto, Long clienteId) {
         Contrato contrato = contratoService.obtenerContratoValido(dto.getContratoId());
@@ -38,9 +40,21 @@ public class ReembolsoService {
         reembolso.setContrato(contrato);
         reembolso.setMonto(dto.getMonto());
         reembolso.setDescripcion(dto.getDescripcion());
-        reembolso.setArchivos(dto.getArchivos() != null ? dto.getArchivos().toString() : null);
 
-        // Info médica y de accidente si aplica
+        // ✅ Usar JSON válido para los archivos
+        try {
+            if (dto.getArchivos() != null) {
+                ObjectMapper mapper = new ObjectMapper();
+                String archivosJson = mapper.writeValueAsString(dto.getArchivos());
+                reembolso.setArchivos(archivosJson);
+            } else {
+                reembolso.setArchivos(null);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error al convertir archivos a JSON", e);
+        }
+
+        // Datos médicos y de accidente
         reembolso.setNombreMedico(dto.getNombreMedico());
         reembolso.setMotivoConsulta(dto.getMotivoConsulta());
         reembolso.setCie10(dto.getCie10());
@@ -51,6 +65,7 @@ public class ReembolsoService {
 
         return reembolsoRepository.save(reembolso);
     }
+
 
     public List<Reembolso> obtenerReembolsosPendientes() {
         return reembolsoRepository.findByEstado(Reembolso.EstadoReembolso.PENDIENTE);

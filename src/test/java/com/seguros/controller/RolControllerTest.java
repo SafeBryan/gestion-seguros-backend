@@ -51,7 +51,7 @@ public class RolControllerTest {
     private void mockSecurityContext() {
         UserDetails user = new User("admin", "123", List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
         Mockito.when(jwtService.extractUsername(any())).thenReturn("admin");
-        Mockito.when(jwtService.isTokenValid(any(), any())).thenReturn(true);
+        Mockito.when(jwtService.isTokenValid(any(String.class), any(UserDetails.class))).thenReturn(true);
         Mockito.when(userDetailsService.loadUserByUsername("admin")).thenReturn(user);
     }
 

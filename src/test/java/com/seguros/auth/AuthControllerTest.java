@@ -3,6 +3,7 @@ package com.seguros.auth;
 import com.seguros.model.Usuario;
 import com.seguros.repository.UsuarioRepository;
 import com.seguros.security.JwtService;
+import com.seguros.security.UsuarioDetails;
 import com.seguros.security.UsuarioDetailsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,13 +13,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -57,18 +58,25 @@ class AuthControllerTest {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authentication);
 
-        // Mock de UserDetails
-        UserDetails userDetails = mock(UserDetails.class);
-        GrantedAuthority authority = () -> "ROLE_USER";
-        doReturn(Arrays.asList(authority)).when(userDetails).getAuthorities();
-        when(userDetailsService.loadUserByUsername(email)).thenReturn(userDetails);
-
-        // Mock del usuario
+        // Crear objeto Usuario real
         Usuario usuario = new Usuario();
         usuario.setId(usuarioId);
         usuario.setNombre(nombre);
         usuario.setApellido(apellido);
+        usuario.setEmail(email);
+        usuario.setPassword(password);
 
+        // Autoridad simulada
+        GrantedAuthority authority = () -> "ROLE_USER";
+        Collection<GrantedAuthority> authorities = Arrays.asList(authority);
+
+        // Crear UsuarioDetails real con el usuario
+        UsuarioDetails userDetails = new UsuarioDetails(usuario, authorities);
+
+        // Mock del servicio que retorna UsuarioDetails
+        when(userDetailsService.loadUserByUsername(email)).thenReturn(userDetails);
+
+        // Mock del repositorio
         UsuarioRepository usuarioRepository = mock(UsuarioRepository.class);
         when(usuarioRepository.findByEmail(email)).thenReturn(Optional.of(usuario));
 

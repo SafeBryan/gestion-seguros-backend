@@ -57,7 +57,7 @@ import { MatDivider } from '@angular/material/divider';
     MatSnackBarModule,
     MatDialogModule,
     MatSelectModule,
-    MatDivider
+    MatDivider,
   ],
 })
 export class ContratosListComponent implements OnInit {
@@ -101,13 +101,16 @@ export class ContratosListComponent implements OnInit {
     private dialog: MatDialog
   ) {
     const perfil = this.authService.getUsuarioPerfil();
-    const roles: string[] = perfil && Array.isArray((perfil as any).roles) ? (perfil as any).roles : [];
+    const roles: string[] =
+      perfil && Array.isArray((perfil as any).roles)
+        ? (perfil as any).roles
+        : [];
     this.esCliente = roles.includes('ROLE_CLIENTE');
     this.esAdmin = roles.includes('ROLE_ADMIN');
-    console.log("Perfil:",perfil)
-    
-    console.log("Admin:",this.esAdmin)
-    console.log("Cliente:",this.esCliente)
+    console.log('Perfil:', perfil);
+
+    console.log('Admin:', this.esAdmin);
+    console.log('Cliente:', this.esCliente);
   }
 
   ngOnInit(): void {
@@ -130,7 +133,9 @@ export class ContratosListComponent implements OnInit {
         this.loading = false;
         // Buscar contrato ACTIVO para firma
         if (this.esCliente) {
-          const contratoActivo = this.contratos.find(c => c.estado === 'ACTIVO');
+          const contratoActivo = this.contratos.find(
+            (c) => c.estado === 'ACTIVO'
+          );
           if (contratoActivo) {
             this.contratoActivoParaFirmar = contratoActivo;
             this.mostrarModalFirma = true;
@@ -141,15 +146,15 @@ export class ContratosListComponent implements OnInit {
         }
       },
       error: (err) => {
-        this.snackBar.open('Error al cargar los contratos', 'Cerrar', { duration: 3000 });
+        this.snackBar.open('Error al cargar los contratos', 'Cerrar', {
+          duration: 3000,
+        });
         this.loading = false;
       },
     });
   }
 
-  cargarContratosPorId(){
-    
-  }
+  cargarContratosPorId() {}
 
   // Método para normalizar los estados de todos los contratos
   normalizarEstadosContratos(): void {
@@ -329,48 +334,64 @@ export class ContratosListComponent implements OnInit {
   }
 
   editarContrato(contrato: Contrato): void {
-    if ((contrato.estado as string) === 'ACEPTADO' || (contrato.estado as string) === 'RECHAZADO') return;
+    if (
+      (contrato.estado as string) === 'ACEPTADO' ||
+      (contrato.estado as string) === 'RECHAZADO'
+    )
+      return;
     this.editar.emit({ ...contrato });
   }
 
   aceptarContrato(): void {
     if (!this.contratoActivoParaFirmar?.id) return;
-    
+
     this.aceptando = true;
-    
-    this.contratoService.actualizarEstado(this.contratoActivoParaFirmar.id, 'ACEPTADO').subscribe({
-      next: (contrato) => {
-        this.snackBar.open('Contrato aceptado exitosamente', 'Cerrar', { duration: 3000 });
-        this.aceptando = false;
-        this.mostrarModalFirma = false;
-        this.cargarContratos();
-      },
-      error: (err) => {
-        console.error('Error al aceptar el contrato:', err);
-        this.snackBar.open('Error al aceptar el contrato', 'Cerrar', { duration: 3000 });
-        this.aceptando = false;
-      }
-    });
+
+    this.contratoService
+      .actualizarEstado(this.contratoActivoParaFirmar.id, 'ACEPTADO')
+      .subscribe({
+        next: (contrato) => {
+          this.snackBar.open('Contrato aceptado exitosamente', 'Cerrar', {
+            duration: 3000,
+          });
+          this.aceptando = false;
+          this.mostrarModalFirma = false;
+          this.cargarContratos();
+        },
+        error: (err) => {
+          console.error('Error al aceptar el contrato:', err);
+          this.snackBar.open('Error al aceptar el contrato', 'Cerrar', {
+            duration: 3000,
+          });
+          this.aceptando = false;
+        },
+      });
   }
-  
+
   rechazarContrato(): void {
     if (!this.contratoActivoParaFirmar?.id) return;
-    
+
     this.rechazando = true;
-    
-    this.contratoService.actualizarEstado(this.contratoActivoParaFirmar.id, 'RECHAZADO').subscribe({
-      next: (contrato) => {
-        this.snackBar.open('Contrato rechazado', 'Cerrar', { duration: 3000 });
-        this.rechazando = false;
-        this.mostrarModalFirma = false;
-        this.cargarContratos();
-      },
-      error: (err) => {
-        console.error('Error al rechazar el contrato:', err);
-        this.snackBar.open('Error al rechazar el contrato', 'Cerrar', { duration: 3000 });
-        this.rechazando = false;
-      }
-    });
+
+    this.contratoService
+      .actualizarEstado(this.contratoActivoParaFirmar.id, 'RECHAZADO')
+      .subscribe({
+        next: (contrato) => {
+          this.snackBar.open('Contrato rechazado', 'Cerrar', {
+            duration: 3000,
+          });
+          this.rechazando = false;
+          this.mostrarModalFirma = false;
+          this.cargarContratos();
+        },
+        error: (err) => {
+          console.error('Error al rechazar el contrato:', err);
+          this.snackBar.open('Error al rechazar el contrato', 'Cerrar', {
+            duration: 3000,
+          });
+          this.rechazando = false;
+        },
+      });
   }
 
   getEstadoColor(estado: string): string {
