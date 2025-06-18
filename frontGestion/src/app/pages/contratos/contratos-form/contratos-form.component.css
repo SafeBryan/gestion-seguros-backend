@@ -1,11 +1,12 @@
 .contrato-form {
   position: relative;
-  padding: 16px;
+
 }
 
 .form-card {
   margin-bottom: 20px;
   position: relative;
+
 }
 
 .loading-overlay {
@@ -31,7 +32,6 @@
 
 .date-container {
   display: flex;
-  flex-wrap: wrap;
   gap: 16px;
 }
 
@@ -116,8 +116,7 @@
 }
 
 .beneficiario-porcentaje {
-  max-width: 120px;
-  min-width: 100px;
+  max-width: 100px;
 }
 
 .add-beneficiario,
@@ -138,18 +137,13 @@ mat-card-actions {
 }
 
 @media (max-width: 600px) {
-  .date-container,
-  .beneficiario-row,
-  .dependiente-row,
-  .discapacidad-container {
+  .date-container {
     flex-direction: column;
-    gap: 8px;
+    gap: 0;
   }
-
-  .half-width,
-  .beneficiario-porcentaje {
+  
+  .half-width {
     width: 100%;
-    max-width: 100%;
   }
   
   .beneficiario-row,

@@ -6,15 +6,39 @@
       <h2>Revisión y Firma de Contrato</h2>
       <mat-divider></mat-divider>
       <div class="modal-firma-content">
-        <h3>Seguro: {{ contratoActivoParaFirmar.seguro?.nombre }} ({{ contratoActivoParaFirmar.seguro?.tipo }})</h3>
-        <p><strong>Descripción:</strong> {{ contratoActivoParaFirmar.seguro?.descripcion }}</p>
-        <p><strong>Fecha de inicio:</strong> {{ formatearFecha(contratoActivoParaFirmar.fechaInicio) }}</p>
-        <p><strong>Fecha de fin:</strong> {{ formatearFecha(contratoActivoParaFirmar.fechaFin) }}</p>
-        <p><strong>Frecuencia de pago:</strong> {{ getFrecuenciaPagoTexto(contratoActivoParaFirmar.frecuenciaPago) }}</p>
-        <p><strong>Estado actual:</strong> {{ contratoActivoParaFirmar.estado }}</p>
+        <h3>
+          Seguro: {{ contratoActivoParaFirmar.seguro?.nombre }} ({{
+            contratoActivoParaFirmar.seguro?.tipo
+          }})
+        </h3>
+        <p>
+          <strong>Descripción:</strong>
+          {{ contratoActivoParaFirmar.seguro?.descripcion }}
+        </p>
+        <p>
+          <strong>Fecha de inicio:</strong>
+          {{ formatearFecha(contratoActivoParaFirmar.fechaInicio) }}
+        </p>
+        <p>
+          <strong>Fecha de fin:</strong>
+          {{ formatearFecha(contratoActivoParaFirmar.fechaFin) }}
+        </p>
+        <p>
+          <strong>Frecuencia de pago:</strong>
+          {{ getFrecuenciaPagoTexto(contratoActivoParaFirmar.frecuenciaPago) }}
+        </p>
+        <p>
+          <strong>Estado actual:</strong> {{ contratoActivoParaFirmar.estado }}
+        </p>
         <div *ngIf="contratoActivoParaFirmar.seguro?.tipo === 'VIDA'">
           <h4>Beneficiarios</h4>
-          <table *ngIf="contratoActivoParaFirmar.beneficiarios && contratoActivoParaFirmar.beneficiarios.length > 0" class="beneficiarios-table">
+          <table
+            *ngIf="
+              contratoActivoParaFirmar.beneficiarios &&
+              contratoActivoParaFirmar.beneficiarios.length > 0
+            "
+            class="beneficiarios-table"
+          >
             <thead>
               <tr>
                 <th>Nombre</th>
@@ -32,7 +56,7 @@
                 <td>{{ b.nombre }}</td>
                 <td>{{ b.parentesco }}</td>
                 <td>{{ b.porcentaje }}%</td>
-                <td>{{ b.esPrincipal ? 'Sí' : 'No' }}</td>
+                <td>{{ b.esPrincipal ? "Sí" : "No" }}</td>
                 <td>{{ b.documentoIdentidad }}</td>
                 <td>{{ b.email }}</td>
                 <td>{{ b.telefono }}</td>
@@ -40,7 +64,12 @@
               </tr>
             </tbody>
           </table>
-          <div *ngIf="!contratoActivoParaFirmar.beneficiarios || contratoActivoParaFirmar.beneficiarios.length === 0">
+          <div
+            *ngIf="
+              !contratoActivoParaFirmar.beneficiarios ||
+              contratoActivoParaFirmar.beneficiarios.length === 0
+            "
+          >
             <p>No hay beneficiarios registrados.</p>
           </div>
         </div>
@@ -50,9 +79,23 @@
         </div>
       </div>
       <div class="modal-firma-actions">
-        <button mat-raised-button color="primary" (click)="aceptarContrato()" [disabled]="aceptando || rechazando">Aceptar contrato</button>
-        <button mat-raised-button color="warn" (click)="rechazarContrato()" [disabled]="aceptando || rechazando">Rechazar contrato</button>
-        <mat-form-field style="width: 100%; margin-top: 8px;" *ngIf="rechazando">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="aceptarContrato()"
+          [disabled]="aceptando || rechazando"
+        >
+          Aceptar contrato
+        </button>
+        <button
+          mat-raised-button
+          color="warn"
+          (click)="rechazarContrato()"
+          [disabled]="aceptando || rechazando"
+        >
+          Rechazar contrato
+        </button>
+        <mat-form-field style="width: 100%; margin-top: 8px" *ngIf="rechazando">
           <mat-label>Motivo de rechazo (opcional)</mat-label>
           <input matInput [(ngModel)]="motivoRechazo" />
         </mat-form-field>
@@ -63,18 +106,18 @@
     </div>
   </ng-container>
   @if(!esCliente){
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Contratos</mat-card-title>
-      </mat-card-header>
-      
-      <mat-card-content>
-        <div class="loading-container" *ngIf="loading">
-          <mat-spinner diameter="40"></mat-spinner>
-        </div>
-        
-        <!-- Filtro de estados -->
-        <!-- <div class="filtros-container" *ngIf="!loading && contratos.length > 0">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Contratos</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="loading-container" *ngIf="loading">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <!-- Filtro de estados -->
+      <!-- <div class="filtros-container" *ngIf="!loading && contratos.length > 0">
           <mat-form-field appearance="fill">
             <mat-label>Filtrar por estado</mat-label>
             <mat-select [(value)]="filtroEstado" (selectionChange)="aplicarFiltro()">
@@ -87,8 +130,8 @@
             </mat-select>
           </mat-form-field>
            -->
-          <!-- Información de depuración -->
-          <!-- <div class="debug-info" *ngIf="contratosFiltrados.length !== contratos.length">
+      <!-- Información de depuración -->
+      <!-- <div class="debug-info" *ngIf="contratosFiltrados.length !== contratos.length">
             Mostrando {{contratosFiltrados.length}} de {{contratos.length}} contratos
             (Filtro: {{filtroEstado}})
           </div>
@@ -98,128 +141,179 @@
           <p>No tienes contratos registrados</p>
           <mat-icon class="no-data-icon">description</mat-icon>
         </div> -->
-        
-        <div *ngIf="!loading && contratos.length > 0 && contratosFiltrados.length === 0" class="no-contratos">
-          <p>No hay contratos que coincidan con el filtro "{{filtroEstado}}"</p>
-          <mat-icon class="no-data-icon">filter_list</mat-icon>
-        </div>
-        
-        <div class="table-container" *ngIf="contratosFiltrados.length > 0">
-          <table mat-table [dataSource]="contratosFiltrados" class="mat-elevation-z1 contratos-table" multiTemplateDataRows>
-            <!-- ID Column -->
-            <ng-container matColumnDef="id">
-              <th mat-header-cell *matHeaderCellDef>No.</th>
-              <td mat-cell *matCellDef="let contrato">{{ contrato.id }}</td>
-            </ng-container>
-            
-            <!-- Seguro Column -->
-            <ng-container matColumnDef="seguro">
-              <th mat-header-cell *matHeaderCellDef>Seguro</th>
-              <td mat-cell *matCellDef="let contrato">
-                <span class="seguro-info">{{ contrato.seguro?.nombre || 'N/A' }}</span>
-              </td>
-            </ng-container>
-            
-            <!-- Fecha Inicio Column -->
-            <ng-container matColumnDef="fechaInicio">
-              <th mat-header-cell *matHeaderCellDef>Inicio</th>
-              <td mat-cell *matCellDef="let contrato">{{ formatearFecha(contrato.fechaInicio) }}</td>
-            </ng-container>
-            
-            <!-- Fecha Fin Column -->
-            <ng-container matColumnDef="fechaFin">
-              <th mat-header-cell *matHeaderCellDef>Vencimiento</th>
-              <td mat-cell *matCellDef="let contrato">{{ formatearFecha(contrato.fechaFin) }}</td>
-            </ng-container>
-            
-            <!-- Estado Column -->
-            <ng-container matColumnDef="estado">
-              <th mat-header-cell *matHeaderCellDef>Estado</th>
-              <td mat-cell *matCellDef="let contrato">
-                <mat-chip [color]="getEstadoColor(contrato.estado)" selected>
-                  {{ contrato.estado }}
-                </mat-chip>
-              </td>
-            </ng-container>
-            
-            <!-- Acciones Column -->
-            <ng-container matColumnDef="acciones">
-              <th mat-header-cell *matHeaderCellDef>Acciones</th>
-              <td mat-cell *matCellDef="let contrato">
-                <div class="action-buttons">
-                  <button 
-                    mat-icon-button
-                    color="primary"
-                    matTooltip="Editar contrato"
-                    [disabled]="contrato.estado === 'CANCELADO'"
-                    (click)="editarContrato(contrato)">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  
-                  <button 
-                    mat-icon-button
-                    color="warn"
-                    matTooltip="Cancelar contrato"
-                    [disabled]="contrato.estado === 'CANCELADO'"
-                    (click)="desactivarContrato(contrato)">
-                    <mat-icon>cancel</mat-icon>
-                  </button>
-                  
-                  <button
-                    mat-icon-button
-                    color="accent"
-                    matTooltip="Ver beneficiarios"
-                    (click)="expandRow(contrato)">
-                    <mat-icon>{{ isExpanded(contrato) ? 'expand_less' : 'expand_more' }}</mat-icon>
-                  </button>
-                </div>
-              </td>
-            </ng-container>
-            
-            <!-- Expanded Content Column - The detail row is made up of this one column -->
-            <ng-container matColumnDef="expandedDetail">
-              <td mat-cell *matCellDef="let contrato" [attr.colspan]="displayedColumns.length">
-                <div class="beneficiarios-detail"
-                     [@detailExpand]="isExpanded(contrato) ? 'expanded' : 'collapsed'">
-                  <div class="beneficiarios-wrapper" *ngIf="isExpanded(contrato)">
-                    <h3>Beneficiarios</h3>
-                    <div *ngIf="!contrato.beneficiarios || contrato.beneficiarios.length === 0" class="no-beneficiarios">
-                      <p>No hay beneficiarios registrados para este contrato</p>
-                    </div>
-                    <div *ngIf="contrato.beneficiarios && contrato.beneficiarios.length > 0">
-                      <table class="beneficiarios-table">
-                        <thead>
-                          <tr>
-                            <th>Nombre</th>
-                            <th>Parentesco</th>
-                            <th>Porcentaje</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr *ngFor="let beneficiario of contrato.beneficiarios">
-                            <td>{{ beneficiario.nombre }}</td>
-                            <td>{{ beneficiario.parentesco }}</td>
-                            <td>{{ beneficiario.porcentaje }}%</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
+
+      <div
+        *ngIf="
+          !loading && contratos.length > 0 && contratosFiltrados.length === 0
+        "
+        class="no-contratos"
+      >
+        <p>No hay contratos que coincidan con el filtro "{{ filtroEstado }}"</p>
+        <mat-icon class="no-data-icon">filter_list</mat-icon>
+      </div>
+
+      <div class="table-container" *ngIf="contratosFiltrados.length > 0">
+        <table
+          mat-table
+          [dataSource]="contratosFiltrados"
+          class="mat-elevation-z1 contratos-table"
+          multiTemplateDataRows
+        >
+          <!-- ID Column -->
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>No.</th>
+            <td mat-cell *matCellDef="let contrato">{{ contrato.id }}</td>
+          </ng-container>
+
+          <!-- Seguro Column -->
+          <ng-container matColumnDef="seguro">
+            <th mat-header-cell *matHeaderCellDef>Seguro</th>
+            <td mat-cell *matCellDef="let contrato">
+              <span class="seguro-info">{{
+                contrato.seguro?.nombre || "N/A"
+              }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Fecha Inicio Column -->
+          <ng-container matColumnDef="fechaInicio">
+            <th mat-header-cell *matHeaderCellDef>Inicio</th>
+            <td mat-cell *matCellDef="let contrato">
+              {{ formatearFecha(contrato.fechaInicio) }}
+            </td>
+          </ng-container>
+
+          <!-- Fecha Fin Column -->
+          <ng-container matColumnDef="fechaFin">
+            <th mat-header-cell *matHeaderCellDef>Vencimiento</th>
+            <td mat-cell *matCellDef="let contrato">
+              {{ formatearFecha(contrato.fechaFin) }}
+            </td>
+          </ng-container>
+
+          <!-- Estado Column -->
+          <ng-container matColumnDef="estado">
+            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <td mat-cell *matCellDef="let contrato">
+              <mat-chip [color]="getEstadoColor(contrato.estado)" selected>
+                {{ contrato.estado }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Acciones Column -->
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let contrato">
+              <div class="action-buttons">
+                <button
+                  mat-icon-button
+                  color="primary"
+                  matTooltip="Editar contrato"
+                  [disabled]="contrato.estado === 'CANCELADO'"
+                  (click)="editarContrato(contrato)"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+
+                <button
+                  mat-icon-button
+                  color="warn"
+                  matTooltip="Cancelar contrato"
+                  [disabled]="contrato.estado === 'CANCELADO'"
+                  (click)="desactivarContrato(contrato)"
+                >
+                  <mat-icon>cancel</mat-icon>
+                </button>
+
+                <button
+                  mat-icon-button
+                  color="accent"
+                  matTooltip="Ver beneficiarios"
+                  (click)="expandRow(contrato)"
+                >
+                  <mat-icon>{{
+                    isExpanded(contrato) ? "expand_less" : "expand_more"
+                  }}</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Expanded Content Column - The detail row is made up of this one column -->
+          <ng-container matColumnDef="expandedDetail">
+            <td
+              mat-cell
+              *matCellDef="let contrato"
+              [attr.colspan]="displayedColumns.length"
+            >
+              <div
+                class="beneficiarios-detail"
+                [@detailExpand]="
+                  isExpanded(contrato) ? 'expanded' : 'collapsed'
+                "
+              >
+                <div class="beneficiarios-wrapper" *ngIf="isExpanded(contrato)">
+                  <h3>Beneficiarios</h3>
+                  <div
+                    *ngIf="
+                      !contrato.beneficiarios ||
+                      contrato.beneficiarios.length === 0
+                    "
+                    class="no-beneficiarios"
+                  >
+                    <p>No hay beneficiarios registrados para este contrato</p>
+                  </div>
+                  <div
+                    *ngIf="
+                      contrato.beneficiarios &&
+                      contrato.beneficiarios.length > 0
+                    "
+                  >
+                    <table class="beneficiarios-table">
+                      <thead>
+                        <tr>
+                          <th>Nombre</th>
+                          <th>Parentesco</th>
+                          <th>Porcentaje</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let beneficiario of contrato.beneficiarios">
+                          <td>{{ beneficiario.nombre }}</td>
+                          <td>{{ beneficiario.parentesco }}</td>
+                          <td>{{ beneficiario.porcentaje }}%</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
-              </td>
-            </ng-container>
-  
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr 
-              mat-row 
-              *matRowDef="let row; columns: displayedColumns;"
-              [ngClass]="{'cancelled-row': row.estado === 'CANCELADO', 'expired-row': row.estado === 'VENCIDO', 'expanded-row': isExpanded(row)}">
-            </tr>
-            <tr mat-row *matRowDef="let row; columns: ['expandedDetail']; when: isExpandable"
-                class="detail-row"></tr>
-          </table>
-        </div>
-      </mat-card-content>
-    </mat-card>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: displayedColumns"
+            [ngClass]="{
+              'cancelled-row': row.estado === 'CANCELADO',
+              'expired-row': row.estado === 'VENCIDO',
+              'expanded-row': isExpanded(row)
+            }"
+          ></tr>
+          <tr
+            mat-row
+            *matRowDef="
+              let row;
+              columns: ['expandedDetail'];
+              when: isExpandable
+            "
+            class="detail-row"
+          ></tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
   }
 </div>

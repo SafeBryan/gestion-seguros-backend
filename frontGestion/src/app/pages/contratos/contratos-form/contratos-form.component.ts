@@ -13,7 +13,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 
-import { Contrato, Beneficiario, Dependiente } from '../../../models/contrato.model';
+import {
+  Contrato,
+  Beneficiario,
+  Dependiente,
+} from '../../../models/contrato.model';
 import { Seguro } from '../../../models/seguro.model';
 import { SeguroService } from '../../../core/services/seguro.service';
 import { UsuarioService } from '../../../core/services/usuario.service';
@@ -29,7 +33,7 @@ import { ClienteService } from '../../../core/services/cliente.service';
   templateUrl: './contratos-form.component.html',
   styleUrls: ['./contratos-form.component.css'],
   imports: [
-    CommonModule, 
+    CommonModule,
     FormsModule,
     MatButtonModule,
     MatFormFieldModule,
@@ -40,7 +44,7 @@ import { ClienteService } from '../../../core/services/cliente.service';
     MatIconModule,
     MatCardModule,
     MatDividerModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
   ],
 })
 export class ContratosFormComponent implements OnInit {
@@ -60,8 +64,25 @@ export class ContratosFormComponent implements OnInit {
 
   // Listas para selección
   tiposIdentificacion = ['CEDULA', 'PASAPORTE'];
-  tiposParentesco = ['CONYUGE', 'HIJO/A', 'PADRE', 'MADRE', 'HERMANO/A', 'ABUELO/A', 'NIETO/A', 'OTRO'];
-  hospitalesDisponibles = ['Hospital Metropolitano', 'Hospital de los Valles', 'Clínica Internacional', 'Hospital Vozandes', 'Hospital del IESS', 'Hospital Militar', 'Otro'];
+  tiposParentesco = [
+    'CONYUGE',
+    'HIJO/A',
+    'PADRE',
+    'MADRE',
+    'HERMANO/A',
+    'ABUELO/A',
+    'NIETO/A',
+    'OTRO',
+  ];
+  hospitalesDisponibles = [
+    'Hospital Metropolitano',
+    'Hospital de los Valles',
+    'Clínica Internacional',
+    'Hospital Vozandes',
+    'Hospital del IESS',
+    'Hospital Militar',
+    'Otro',
+  ];
 
   // Control de porcentajes para beneficiarios
   porcentajeTotal = 0;
@@ -96,7 +117,7 @@ export class ContratosFormComponent implements OnInit {
       estado: 'PENDIENTE',
       firmaElectronica: '',
       beneficiarios: [],
-      dependientes: []
+      dependientes: [],
     };
   }
 
@@ -109,9 +130,11 @@ export class ContratosFormComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al cargar seguros', err);
-        this.snackBar.open('Error al cargar los seguros', 'Cerrar', { duration: 3000 });
+        this.snackBar.open('Error al cargar los seguros', 'Cerrar', {
+          duration: 3000,
+        });
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -124,9 +147,11 @@ export class ContratosFormComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al cargar agentes', err);
-        this.snackBar.open('Error al cargar los agentes', 'Cerrar', { duration: 3000 });
+        this.snackBar.open('Error al cargar los agentes', 'Cerrar', {
+          duration: 3000,
+        });
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -134,15 +159,17 @@ export class ContratosFormComponent implements OnInit {
     this.loading = true;
     this.clienteService.listarClientes().subscribe({
       next: (data) => {
-        console.log("Clientes",data);  
+        console.log('Clientes', data);
         this.clientes = data;
         this.loading = false;
       },
       error: (err) => {
         console.error('Error al cargar clientes', err);
-        this.snackBar.open('Error al cargar los clientes', 'Cerrar', { duration: 3000 });
+        this.snackBar.open('Error al cargar los clientes', 'Cerrar', {
+          duration: 3000,
+        });
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -157,7 +184,7 @@ export class ContratosFormComponent implements OnInit {
       porcentaje: 0,
       estatura: '',
       peso: '',
-      lugarNacimiento: ''
+      lugarNacimiento: '',
     });
     this.calcularPorcentajeTotal();
   }
@@ -166,7 +193,7 @@ export class ContratosFormComponent implements OnInit {
     this.contrato!.beneficiarios.splice(index, 1);
     this.calcularPorcentajeTotal();
   }
-  
+
   agregarDependiente(): void {
     this.contrato!.dependientes.push({
       nombre: '',
@@ -180,14 +207,14 @@ export class ContratosFormComponent implements OnInit {
       lugarNacimiento: '',
       tieneDiscapacidad: false,
       diagnosticoDiscapacidad: '',
-      hospitalCobertura: ''
+      hospitalCobertura: '',
     });
   }
-  
+
   eliminarDependiente(index: number): void {
     this.contrato!.dependientes.splice(index, 1);
   }
-  
+
   onSeguroChange(): void {
     if (!this.contrato?.seguroId) {
       this.tipoSeguroSeleccionado = null;
@@ -195,24 +222,32 @@ export class ContratosFormComponent implements OnInit {
       this.mostrarCamposDependientes = false;
       return;
     }
-    
-    const seguroSeleccionado = this.seguros.find(s => s.id === this.contrato!.seguroId);
+
+    const seguroSeleccionado = this.seguros.find(
+      (s) => s.id === this.contrato!.seguroId
+    );
     if (seguroSeleccionado) {
       this.tipoSeguroSeleccionado = seguroSeleccionado.tipo;
       this.mostrarCamposBeneficiarios = seguroSeleccionado.tipo === 'VIDA';
       this.mostrarCamposDependientes = seguroSeleccionado.tipo === 'SALUD';
-      
+
       // Inicializar las listas según el tipo de seguro
-      if (this.mostrarCamposBeneficiarios && this.contrato!.beneficiarios.length === 0) {
+      if (
+        this.mostrarCamposBeneficiarios &&
+        this.contrato!.beneficiarios.length === 0
+      ) {
         this.agregarBeneficiario();
       }
-      
-      if (this.mostrarCamposDependientes && this.contrato!.dependientes.length === 0) {
+
+      if (
+        this.mostrarCamposDependientes &&
+        this.contrato!.dependientes.length === 0
+      ) {
         this.agregarDependiente();
       }
     }
   }
-  
+
   calcularPorcentajeTotal(): void {
     this.porcentajeTotal = 0;
     if (this.contrato?.beneficiarios) {
@@ -235,46 +270,63 @@ export class ContratosFormComponent implements OnInit {
       persona.fechaNacimiento = fechaStr;
     }
   }
-  
+
   formatearContrato(): Contrato {
     // Crear una copia del contrato para no modificar el original
     const contratoFormateado: any = { ...this.contrato! };
-    
+
     // Establecer el estado inicial como ACTIVO
     contratoFormateado.estado = 'ACTIVO';
-    
+
     // Formatear la fecha de inicio y fin como strings en formato YYYY-MM-DD
-    if (typeof contratoFormateado.fechaInicio === 'object' && contratoFormateado.fechaInicio !== null) {
-      contratoFormateado.fechaInicio = new Date(contratoFormateado.fechaInicio).toISOString().split('T')[0];
+    if (
+      typeof contratoFormateado.fechaInicio === 'object' &&
+      contratoFormateado.fechaInicio !== null
+    ) {
+      contratoFormateado.fechaInicio = new Date(contratoFormateado.fechaInicio)
+        .toISOString()
+        .split('T')[0];
     }
-    
-    if (typeof contratoFormateado.fechaFin === 'object' && contratoFormateado.fechaFin !== null) {
-      contratoFormateado.fechaFin = new Date(contratoFormateado.fechaFin).toISOString().split('T')[0];
+
+    if (
+      typeof contratoFormateado.fechaFin === 'object' &&
+      contratoFormateado.fechaFin !== null
+    ) {
+      contratoFormateado.fechaFin = new Date(contratoFormateado.fechaFin)
+        .toISOString()
+        .split('T')[0];
     }
-    
+
     // Obtener el tipo de seguro seleccionado
-    const seguroSeleccionado = this.seguros.find(s => s.id === contratoFormateado.seguroId);
-    
+    const seguroSeleccionado = this.seguros.find(
+      (s) => s.id === contratoFormateado.seguroId
+    );
+
     // Formatear según el tipo de seguro
     if (seguroSeleccionado?.tipo === 'VIDA') {
       // Para seguro de VIDA, asegurarse que los beneficiarios estén correctamente formateados
-      if (contratoFormateado.beneficiarios && contratoFormateado.beneficiarios.length > 0) {
+      if (
+        contratoFormateado.beneficiarios &&
+        contratoFormateado.beneficiarios.length > 0
+      ) {
         // Crear un nuevo array con el formato correcto para la API
-        const beneficiariosFormateados = contratoFormateado.beneficiarios.map((beneficiario: any) => ({
-          nombre: beneficiario.nombre,
-          parentesco: beneficiario.parentesco,
-          porcentaje: beneficiario.porcentaje,
-          esPrincipal: !!beneficiario.esPrincipal, 
-          documentoIdentidad: beneficiario.numeroIdentificacion,
-          email: beneficiario.email || '',
-          telefono: beneficiario.telefono || '',
-          fechaNacimiento: beneficiario.fechaNacimiento
-        }));
-        
+        const beneficiariosFormateados = contratoFormateado.beneficiarios.map(
+          (beneficiario: any) => ({
+            nombre: beneficiario.nombre,
+            parentesco: beneficiario.parentesco,
+            porcentaje: beneficiario.porcentaje,
+            esPrincipal: beneficiario.esPrincipal ? 1 : 0,
+            documentoIdentidad: beneficiario.numeroIdentificacion,
+            email: beneficiario.email || '',
+            telefono: beneficiario.telefono || '',
+            fechaNacimiento: beneficiario.fechaNacimiento,
+          })
+        );
+
         // Asignar el nuevo array formateado
         contratoFormateado.beneficiarios = beneficiariosFormateados;
       }
-      
+
       // Para evitar errores con propiedades no opcionales, usamos delete en el objeto 'any'
       if ('dependientes' in contratoFormateado) {
         delete contratoFormateado.dependientes;
@@ -285,7 +337,7 @@ export class ContratosFormComponent implements OnInit {
         delete contratoFormateado.beneficiarios;
       }
     }
-    
+
     console.log('Contrato formateado:', contratoFormateado);
     return contratoFormateado as Contrato;
   }
@@ -295,19 +347,21 @@ export class ContratosFormComponent implements OnInit {
       return;
     }
     this.loading = true;
-    
+
     // Preparar el contrato según el tipo de seguro
     const contratoFormateado = this.formatearContrato();
-    
+
     const accion = this.contrato!.id
       ? this.contratoService.actualizarContrato(contratoFormateado)
       : this.contratoService.crearContrato(contratoFormateado);
-    
+
     accion.subscribe({
       next: () => {
         this.snackBar.open(
-          `Contrato ${this.contrato!.id ? 'actualizado' : 'creado'} exitosamente`, 
-          'Cerrar', 
+          `Contrato ${
+            this.contrato!.id ? 'actualizado' : 'creado'
+          } exitosamente`,
+          'Cerrar',
           { duration: 3000 }
         );
         this.loading = false;
@@ -317,7 +371,9 @@ export class ContratosFormComponent implements OnInit {
       error: (err) => {
         console.log('Contrato enviado:', contratoFormateado);
         console.error('Error al guardar contrato', err);
-        this.snackBar.open('Error al guardar el contrato', 'Cerrar', { duration: 3000 });
+        this.snackBar.open('Error al guardar el contrato', 'Cerrar', {
+          duration: 3000,
+        });
         this.loading = false;
       },
     });
@@ -326,91 +382,132 @@ export class ContratosFormComponent implements OnInit {
   validarFormulario(): boolean {
     // Validaciones básicas del contrato
     if (!this.contrato?.clienteId) {
-      this.snackBar.open('Debe seleccionar un cliente', 'Cerrar', { duration: 3000 });
+      this.snackBar.open('Debe seleccionar un cliente', 'Cerrar', {
+        duration: 3000,
+      });
       return false;
     }
     if (!this.contrato?.seguroId) {
-      this.snackBar.open('Debe seleccionar un seguro', 'Cerrar', { duration: 3000 });
+      this.snackBar.open('Debe seleccionar un seguro', 'Cerrar', {
+        duration: 3000,
+      });
       return false;
     }
     if (!this.contrato?.agenteId) {
-      this.snackBar.open('Debe seleccionar un agente', 'Cerrar', { duration: 3000 });
+      this.snackBar.open('Debe seleccionar un agente', 'Cerrar', {
+        duration: 3000,
+      });
       return false;
     }
     if (!this.contrato?.fechaInicio) {
-      this.snackBar.open('Debe establecer una fecha de inicio', 'Cerrar', { duration: 3000 });
+      this.snackBar.open('Debe establecer una fecha de inicio', 'Cerrar', {
+        duration: 3000,
+      });
       return false;
     }
     if (!this.contrato?.fechaFin) {
-      this.snackBar.open('Debe establecer una fecha de fin', 'Cerrar', { duration: 3000 });
+      this.snackBar.open('Debe establecer una fecha de fin', 'Cerrar', {
+        duration: 3000,
+      });
       return false;
     }
-    
+
     // Asignar estado PENDIENTE por defecto
     this.contrato.estado = 'PENDIENTE';
-    
+
     // Validaciones específicas según el tipo de seguro
     if (this.tipoSeguroSeleccionado === 'VIDA') {
       // Validar beneficiarios para seguro de VIDA
       if (this.contrato.beneficiarios.length === 0) {
-        this.snackBar.open('Debe agregar al menos un beneficiario para el seguro de VIDA', 'Cerrar', { duration: 3000 });
+        this.snackBar.open(
+          'Debe agregar al menos un beneficiario para el seguro de VIDA',
+          'Cerrar',
+          { duration: 3000 }
+        );
         return false;
       }
-      
+
       // Validar que el porcentaje total sea exactamente 100%
       this.calcularPorcentajeTotal();
       if (this.porcentajeTotal !== 100) {
-        this.snackBar.open(`El porcentaje total de beneficiarios debe ser exactamente 100%. Actualmente: ${this.porcentajeTotal}%`, 'Cerrar', { duration: 3000 });
+        this.snackBar.open(
+          `El porcentaje total de beneficiarios debe ser exactamente 100%. Actualmente: ${this.porcentajeTotal}%`,
+          'Cerrar',
+          { duration: 3000 }
+        );
         return false;
       }
-      
+
       // Validar campos obligatorios de cada beneficiario
       for (const beneficiario of this.contrato.beneficiarios) {
-        if (!beneficiario.nombre || 
-            !beneficiario.tipoIdentificacion || 
-            !beneficiario.numeroIdentificacion || 
-            !beneficiario.fechaNacimiento || 
-            !beneficiario.nacionalidad || 
-            !beneficiario.parentesco || 
-            !beneficiario.estatura || 
-            !beneficiario.peso || 
-            !beneficiario.lugarNacimiento || 
-            beneficiario.porcentaje <= 0) {
-          this.snackBar.open('Todos los campos de beneficiarios deben estar completos', 'Cerrar', { duration: 3000 });
+        if (
+          !beneficiario.nombre ||
+          !beneficiario.tipoIdentificacion ||
+          !beneficiario.numeroIdentificacion ||
+          !beneficiario.fechaNacimiento ||
+          !beneficiario.nacionalidad ||
+          !beneficiario.parentesco ||
+          !beneficiario.estatura ||
+          !beneficiario.peso ||
+          !beneficiario.lugarNacimiento ||
+          beneficiario.porcentaje <= 0
+        ) {
+          this.snackBar.open(
+            'Todos los campos de beneficiarios deben estar completos',
+            'Cerrar',
+            { duration: 3000 }
+          );
           return false;
         }
       }
     } else if (this.tipoSeguroSeleccionado === 'SALUD') {
       // Validar dependientes para seguro de SALUD
       if (this.contrato.dependientes.length === 0) {
-        this.snackBar.open('Debe agregar al menos un dependiente para el seguro de SALUD', 'Cerrar', { duration: 3000 });
+        this.snackBar.open(
+          'Debe agregar al menos un dependiente para el seguro de SALUD',
+          'Cerrar',
+          { duration: 3000 }
+        );
         return false;
       }
-      
+
       // Validar campos obligatorios de cada dependiente
       for (const dependiente of this.contrato.dependientes) {
-        if (!dependiente.nombre || 
-            !dependiente.tipoIdentificacion || 
-            !dependiente.numeroIdentificacion || 
-            !dependiente.fechaNacimiento || 
-            !dependiente.nacionalidad || 
-            !dependiente.parentesco || 
-            !dependiente.estatura || 
-            !dependiente.peso || 
-            !dependiente.lugarNacimiento || 
-            !dependiente.hospitalCobertura) {
-          this.snackBar.open('Todos los campos de dependientes deben estar completos', 'Cerrar', { duration: 3000 });
+        if (
+          !dependiente.nombre ||
+          !dependiente.tipoIdentificacion ||
+          !dependiente.numeroIdentificacion ||
+          !dependiente.fechaNacimiento ||
+          !dependiente.nacionalidad ||
+          !dependiente.parentesco ||
+          !dependiente.estatura ||
+          !dependiente.peso ||
+          !dependiente.lugarNacimiento ||
+          !dependiente.hospitalCobertura
+        ) {
+          this.snackBar.open(
+            'Todos los campos de dependientes deben estar completos',
+            'Cerrar',
+            { duration: 3000 }
+          );
           return false;
         }
-        
+
         // Validar que se haya ingresado un diagnóstico si tiene discapacidad
-        if (dependiente.tieneDiscapacidad && !dependiente.diagnosticoDiscapacidad) {
-          this.snackBar.open('Debe ingresar el diagnóstico para dependientes con discapacidad', 'Cerrar', { duration: 3000 });
+        if (
+          dependiente.tieneDiscapacidad &&
+          !dependiente.diagnosticoDiscapacidad
+        ) {
+          this.snackBar.open(
+            'Debe ingresar el diagnóstico para dependientes con discapacidad',
+            'Cerrar',
+            { duration: 3000 }
+          );
           return false;
         }
       }
     }
-    
+
     return true;
   }
 
