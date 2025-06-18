@@ -1,0 +1,187 @@
+/* Estilos generales */
+.bg-gradient {
+  background: linear-gradient(to right bottom, #ffffff, #f8f9fa);
+}
+
+/* Bordes y sombras */
+.card {
+  border: none;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+.shadow-sm {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+
+.card-header {
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  border-bottom: none;
+}
+
+/* Elementos para gráficas */
+.progress {
+  height: 12px;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #f0f0f0;
+}
+
+.progress-bar {
+  border-radius: 10px;
+}
+
+/* Iconos y elementos visuales */
+.icon-wrapper {
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.counter-value {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.icon-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Avatars */
+.avatar-sm {
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Tablas */
+.table th {
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.table td {
+  vertical-align: middle;
+  padding: 0.75rem;
+}
+
+/* Estados vacíos */
+.empty-state {
+  padding: 30px;
+}
+
+/* Tarjetas de acceso rápido */
+.shortcut-card {
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.shortcut-card:hover {
+  background-color: #f8f9fa;
+  transform: translateY(-5px);
+}
+
+/* Colores personalizados para badges */
+.bg-primary-lightest {
+  background-color: rgba(13, 110, 253, 0.1);
+}
+
+.bg-success-lightest {
+  background-color: rgba(25, 135, 84, 0.1);
+}
+
+.bg-secondary-lightest {
+  background-color: rgba(108, 117, 125, 0.1);
+}
+
+.bg-info-lightest {
+  background-color: rgba(13, 202, 240, 0.1);
+}
+
+.bg-warning-lightest {
+  background-color: rgba(255, 193, 7, 0.1);
+}
+
+/* Ajustes para responsive */
+@media (max-width: 767.98px) {
+  .counter-value {
+    font-size: 1.8rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Spinners personalizados */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: 0.25em;
+}
+
+/* Efecto de pulso para datos importantes */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.counter-value {
+  animation: pulse 2s infinite;
+}
+.dashboard-header-card {
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  background-color: #ffffff;
+}
+
+.dashboard-header-card h1 {
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.dashboard-header-card .badge {
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+mat-card.dashboard-header-card button[mat-mini-fab] {
+  box-shadow: none;
+}

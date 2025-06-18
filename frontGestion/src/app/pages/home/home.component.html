@@ -1,0 +1,457 @@
+<div class="container-fluid py-4">
+<mat-card class="dashboard-header-card mb-4">
+  <div class="row align-items-center">
+    <div class="col-md-8">
+      <h1 class="text-black fw-bold mb-1">Dashboard de Gestión de Seguros</h1>
+      <p class="text-muted mb-0">Resumen de actividad y estadísticas principales</p>
+    </div>
+    <div class="col-md-4 text-end">
+      <div class="d-flex justify-content-end align-items-center">
+        <div class="badge bg-primary p-2 me-3 d-inline-block">
+          <i class="bi bi-calendar-check me-1"></i> {{ today | date: 'dd/MM/yyyy' }}
+        </div>
+        <button mat-mini-fab color="primary" matTooltip="Refrescar datos" (click)="refreshData()">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</mat-card>
+  
+  <!-- Cards de resumen con efecto de elevación -->
+  <div class="row mb-4 g-3">
+    <div class="col-md-3 col-sm-6">
+      <mat-card class="h-100" appearance="outlined">
+        <mat-card-content>
+          <div class="text-center">
+            <div class="icon-wrapper mb-3">
+              <mat-icon class="text-primary" style="font-size: 3rem; width: auto; height: auto">people</mat-icon>
+            </div>
+            <h3 class="counter-value text-primary">{{totalUsuarios}}</h3>
+            <p class="text-muted mb-0">Usuarios Totales</p>
+            <mat-progress-bar mode="determinate" value="100" color="primary" class="mt-3"></mat-progress-bar>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+    
+    <div class="col-md-3 col-sm-6">
+      <mat-card class="h-100" appearance="outlined">
+        <mat-card-content>
+          <div class="text-center">
+            <div class="icon-wrapper mb-3">
+              <mat-icon class="text-success" style="font-size: 3rem; width: auto; height: auto">person_check</mat-icon>
+            </div>
+            <h3 class="counter-value text-success">{{usuariosActivos}}</h3>
+            <p class="text-muted mb-0">Usuarios Activos</p>
+            <mat-progress-bar mode="determinate" [value]="(usuariosActivos / totalUsuarios * 100)" color="accent" class="mt-3"></mat-progress-bar>
+            <small class="text-muted mt-2 d-block">{{(usuariosActivos / totalUsuarios * 100).toFixed(0)}}% del total</small>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+    
+    <div class="col-md-3 col-sm-6">
+      <mat-card class="h-100" appearance="outlined">
+        <mat-card-content>
+          <div class="text-center">
+            <div class="icon-wrapper mb-3">
+              <mat-icon class="text-info" style="font-size: 3rem; width: auto; height: auto">shield</mat-icon>
+            </div>
+            <h3 class="counter-value text-info">{{totalSeguros}}</h3>
+            <p class="text-muted mb-0">Seguros Totales</p>
+            <mat-progress-bar mode="determinate" value="100" color="primary" class="mt-3"></mat-progress-bar>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+    
+    <div class="col-md-3 col-sm-6">
+      <mat-card class="h-100" appearance="outlined">
+        <mat-card-content>
+          <div class="text-center">
+            <div class="icon-wrapper mb-3">
+              <mat-icon class="text-success" style="font-size: 3rem; width: auto; height: auto">check_circle</mat-icon>
+            </div>
+            <h3 class="counter-value text-success">{{segurosActivos}}</h3>
+            <p class="text-muted mb-0">Seguros Activos</p>
+            <mat-progress-bar mode="determinate" [value]="(segurosActivos / totalSeguros * 100)" color="accent" class="mt-3"></mat-progress-bar>
+            <small class="text-muted mt-2 d-block">{{(segurosActivos / totalSeguros * 100).toFixed(0)}}% del total</small>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+  
+  
+  <!-- Gráfico de actividad reciente -->
+  <!-- <div class="row mb-4">
+    <div class="col-12">
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <mat-card-title>
+            <div class="d-flex align-items-center">
+              <mat-icon class="me-2 text-primary">trending_up</mat-icon>
+              <span class="fw-bold">Actividad Reciente</span>
+            </div>
+          </mat-card-title>
+          <mat-card-subtitle>Usuarios y seguros registrados en los últimos 6 meses</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="chart-container" style="position: relative; height:250px;">
+            <canvas id="activityChart"></canvas>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div> -->
+  
+  <!-- Distribución de Seguros -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <mat-card appearance="outlined" class="h-100">
+        <mat-card-header>
+          <div class="d-flex align-items-center">
+            <mat-icon class="me-2 text-primary">pie_chart</mat-icon>
+            <mat-card-title class="fw-bold">Distribución de Seguros por Tipo</mat-card-title>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <div *ngIf="cargandoSeguros" class="text-center p-4">
+            <mat-spinner diameter="50" color="primary" class="mx-auto"></mat-spinner>
+            <p class="mt-3">Cargando datos...</p>
+          </div>
+          
+          <div *ngIf="!cargandoSeguros">
+            <div class="row text-center mb-4">
+              <div class="col-6">
+                <mat-card class="bg-light border-0">
+                  <mat-card-content class="py-3">
+                    <div class="d-flex align-items-center">
+                      <div class="rounded-circle bg-info p-3 me-3 d-flex align-items-center justify-content-center">
+                        <mat-icon class="text-white">favorite</mat-icon>
+                      </div>
+                      <div class="text-start">
+                        <h2 class="mb-0 fw-bold text-info">{{segurosSalud}}</h2>
+                        <p class="mb-0 text-muted">Seguros de Salud</p>
+                      </div>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+              
+              <div class="col-6">
+                <mat-card class="bg-light border-0">
+                  <mat-card-content class="py-3">
+                    <div class="d-flex align-items-center">
+                      <div class="rounded-circle bg-warning p-3 me-3 d-flex align-items-center justify-content-center">
+                        <mat-icon class="text-white">auto_awesome</mat-icon>
+                      </div>
+                      <div class="text-start">
+                        <h2 class="mb-0 fw-bold text-warning">{{segurosVida}}</h2>
+                        <p class="mb-0 text-muted">Seguros de Vida</p>
+                      </div>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+            </div>
+            
+            <mat-progress-bar class="custom-progress-height" mode="determinate" [value]="segurosSalud / totalSeguros * 100" color="accent"></mat-progress-bar>
+            <mat-progress-bar class="custom-progress-height mt-1" mode="determinate" [value]="segurosVida / totalSeguros * 100" color="warn"></mat-progress-bar>
+            
+            <div class="row mt-3">
+              <div class="col-6">
+                <div class="d-flex align-items-center">
+                  <div class="dot bg-info me-2"></div>
+                  <small class="text-muted">Seguros de Salud ({{(segurosSalud / totalSeguros * 100).toFixed(0)}}%)</small>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-flex align-items-center">
+                  <div class="dot bg-warning me-2"></div>
+                  <small class="text-muted">Seguros de Vida ({{(segurosVida / totalSeguros * 100).toFixed(0)}}%)</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+    
+    <div class="col-md-6">
+      <mat-card appearance="outlined" class="h-100">
+        <mat-card-header>
+          <div class="d-flex align-items-center">
+            <mat-icon class="me-2 text-primary">trending_up</mat-icon>
+            <mat-card-title class="fw-bold">Estado de Usuarios Registrados</mat-card-title>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <div *ngIf="cargandoUsuarios" class="text-center p-4">
+            <mat-spinner diameter="50" color="primary" class="mx-auto"></mat-spinner>
+            <p class="mt-3">Cargando datos...</p>
+          </div>
+          
+          <div *ngIf="!cargandoUsuarios">
+            <div class="row text-center mb-4">
+              <div class="col-6">
+                <mat-card class="bg-light border-0">
+                  <mat-card-content class="py-3">
+                    <div class="d-flex align-items-center">
+                      <div class="rounded-circle bg-success p-3 me-3 d-flex align-items-center justify-content-center">
+                        <mat-icon class="text-white">person_check</mat-icon>
+                      </div>
+                      <div class="text-start">
+                        <h2 class="mb-0 fw-bold text-success">{{usuariosActivos}}</h2>
+                        <p class="mb-0 text-muted">Usuarios Activos</p>
+                      </div>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+              
+              <div class="col-6">
+                <mat-card class="bg-light border-0">
+                  <mat-card-content class="py-3">
+                    <div class="d-flex align-items-center">
+                      <div class="rounded-circle bg-secondary p-3 me-3 d-flex align-items-center justify-content-center">
+                        <mat-icon class="text-white">person_off</mat-icon>
+                      </div>
+                      <div class="text-start">
+                        <h2 class="mb-0 fw-bold text-secondary">{{usuariosInactivos}}</h2>
+                        <p class="mb-0 text-muted">Usuarios Inactivos</p>
+                      </div>
+                    </div>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+            </div>
+            
+            <mat-progress-bar class="custom-progress-height" mode="determinate" [value]="usuariosActivos / totalUsuarios * 100" color="primary"></mat-progress-bar>
+            <mat-progress-bar class="custom-progress-height mt-1" mode="determinate" [value]="usuariosInactivos / totalUsuarios * 100" color="accent"></mat-progress-bar>
+            
+            <div class="row mt-3">
+              <div class="col-6">
+                <div class="d-flex align-items-center">
+                  <div class="dot bg-success me-2"></div>
+                  <small class="text-muted">Usuarios Activos ({{(usuariosActivos / totalUsuarios * 100).toFixed(0)}}%)</small>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-flex align-items-center">
+                  <div class="dot bg-secondary me-2"></div>
+                  <small class="text-muted">Usuarios Inactivos ({{(usuariosInactivos / totalUsuarios * 100).toFixed(0)}}%)</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+  
+  <!-- Últimos Registros -->
+  <div class="row mb-4 g-3">
+    <div class="col-md-6" >
+      <div class="card shadow-sm" >
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center pt-4 pb-2" >
+          <h5 class="fw-bold text-black mb-0">
+            <i class="bi bi-people-fill me-2"></i>
+            Últimos Usuarios Registrados
+          </h5>
+          <a routerLink="/usuarios" class="btn btn-sm btn-primary">
+            Ver Todos <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+        <div class="card-body pb-4">
+          <div *ngIf="cargandoUsuarios" class="text-center p-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">Cargando datos...</p>
+          </div>
+          
+          <div *ngIf="!cargandoUsuarios && ultimosUsuarios.length === 0" class="text-center p-4">
+            <div class="empty-state">
+              <i class="bi bi-person-x display-1 text-muted"></i>
+              <p class="text-muted mt-3">No hay usuarios registrados</p>
+            </div>
+          </div>
+          
+          <div *ngIf="!cargandoUsuarios && ultimosUsuarios.length > 0">
+            <div class="table-responsive">
+              <table class="table table-hover border-0 align-middle">
+                <thead>
+                  <tr class="bg-light">
+                    <th class="border-0">Nombre</th>
+                    <th class="border-0">Email</th>
+                    <th class="border-0">Rol</th>
+                    <th class="border-0">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let usuario of ultimosUsuarios">
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar-sm bg-primary rounded-circle text-white me-3 d-flex align-items-center justify-content-center">
+                          {{usuario.nombre.charAt(0)}}{{usuario.apellido.charAt(0)}}
+                        </div>
+                        <div>
+                          <h6 class="mb-0">{{usuario.nombre}} {{usuario.apellido}}</h6>
+                          <small class="text-muted">ID: {{usuario.id}}</small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{{usuario.email}}</td>
+                    <td>
+                      <span class="badge rounded-pill bg-primary-lightest text-primary">
+                        {{usuario.rolNombre}}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="badge rounded-pill" [ngClass]="usuario.activo ? 'bg-success-lightest text-success' : 'bg-secondary-lightest text-secondary'">
+                        <i class="bi" [ngClass]="usuario.activo ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                        {{usuario.activo ? 'Activo' : 'Inactivo'}}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center pt-4 pb-2">
+          <h5 class="fw-bold text-black mb-0">
+            <i class="bi bi-shield-fill-check me-2"></i>
+            Últimos Seguros Registrados
+          </h5>
+          <a routerLink="/seguros" class="btn btn-sm btn-primary">
+            Ver Todos <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+        <div class="card-body pb-4">
+          <div *ngIf="cargandoSeguros" class="text-center p-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">Cargando datos...</p>
+          </div>
+          
+          <div *ngIf="!cargandoSeguros && ultimosSeguros.length === 0" class="text-center p-4">
+            <div class="empty-state">
+              <i class="bi bi-shield-x display-1 text-muted"></i>
+              <p class="text-muted mt-3">No hay seguros registrados</p>
+            </div>
+          </div>
+          
+          <div *ngIf="!cargandoSeguros && ultimosSeguros.length > 0">
+            <div class="table-responsive">
+              <table class="table table-hover border-0 align-middle">
+                <thead>
+                  <tr class="bg-light">
+                    <th class="border-0">Nombre</th>
+                    <th class="border-0">Tipo</th>
+                    <th class="border-0">Precio</th>
+                    <th class="border-0">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let seguro of ultimosSeguros">
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar-sm rounded-circle text-white me-3 d-flex align-items-center justify-content-center"
+                            [ngClass]="seguro.tipo === 'SALUD' ? 'bg-info' : 'bg-warning'">
+                          <i class="bi" [ngClass]="seguro.tipo === 'SALUD' ? 'bi-heart-pulse-fill' : 'bi-stars'"></i>
+                        </div>
+                        <div>
+                          <h6 class="mb-0">{{seguro.nombre}}</h6>
+                          <small class="text-muted">ID: {{seguro.id}}</small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge rounded-pill" [ngClass]="seguro.tipo === 'SALUD' ? 'bg-info-lightest text-info' : 'bg-warning-lightest text-warning'">
+                        <i class="bi" [ngClass]="seguro.tipo === 'SALUD' ? 'bi-heart-pulse-fill' : 'bi-stars'"></i>
+                        {{seguro.tipo}}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="fw-bold">${{seguro.precioAnual | number:'1.2-2'}}</span>
+                      <small class="text-muted d-block">Anual</small>
+                    </td>
+                    <td>
+                      <span class="badge rounded-pill" [ngClass]="seguro.activo ? 'bg-success-lightest text-success' : 'bg-secondary-lightest text-secondary'">
+                        <i class="bi" [ngClass]="seguro.activo ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                        {{seguro.activo ? 'Activo' : 'Inactivo'}}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Acceso Rápido -->
+  <div class="row" style="padding-bottom: 60px;">
+    <div class="col-12">
+      <div class="card shadow-sm" >
+        <div class="card-header bg-white border-0 pt-4 pb-2">
+          <h5 class="fw-bold text-primary mb-0">
+            <i class="bi bi-lightning-fill me-2"></i>
+            Acceso Rápido
+          </h5>
+        </div>
+        <div class="card-body pb-4">
+          <div class="row g-3">
+            <div class="col-md-3 col-6">
+              <a routerLink="/usuarios" class="card shortcut-card h-100">
+                <div class="card-body text-center p-4">
+                  <div class="icon-circle bg-primary-lightest text-primary mb-3 mx-auto">
+                    <i class="bi bi-people-fill fs-4"></i>
+                  </div>
+                  <h6 class="card-title mb-0">Usuarios</h6>
+                </div>
+              </a>
+            </div>
+            <div class="col-md-3 col-6">
+              <a routerLink="/seguros" class="card shortcut-card h-100">
+                <div class="card-body text-center p-4">
+                  <div class="icon-circle bg-primary-lightest text-primary mb-3 mx-auto">
+                    <i class="bi bi-shield-fill-check fs-4"></i>
+                  </div>
+                  <h6 class="card-title mb-0">Seguros</h6>
+                </div>
+              </a>
+            </div>
+            <div class="col-md-3 col-6">
+              <a routerLink="/reportes" class="card shortcut-card h-100">
+                <div class="card-body text-center p-4">
+                  <div class="icon-circle bg-primary-lightest text-primary mb-3 mx-auto">
+                    <i class="bi bi-bar-chart-fill fs-4"></i>
+                  </div>
+                  <h6 class="card-title mb-0">Reportes</h6>
+                </div>
+              </a>
+            </div>
+            <div class="col-md-3 col-6">
+              <a routerLink="/configuracion" class="card shortcut-card h-100">
+                <div class="card-body text-center p-4">
+                  <div class="icon-circle bg-primary-lightest text-primary mb-3 mx-auto">
+                    <i class="bi bi-gear-fill fs-4"></i>
+                  </div>
+                  <h6 class="card-title mb-0">Configuración</h6>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

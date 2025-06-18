@@ -1,0 +1,60 @@
+<div class="admin-container">
+  <h2 class="admin-title">Listado de Clientes</h2>
+
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="abrirFormularioNuevoCliente()"
+  >
+    <mat-icon>add</mat-icon> Nuevo Cliente
+  </button>
+
+  <input
+    type="text"
+    [(ngModel)]="filtro"
+    (input)="filtrar()"
+    placeholder="Buscar por nombre, cédula o email"
+    class="buscador-input"
+  />
+
+  <table class="tabla-clientes">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Cédula / ID</th>
+        <th>Email</th>
+        <th>Fecha Nacimiento</th>
+        <th>Estado Civil</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let cliente of clientesFiltrados">
+        <td>{{ cliente.nombre }} {{ cliente.apellido }}</td>
+        <td>{{ cliente.numeroIdentificacion }}</td>
+        <td>{{ cliente.email }}</td>
+        <td>{{ cliente.fechaNacimiento }}</td>
+        <td>{{ cliente.estadoCivil }}</td>
+        <td>
+          <button
+            mat-icon-button
+            color="primary"
+            (click)="editarCliente(cliente.id)"
+            matTooltip="Editar cliente"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+
+          <button
+            mat-icon-button
+            color="warn"
+            (click)="desactivarCliente(cliente.id)"
+            matTooltip="Desactivar cliente"
+          >
+            <mat-icon>block</mat-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

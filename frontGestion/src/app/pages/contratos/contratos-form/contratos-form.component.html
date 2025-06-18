@@ -1,0 +1,330 @@
+<form #contratoForm="ngForm" (ngSubmit)="guardarContrato()" class="contrato-form">
+  <mat-card class="form-card">
+
+    <mat-card-content>
+      <div class="loading-overlay" *ngIf="loading">
+        <mat-spinner [diameter]="50"></mat-spinner>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Cliente</mat-label>
+          <mat-select [(ngModel)]="contrato!.clienteId" name="clienteId" required>
+            <mat-option *ngFor="let cliente of clientes" [value]="cliente.id">
+              {{ cliente.nombre }} {{ cliente.apellido }} - perrito
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Seguro</mat-label>
+          <mat-select [(ngModel)]="contrato!.seguroId" name="seguroId" required (selectionChange)="onSeguroChange()">
+            <mat-option *ngFor="let seguro of seguros" [value]="seguro.id">
+              {{ seguro.nombre }} - {{ seguro.descripcion }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix>policy</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Agente Asignado</mat-label>
+          <mat-select [(ngModel)]="contrato!.agenteId" name="agenteId" required>
+            <mat-option *ngFor="let agente of agentes" [value]="agente.id">
+              {{ agente.nombre }} {{ agente.apellido }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row date-container">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Fecha de Inicio</mat-label>
+          <input matInput [matDatepicker]="inicioDatePicker" [(ngModel)]="contrato!.fechaInicio" name="fechaInicio" required>
+          <mat-datepicker-toggle matSuffix [for]="inicioDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #inicioDatePicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Fecha de Fin</mat-label>
+          <input matInput [matDatepicker]="finDatePicker" [(ngModel)]="contrato!.fechaFin" name="fechaFin" required>
+          <mat-datepicker-toggle matSuffix [for]="finDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #finDatePicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Frecuencia de Pago</mat-label>
+          <mat-select [(ngModel)]="contrato!.frecuenciaPago" name="frecuenciaPago" required>
+            <mat-option value="MENSUAL">Mensual</mat-option>
+            <mat-option value="TRIMESTRAL">Trimestral</mat-option>
+            <mat-option value="SEMESTRAL">Semestral</mat-option>
+            <mat-option value="ANUAL">Anual</mat-option>
+          </mat-select>
+          <mat-icon matSuffix>calendar_today</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <mat-divider class="margin-y"></mat-divider>
+
+      <!-- Sección de Beneficiarios para Seguro de VIDA -->
+      <div *ngIf="mostrarCamposBeneficiarios" class="beneficiarios-section"> 
+        <div class="section-header">
+          <h3>Beneficiarios</h3>
+          <div class="porcentaje-total" [ngClass]="{'porcentaje-completo': porcentajeTotal === 100, 'porcentaje-incompleto': porcentajeTotal !== 100}">
+            Total: {{porcentajeTotal}}%
+          </div>
+        </div>
+      
+        <div *ngIf="contrato?.beneficiarios?.length === 0" class="no-beneficiarios">
+          <p>No hay beneficiarios registrados</p>
+        </div>
+      
+        <div *ngFor="let beneficiario of contrato!.beneficiarios; let i = index" class="beneficiario-container">
+          <div class="beneficiario-header">
+            <h4>Beneficiario #{{i + 1}}</h4>
+            <button type="button" mat-icon-button color="warn" (click)="eliminarBeneficiario(i)" aria-label="Eliminar beneficiario">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+      
+          <!-- Primera fila -->
+          <div class="form-row beneficiario-row">
+            <mat-form-field appearance="outline" class="beneficiario-field">
+              <mat-label>Nombre completo</mat-label>
+              <input matInput [(ngModel)]="beneficiario.nombre" [name]="'nombre' + i" required pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$" #nombreCtrl="ngModel">
+              <mat-icon matSuffix>person</mat-icon>
+              <mat-error *ngIf="nombreCtrl.invalid && nombreCtrl.touched">Solo se permiten letras</mat-error>
+            </mat-form-field>
+      
+            <mat-form-field appearance="outline" class="beneficiario-field">
+              <mat-label>Tipo de identificación</mat-label>
+              <mat-select [(ngModel)]="beneficiario.tipoIdentificacion" [name]="'tipoIdentificacion' + i" required>
+                <mat-option *ngFor="let tipo of tiposIdentificacion" [value]="tipo">{{ tipo }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+      
+            <mat-form-field appearance="outline" class="beneficiario-field">
+              <mat-label>Número de identificación</mat-label>
+              <input matInput [(ngModel)]="beneficiario.numeroIdentificacion" [name]="'numeroIdentificacion' + i" required pattern="^[0-9]+$" #idCtrl="ngModel">
+              <mat-error *ngIf="idCtrl.invalid && idCtrl.touched">Solo se permiten números</mat-error>
+            </mat-form-field>
+          </div>
+      
+          <!-- Segunda fila -->
+          <div class="form-row beneficiario-row">
+            <mat-form-field appearance="outline" class="beneficiario-field">
+              <mat-label>Fecha de nacimiento</mat-label>
+              <input matInput [matDatepicker]="picker1" (dateChange)="onFechaChange($event, beneficiario)" [name]="'fechaNacimiento' + i" required>
+              <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+              <mat-datepicker #picker1></mat-datepicker>
+            </mat-form-field>
+      
+            <mat-form-field appearance="outline" class="beneficiario-field">
+              <mat-label>Nacionalidad</mat-label>
+              <input matInput [(ngModel)]="beneficiario.nacionalidad" [name]="'nacionalidad' + i" required pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$" #nacCtrl="ngModel">
+              <mat-error *ngIf="nacCtrl.invalid && nacCtrl.touched">Solo se permiten letras</mat-error>
+            </mat-form-field>
+      
+            <mat-form-field appearance="outline" class="beneficiario-field">
+              <mat-label>Parentesco</mat-label>
+              <mat-select [(ngModel)]="beneficiario.parentesco" [name]="'parentesco' + i" required>
+                <mat-option *ngFor="let parentesco of tiposParentesco" [value]="parentesco">{{ parentesco }}</mat-option>
+              </mat-select>
+              <mat-icon matSuffix>family_restroom</mat-icon>
+            </mat-form-field>
+          </div>
+      
+          <!-- Tercera fila -->
+          <div class="form-row beneficiario-row">
+            <mat-form-field appearance="outline" class="beneficiario-field">
+              <mat-label>Estatura (m)</mat-label>
+              <input matInput type="number" step="0.01" [(ngModel)]="beneficiario.estatura" [name]="'estatura' + i" required>
+              <span matSuffix>m</span>
+            </mat-form-field>
+      
+            <mat-form-field appearance="outline" class="beneficiario-field">
+              <mat-label>Peso (kg)</mat-label>
+              <input matInput type="number" step="0.1" [(ngModel)]="beneficiario.peso" [name]="'peso' + i" required>
+              <span matSuffix>kg</span>
+            </mat-form-field>
+      
+            <mat-form-field appearance="outline" class="beneficiario-field">
+              <mat-label>Lugar de nacimiento</mat-label>
+              <input matInput [(ngModel)]="beneficiario.lugarNacimiento" [name]="'lugarNacimiento' + i" required pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$" #lugarCtrl="ngModel">
+              <mat-error *ngIf="lugarCtrl.invalid && lugarCtrl.touched">Solo se permiten letras</mat-error>
+            </mat-form-field>
+      
+            <mat-form-field appearance="outline" class="beneficiario-field beneficiario-porcentaje">
+              <mat-label>Porcentaje (%)</mat-label>
+              <input matInput type="number" min="1" max="100" [(ngModel)]="beneficiario.porcentaje" [name]="'porcentaje' + i" required (change)="actualizarPorcentaje()">
+              <span matSuffix>%</span>
+            </mat-form-field>
+      
+            <mat-form-field appearance="outline" class="beneficiario-field">
+              <mat-label>Email</mat-label>
+              <input matInput type="email" [(ngModel)]="beneficiario.email" [name]="'email' + i" #emailCtrl="ngModel">
+              <mat-icon matSuffix>email</mat-icon>
+              <mat-error *ngIf="emailCtrl.invalid && emailCtrl.touched">Ingrese un correo válido</mat-error>
+            </mat-form-field>
+      
+            <mat-form-field appearance="outline" class="beneficiario-field">
+              <mat-label>Teléfono</mat-label>
+              <input matInput type="tel" [(ngModel)]="beneficiario.telefono" [name]="'telefono' + i" pattern="^[0-9]+$" #telCtrl="ngModel">
+              <mat-icon matSuffix>phone</mat-icon>
+              <mat-error *ngIf="telCtrl.invalid && telCtrl.touched">Solo se permiten números</mat-error>
+            </mat-form-field>
+          </div>
+      
+          <!-- Cuarta fila -->
+          <div class="form-row beneficiario-row">
+            <div class="checkbox-container">
+              <input type="checkbox" [(ngModel)]="beneficiario.esPrincipal" [name]="'esPrincipal' + i" [id]="'esPrincipal' + i" class="checkbox-input">
+              <label [for]="'esPrincipal' + i" class="checkbox-label">¿Es principal?</label>
+            </div>
+          </div>
+      
+          <mat-divider *ngIf="i < contrato!.beneficiarios.length - 1" class="margin-y"></mat-divider>
+        </div>
+      
+        <div class="add-beneficiario">
+          <button type="button" mat-stroked-button color="primary" (click)="agregarBeneficiario()">
+            <mat-icon>add</mat-icon> Agregar Beneficiario
+          </button>
+        </div>
+      </div>
+      
+
+      <!-- Sección de Dependientes para Seguro de SALUD -->
+      <div *ngIf="mostrarCamposDependientes" class="dependientes-section">
+        <h3>Dependientes</h3>
+        
+        <div *ngIf="contrato?.dependientes?.length === 0" class="no-dependientes">
+          <p>No hay dependientes registrados</p>
+        </div>
+
+        <div *ngFor="let dependiente of contrato!.dependientes; let i = index" class="dependiente-container">
+          <div class="dependiente-header">
+            <h4>Dependiente #{{i + 1}}</h4>
+            <button type="button" mat-icon-button color="warn" (click)="eliminarDependiente(i)" aria-label="Eliminar dependiente">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+
+          <!-- Primera fila de campos -->
+          <div class="form-row dependiente-row">
+            <mat-form-field appearance="outline" class="dependiente-field">
+              <mat-label>Nombre completo</mat-label>
+              <input matInput [(ngModel)]="dependiente.nombre" [name]="'depNombre' + i" required>
+              <mat-icon matSuffix>person</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="dependiente-field">
+              <mat-label>Tipo de identificación</mat-label>
+              <mat-select [(ngModel)]="dependiente.tipoIdentificacion" [name]="'depTipoIdentificacion' + i" required>
+                <mat-option *ngFor="let tipo of tiposIdentificacion" [value]="tipo">{{ tipo }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="dependiente-field">
+              <mat-label>Número de identificación</mat-label>
+              <input matInput [(ngModel)]="dependiente.numeroIdentificacion" [name]="'depNumeroIdentificacion' + i" required>
+            </mat-form-field>
+          </div>
+
+          <!-- Segunda fila de campos -->
+          <div class="form-row dependiente-row">
+            <mat-form-field appearance="outline" class="dependiente-field">
+              <mat-label>Fecha de nacimiento</mat-label>
+              <input matInput [matDatepicker]="picker2" (dateChange)="onFechaChange($event, dependiente)" [name]="'depFechaNacimiento' + i" required>
+              <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+              <mat-datepicker #picker2></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="dependiente-field">
+              <mat-label>Nacionalidad</mat-label>
+              <input matInput [(ngModel)]="dependiente.nacionalidad" [name]="'depNacionalidad' + i" required>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="dependiente-field">
+              <mat-label>Parentesco</mat-label>
+              <mat-select [(ngModel)]="dependiente.parentesco" [name]="'depParentesco' + i" required>
+                <mat-option *ngFor="let parentesco of tiposParentesco" [value]="parentesco">{{ parentesco }}</mat-option>
+              </mat-select>
+              <mat-icon matSuffix>family_restroom</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <!-- Tercera fila de campos -->
+          <div class="form-row dependiente-row">
+            <mat-form-field appearance="outline" class="dependiente-field">
+              <mat-label>Estatura (m)</mat-label>
+              <input matInput type="number" step="0.01" [(ngModel)]="dependiente.estatura" [name]="'depEstatura' + i" required>
+              <span matSuffix>m</span>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="dependiente-field">
+              <mat-label>Peso (kg)</mat-label>
+              <input matInput type="number" step="0.1" [(ngModel)]="dependiente.peso" [name]="'depPeso' + i" required>
+              <span matSuffix>kg</span>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="dependiente-field">
+              <mat-label>Lugar de nacimiento</mat-label>
+              <input matInput [(ngModel)]="dependiente.lugarNacimiento" [name]="'depLugarNacimiento' + i" required>
+            </mat-form-field>
+          </div>
+
+          <!-- Cuarta fila de campos -->
+          <div class="form-row dependiente-row">
+            <mat-form-field appearance="outline" class="dependiente-field">
+              <mat-label>¿Tiene discapacidad?</mat-label>
+              <mat-select [(ngModel)]="dependiente.tieneDiscapacidad" [name]="'depDiscapacidad' + i">
+                <mat-option [value]="true">Sí</mat-option>
+                <mat-option [value]="false">No</mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="dependiente-field" *ngIf="dependiente.tieneDiscapacidad">
+              <mat-label>Diagnóstico</mat-label>
+              <textarea matInput [(ngModel)]="dependiente.diagnosticoDiscapacidad" [name]="'depDiagnostico' + i" required rows="2"></textarea>
+            </mat-form-field>
+          </div>
+
+          <!-- Quinta fila de campos -->
+          <div class="form-row dependiente-row">
+            <mat-form-field appearance="outline" class="dependiente-field full-width">
+              <mat-label>Hospital o entidad de cobertura</mat-label>
+              <mat-select [(ngModel)]="dependiente.hospitalCobertura" [name]="'depHospital' + i" required>
+                <mat-option *ngFor="let hospital of hospitalesDisponibles" [value]="hospital">{{ hospital }}</mat-option>
+              </mat-select>
+              <mat-icon matSuffix>local_hospital</mat-icon>
+            </mat-form-field>
+          </div>
+          
+          <mat-divider *ngIf="i < contrato!.dependientes.length - 1" class="margin-y"></mat-divider>
+        </div>
+
+        <div class="add-dependiente">
+          <button type="button" mat-stroked-button color="primary" (click)="agregarDependiente()">
+            <mat-icon>add</mat-icon> Agregar Dependiente
+          </button>
+        </div>
+      </div>
+      
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <button type="button" mat-button color="warn" (click)="cancelar()">Cancelar</button>
+      <button type="submit" mat-raised-button color="primary" [disabled]="loading">
+        <mat-icon>save</mat-icon> Guardar
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</form>

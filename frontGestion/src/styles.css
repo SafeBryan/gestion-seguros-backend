@@ -1,0 +1,48 @@
+/* Estilos globales para corregir problemas de pantalla completa */
+/* Este archivo debe ubicarse en src/styles.css */
+
+/* Reset global para el body y html */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Asegurar que el componente raíz ocupe toda la pantalla */
+app-root {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Clase especial para la ruta de login */
+body.login-route {
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+}
+
+/* Asegurar que no haya márgenes o paddings inesperados */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}/* Estilos para los snackbars */
+.mat-snack-bar-success {
+  --mdc-snackbar-container-color: #2e7d32;
+  --mdc-snackbar-supporting-text-color: white;
+}
+
+.mat-snack-bar-error {
+  --mdc-snackbar-container-color: #d32f2f;
+  --mdc-snackbar-supporting-text-color: white;
+}
+
+.mat-snack-bar-info {
+  --mdc-snackbar-container-color: #0288d1;
+  --mdc-snackbar-supporting-text-color: white;
+}

@@ -1,0 +1,57 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+.drawer-container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+}
+
+.drawer {
+  width: 280px;
+  max-width: 280px;
+  background: #023E8A; /* azul profundo */
+  position: fixed;
+  top: 64px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+  border-radius: 0;
+  z-index: 1001;
+  align-items: stretch;
+}
+
+mat-drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 64px;
+  padding: 1rem;
+  background-color: rgba(192, 180, 180, 0.589);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  image-rendering: crisp-edges;
+}
+
+.opciones {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  background-color: #0077B6; /* azul médico translúcido */
+  color: #FFFFFF;
+  height: 64px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.opciones h3 {
+  margin: 0;
+  line-height: 64px;
+}
+
+button {
+  cursor: pointer;
+}

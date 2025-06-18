@@ -6,5 +6,4 @@ import java.util.List;
 
 public interface SeguroRepository extends JpaRepository<Seguro, Long> {
     List<Seguro> findByActivoTrue();
-    List<Seguro> findByTipo(Seguro.TipoSeguro tipo);
 }
