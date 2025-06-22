@@ -5,7 +5,7 @@ FROM node:18-alpine
 WORKDIR /app
 
 # Copiar los archivos estáticos generados
-COPY ./dist/frontGestion ./dist
+COPY ./dist/front-gestion/browser ./dist
 
 # Instala un servidor HTTP simple
 RUN npm install -g http-server

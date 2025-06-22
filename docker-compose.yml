@@ -29,6 +29,9 @@ services:
       - seguros-net
     depends_on:
       - mysql
+    env_file:
+      - .env
+
 
   frontend:
     build:
