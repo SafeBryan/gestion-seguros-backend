@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -627,6 +628,38 @@ class ContratoServiceTest {
 
         assertEquals(Contrato.EstadoContrato.CANCELADO, actualizado.getEstado());
     }
+    @Test
+    void testActualizarContrato_EstadoNullNoSobrescribe() {
+        Contrato contrato = new Contrato();
+        contrato.setId(1L);
+        contrato.setEstado(Contrato.EstadoContrato.CANCELADO); // estado inicial
+        contrato.setBeneficiarios(new ArrayList<>());
 
+        Usuario cliente = new Usuario(); cliente.setId(1L);
+        Usuario agente = new Usuario(); agente.setId(2L);
+        agente.setRol(new Rol()); agente.getRol().setId(1L); agente.getRol().setNombre("ADMIN");
+        Seguro seguro = new SeguroVida(); seguro.setId(3L);
+
+        when(contratoRepository.findById(1L)).thenReturn(Optional.of(contrato));
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(cliente));
+        when(usuarioRepository.findById(2L)).thenReturn(Optional.of(agente));
+        when(seguroRepository.findById(3L)).thenReturn(Optional.of(seguro));
+        when(contratoRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        ContratoDTO dto = new ContratoDTO();
+        dto.setClienteId(1L);
+        dto.setAgenteId(2L);
+        dto.setSeguroId(3L);
+        dto.setFechaInicio(LocalDate.now());
+        dto.setFechaFin(LocalDate.now().plusDays(30));
+        dto.setFrecuenciaPago(Contrato.FrecuenciaPago.MENSUAL);
+        dto.setEstado(null); // no lo cambiamos
+        dto.setBeneficiarios(List.of(crearBeneficiarioDTO()));
+
+        Contrato actualizado = contratoService.actualizarContrato(1L, dto);
+
+        // Asegura que no fue modificado
+        assertEquals(Contrato.EstadoContrato.CANCELADO, actualizado.getEstado());
+    }
 
 }

@@ -9,7 +9,6 @@ import com.seguros.service.ArchivoService;
 import com.seguros.service.ReembolsoService;
 
 import io.qameta.allure.internal.shadowed.jackson.databind.ObjectMapper;
-import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/reembolsos")
@@ -60,7 +58,7 @@ public class ReembolsoController {
         List<ReembolsoResponseDTO> lista = reembolsoService.obtenerReembolsosPendientes()
                 .stream()
                 .map(this::toDto)
-                .collect(Collectors.toList());
+                .toList();
 
         return ResponseEntity.ok(lista);
     }
@@ -87,7 +85,7 @@ public class ReembolsoController {
         List<ReembolsoResponseDTO> lista = reembolsoService.obtenerReembolsosPorCliente(cliente.getId())
                 .stream()
                 .map(this::toDto)
-                .collect(Collectors.toList());
+                .toList();
 
         return ResponseEntity.ok(lista);
     }
@@ -98,7 +96,7 @@ public class ReembolsoController {
         List<ReembolsoResponseDTO> lista = reembolsoService.obtenerReembolsosPorCliente(clienteId)
                 .stream()
                 .map(this::toDto)
-                .collect(Collectors.toList());
+                .toList();
 
         return ResponseEntity.ok(lista);
     }

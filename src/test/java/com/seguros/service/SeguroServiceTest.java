@@ -306,4 +306,5 @@ class SeguroServiceTest {
         assertEquals(15, ((SeguroSalud) editado).getNumeroConsultasIncluidas());
     }
 
+
 }

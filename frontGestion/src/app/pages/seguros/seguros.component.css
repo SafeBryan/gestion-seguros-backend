@@ -198,3 +198,10 @@ flex-direction: column;
 width: 100%;
 }
 }
+
+.chip-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}

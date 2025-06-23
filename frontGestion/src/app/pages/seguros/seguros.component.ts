@@ -1,6 +1,12 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { SeguroService } from '../../core/services/seguro.service';
 import { Seguro } from '../../models/seguro.model';
 import { AuthService } from '../../services/auth.service';
@@ -10,7 +16,11 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialogModule, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import {
+  MatDialogModule,
+  MatDialog,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -57,10 +67,17 @@ export class SegurosComponent implements OnInit {
   segurosInactivos: Seguro[] = [];
   loading = true;
   editMode = false;
-  
+  vidaCoberturas = [
+    'Fallecimiento Natural',
+    'Fallecimiento Accidental',
+    'Invalidez Permanente',
+    'Enfermedad Terminal',
+    'Asistencia Funeraria',
+  ];
+
   seguroForm!: FormGroup;
   dialogRef: MatDialogRef<any> | null = null;
-  
+
   @ViewChild('dialogTemplate') dialogTemplate!: TemplateRef<any>;
   nuevoSeguro: any;
 
@@ -84,16 +101,36 @@ export class SegurosComponent implements OnInit {
       nombre: ['', [Validators.required, Validators.minLength(3)]],
       tipo: ['VIDA', Validators.required],
       descripcion: ['', [Validators.required, Validators.minLength(10)]],
-      cobertura: ['', [Validators.required, Validators.minLength(10)]],
+      cobertura: [[], Validators.required], // ← array ahora
       precioAnual: [0, [Validators.required, Validators.min(1)]],
       activo: [true, Validators.required],
-      // Campos específicos de VIDA
-      beneficiarios: [''],
       montoCobertura: [0],
-      // Campos específicos de SALUD
-      hospitalesConvenio: [''],
-      numeroConsultasIncluidas: [0]
+      numeroConsultasIncluidas: [0],
     });
+  }
+
+  getCoberturasDisponibles(): string[] {
+    const tipo = this.seguroForm?.get('tipo')?.value;
+
+    if (tipo === 'VIDA') {
+      return [
+        'Fallecimiento Natural',
+        'Fallecimiento Accidental',
+        'Invalidez Permanente',
+        'Enfermedad Terminal',
+        'Asistencia Funeraria',
+      ];
+    } else if (tipo === 'SALUD') {
+      return [
+        'Hospitalización',
+        'Consultas médicas',
+        'Cirugías',
+        'Medicamentos',
+        'Exámenes de laboratorio',
+      ];
+    }
+
+    return [];
   }
 
   cargarSeguros(): void {
@@ -107,7 +144,9 @@ export class SegurosComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al cargar seguros', err);
-        this.snackBar.open('Error al cargar los seguros', 'Cerrar', { duration: 3000 });
+        this.snackBar.open('Error al cargar los seguros', 'Cerrar', {
+          duration: 3000,
+        });
         this.loading = false;
       },
     });
@@ -124,7 +163,7 @@ export class SegurosComponent implements OnInit {
       activo: true,
       precioAnual: 0,
       montoCobertura: 0,
-      numeroConsultasIncluidas: 0
+      numeroConsultasIncluidas: 0,
     });
     this.abrirModal();
   }
@@ -132,7 +171,7 @@ export class SegurosComponent implements OnInit {
   abrirModal(): void {
     this.dialogRef = this.dialog.open(this.dialogTemplate, {
       width: '700px',
-      disableClose: true
+      disableClose: true,
     });
   }
 
@@ -146,11 +185,18 @@ export class SegurosComponent implements OnInit {
 
   guardarSeguro(): void {
     if (this.seguroForm.invalid) {
-      this.snackBar.open('Por favor complete todos los campos requeridos', 'Cerrar', { duration: 3000 });
+      this.snackBar.open(
+        'Por favor complete todos los campos requeridos',
+        'Cerrar',
+        { duration: 3000 }
+      );
       return;
     }
 
-    const formData = this.seguroForm.value;
+    const formData = {
+      ...this.seguroForm.value,
+      cobertura: this.seguroForm.value.cobertura.join(', '),
+    };
     const usuarioId = this.authService.getUsuarioId();
 
     const seguroData: Seguro = {
@@ -161,25 +207,33 @@ export class SegurosComponent implements OnInit {
     if (this.editMode && formData.id) {
       this.seguroService.editarSeguro(formData.id, seguroData).subscribe({
         next: () => {
-          this.snackBar.open('Seguro actualizado exitosamente', 'Cerrar', { duration: 3000 });
+          this.snackBar.open('Seguro actualizado exitosamente', 'Cerrar', {
+            duration: 3000,
+          });
           this.cargarSeguros();
           this.cerrarModal();
         },
         error: (err) => {
           console.error('Error al editar el seguro', err);
-          this.snackBar.open('Error al editar el seguro', 'Cerrar', { duration: 3000 });
+          this.snackBar.open('Error al editar el seguro', 'Cerrar', {
+            duration: 3000,
+          });
         },
       });
     } else {
       this.seguroService.crearSeguro(seguroData).subscribe({
         next: () => {
-          this.snackBar.open('Seguro creado exitosamente', 'Cerrar', { duration: 3000 });
+          this.snackBar.open('Seguro creado exitosamente', 'Cerrar', {
+            duration: 3000,
+          });
           this.cargarSeguros();
           this.cerrarModal();
         },
         error: (err) => {
           console.error('Error al guardar el seguro', err);
-          this.snackBar.open('Error al crear el seguro', 'Cerrar', { duration: 3000 });
+          this.snackBar.open('Error al crear el seguro', 'Cerrar', {
+            duration: 3000,
+          });
         },
       });
     }
@@ -192,27 +246,31 @@ export class SegurosComponent implements OnInit {
       nombre: seguro.nombre,
       tipo: seguro.tipo,
       descripcion: seguro.descripcion,
-      cobertura: seguro.cobertura,
+      cobertura: seguro.cobertura?.split(',').map((item) => item.trim()) || [],
       precioAnual: seguro.precioAnual,
       activo: seguro.activo,
-      beneficiarios: seguro.beneficiarios || '',
       montoCobertura: seguro.montoCobertura || 0,
-      hospitalesConvenio: seguro.hospitalesConvenio || '',
       numeroConsultasIncluidas: seguro.numeroConsultasIncluidas || 0,
     });
     this.abrirModal();
   }
 
   eliminarSeguro(seguro: Seguro): void {
-    if (confirm(`¿Está seguro que desea desactivar el seguro "${seguro.nombre}"?`)) {
+    if (
+      confirm(`¿Está seguro que desea desactivar el seguro "${seguro.nombre}"?`)
+    ) {
       this.seguroService.actualizarEstado(seguro.id, false).subscribe({
         next: () => {
-          this.snackBar.open('Seguro desactivado exitosamente', 'Cerrar', { duration: 3000 });
+          this.snackBar.open('Seguro desactivado exitosamente', 'Cerrar', {
+            duration: 3000,
+          });
           this.cargarSeguros();
         },
         error: (err) => {
           console.error('Error al desactivar el seguro', err);
-          this.snackBar.open('Error al desactivar el seguro', 'Cerrar', { duration: 3000 });
+          this.snackBar.open('Error al desactivar el seguro', 'Cerrar', {
+            duration: 3000,
+          });
         },
       });
     }
@@ -221,22 +279,36 @@ export class SegurosComponent implements OnInit {
   activarSeguro(seguro: Seguro): void {
     this.seguroService.actualizarEstado(seguro.id, true).subscribe({
       next: () => {
-        this.snackBar.open('Seguro activado exitosamente', 'Cerrar', { duration: 3000 });
+        this.snackBar.open('Seguro activado exitosamente', 'Cerrar', {
+          duration: 3000,
+        });
         this.cargarSeguros();
       },
       error: (err) => {
         console.error('Error al activar el seguro', err);
-        this.snackBar.open('Error al activar el seguro', 'Cerrar', { duration: 3000 });
+        this.snackBar.open('Error al activar el seguro', 'Cerrar', {
+          duration: 3000,
+        });
       },
     });
   }
 
   // Getters para validaciones del formulario
-  get nombre() { return this.seguroForm.get('nombre'); }
-  get tipo() { return this.seguroForm.get('tipo'); }
-  get descripcion() { return this.seguroForm.get('descripcion'); }
-  get cobertura() { return this.seguroForm.get('cobertura'); }
-  get precioAnual() { return this.seguroForm.get('precioAnual'); }
+  get nombre() {
+    return this.seguroForm.get('nombre');
+  }
+  get tipo() {
+    return this.seguroForm.get('tipo');
+  }
+  get descripcion() {
+    return this.seguroForm.get('descripcion');
+  }
+  get cobertura() {
+    return this.seguroForm.get('cobertura');
+  }
+  get precioAnual() {
+    return this.seguroForm.get('precioAnual');
+  }
 
   // Método para obtener el color del chip según el tipo
   getTipoColor(tipo: string): string {
@@ -247,7 +319,7 @@ export class SegurosComponent implements OnInit {
   formatearPrecio(precio: number): string {
     return new Intl.NumberFormat('es-ES', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'USD',
     }).format(precio);
   }
 }

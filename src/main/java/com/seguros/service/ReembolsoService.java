@@ -18,12 +18,18 @@ public class ReembolsoService {
     private final ContratoService contratoService;
     private final UsuarioService usuarioService;
 
-    public ReembolsoService(ReembolsoRepository reembolsoRepository,
-                            ContratoService contratoService,
-                            UsuarioService usuarioService) {
+    private final ObjectMapper objectMapper;
+
+    public ReembolsoService(
+            ReembolsoRepository reembolsoRepository,
+            ContratoService contratoService,
+            UsuarioService usuarioService,
+            ObjectMapper objectMapper
+    ) {
         this.reembolsoRepository = reembolsoRepository;
         this.contratoService = contratoService;
         this.usuarioService = usuarioService;
+        this.objectMapper = objectMapper;
     }
 
 
@@ -44,8 +50,7 @@ public class ReembolsoService {
         // ✅ Usar JSON válido para los archivos
         try {
             if (dto.getArchivos() != null) {
-                ObjectMapper mapper = new ObjectMapper();
-                String archivosJson = mapper.writeValueAsString(dto.getArchivos());
+                String archivosJson = objectMapper.writeValueAsString(dto.getArchivos()); // CORREGIDO
                 reembolso.setArchivos(archivosJson);
             } else {
                 reembolso.setArchivos(null);
@@ -53,6 +58,7 @@ public class ReembolsoService {
         } catch (Exception e) {
             throw new RuntimeException("Error al convertir archivos a JSON", e);
         }
+
 
         // Datos médicos y de accidente
         reembolso.setNombreMedico(dto.getNombreMedico());

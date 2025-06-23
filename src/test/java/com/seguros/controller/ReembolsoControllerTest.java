@@ -20,6 +20,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -151,4 +153,209 @@ class ReembolsoControllerTest {
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].descripcion").value("Reembolso 1"));
     }
+
+    @Test
+    void testProcesarReembolso() throws Exception {
+        Usuario mockUsuario = new Usuario();
+        mockUsuario.setId(2L);
+        mockUsuario.setNombre("Admin");
+
+        UsuarioDetails usuarioDetails = new UsuarioDetails(mockUsuario, List.of());
+
+        var auth = new UsernamePasswordAuthenticationToken(usuarioDetails, null, usuarioDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        mockMvc.perform(post("/api/reembolsos/1/procesar")
+                        .param("aprobar", "true")
+                        .param("comentario", "Aprobado")
+                        .header("Authorization", token))
+                .andExpect(status().isOk());
+
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void testObtenerMisReembolsos() throws Exception {
+        Usuario mockUsuario = new Usuario();
+        mockUsuario.setId(5L);
+        mockUsuario.setNombre("Cliente");
+
+        UsuarioDetails usuarioDetails = new UsuarioDetails(mockUsuario, List.of());
+
+        var auth = new UsernamePasswordAuthenticationToken(usuarioDetails, null, usuarioDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        Reembolso mockReembolso = new Reembolso();
+        mockReembolso.setId(1L);
+        mockReembolso.setDescripcion("Examenes");
+        mockReembolso.setMonto(BigDecimal.valueOf(80));
+        mockReembolso.setArchivos("{\"recibo.pdf\":\"/ruta/recibo.pdf\"}");
+
+        Mockito.when(reembolsoService.obtenerReembolsosPorCliente(5L)).thenReturn(List.of(mockReembolso));
+
+        mockMvc.perform(get("/api/reembolsos/mis-reembolsos")
+                        .header("Authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].descripcion").value("Examenes"));
+
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void testObtenerReembolsosPorCliente() throws Exception {
+        Reembolso mockReembolso = new Reembolso();
+        mockReembolso.setId(1L);
+        mockReembolso.setDescripcion("Radiografía");
+        mockReembolso.setMonto(BigDecimal.valueOf(50));
+        mockReembolso.setArchivos("{\"rayos.pdf\":\"/ruta/rayos.pdf\"}");
+
+        Mockito.when(reembolsoService.obtenerReembolsosPorCliente(10L)).thenReturn(List.of(mockReembolso));
+
+        mockMvc.perform(get("/api/reembolsos/cliente/10")
+                        .header("Authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].descripcion").value("Radiografía"));
+    }
+
+    @Test
+    void testObtenerDetalleReembolso() throws Exception {
+        Reembolso mockReembolso = new Reembolso();
+        mockReembolso.setId(1L);
+        mockReembolso.setDescripcion("Cirugía menor");
+        mockReembolso.setMonto(BigDecimal.valueOf(300));
+        mockReembolso.setArchivos("{\"cirugia.pdf\":\"/ruta/cirugia.pdf\"}");
+
+        Mockito.when(reembolsoService.buscarPorId(1L)).thenReturn(java.util.Optional.of(mockReembolso));
+
+        mockMvc.perform(get("/api/reembolsos/1")
+                        .header("Authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.descripcion").value("Cirugía menor"));
+    }
+
+    @Test
+    void testArchivosJsonInvalido() throws Exception {
+        Reembolso mockReembolso = new Reembolso();
+        mockReembolso.setId(2L);
+        mockReembolso.setDescripcion("Error en JSON");
+        mockReembolso.setMonto(BigDecimal.valueOf(100));
+        mockReembolso.setArchivos("no-es-json");
+
+        Mockito.when(reembolsoService.buscarPorId(2L)).thenReturn(java.util.Optional.of(mockReembolso));
+
+        mockMvc.perform(get("/api/reembolsos/2")
+                        .header("Authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.archivos").doesNotExist()); // o null
+    }
+
+    @Test
+    void testDetalleCompletoConContratoYSeguroYClienteYAprobado() throws Exception {
+        Reembolso mockReembolso = new Reembolso();
+        mockReembolso.setId(3L);
+        mockReembolso.setDescripcion("Reembolso completo");
+        mockReembolso.setMonto(BigDecimal.valueOf(200));
+        mockReembolso.setArchivos("{\"factura.pdf\":\"/uploads/factura.pdf\"}");
+
+        // Cliente
+        Usuario cliente = new Usuario();
+        cliente.setId(100L);
+        cliente.setNombre("Juan Cliente");
+
+        // Seguro mockeado
+        var seguro = Mockito.mock(com.seguros.model.Seguro.class);
+        Mockito.when(seguro.getId()).thenReturn(200L);
+        Mockito.when(seguro.getNombre()).thenReturn("Plan Oro");
+
+        // Contrato
+        var contrato = new com.seguros.model.Contrato();
+        contrato.setId(300L);
+        contrato.setCliente(cliente);
+        contrato.setSeguro(seguro);
+
+        // Aprobador
+        Usuario aprobador = new Usuario();
+        aprobador.setNombre("Ana Revisora");
+
+        mockReembolso.setContrato(contrato);
+        mockReembolso.setAprobadoPor(aprobador);
+
+        Mockito.when(reembolsoService.buscarPorId(3L)).thenReturn(java.util.Optional.of(mockReembolso));
+
+        mockMvc.perform(get("/api/reembolsos/3")
+                        .header("Authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.clienteId").value(100L))
+                .andExpect(jsonPath("$.clienteNombre").value("Juan Cliente"))
+                .andExpect(jsonPath("$.seguroId").value(200L))
+                .andExpect(jsonPath("$.seguroNombre").value("Plan Oro"))
+                .andExpect(jsonPath("$.contratoId").value(300L))
+                .andExpect(jsonPath("$.aprobadoPorNombre").value("Ana Revisora"));
+    }
+    @Test
+    void testDetalleConContratoSinSeguro() throws Exception {
+        Reembolso mockReembolso = new Reembolso();
+        mockReembolso.setId(4L);
+        mockReembolso.setDescripcion("Reembolso sin seguro");
+        mockReembolso.setMonto(BigDecimal.valueOf(150));
+        mockReembolso.setArchivos("{\"archivo.pdf\":\"/uploads/archivo.pdf\"}");
+
+        // Cliente
+        Usuario cliente = new Usuario();
+        cliente.setId(101L);
+        cliente.setNombre("Cliente sin seguro");
+
+        // Contrato con cliente pero sin seguro
+        var contrato = new com.seguros.model.Contrato();
+        contrato.setId(301L);
+        contrato.setCliente(cliente);
+        contrato.setSeguro(null);  // <- clave
+
+        mockReembolso.setContrato(contrato);
+
+        Mockito.when(reembolsoService.buscarPorId(4L)).thenReturn(java.util.Optional.of(mockReembolso));
+
+        mockMvc.perform(get("/api/reembolsos/4")
+                        .header("Authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.clienteId").value(101L))
+                .andExpect(jsonPath("$.seguroId").doesNotExist()) // clave para verificar null
+                .andExpect(jsonPath("$.seguroNombre").doesNotExist());
+    }
+
+    @Test
+    void testDetalleConContratoSinCliente() throws Exception {
+        Reembolso mockReembolso = new Reembolso();
+        mockReembolso.setId(5L);
+        mockReembolso.setDescripcion("Reembolso sin cliente");
+        mockReembolso.setMonto(BigDecimal.valueOf(180));
+        mockReembolso.setArchivos("{\"archivo.pdf\":\"/uploads/archivo.pdf\"}");
+
+        // Seguro mock
+        var seguro = Mockito.mock(com.seguros.model.Seguro.class);
+        Mockito.when(seguro.getId()).thenReturn(202L);
+        Mockito.when(seguro.getNombre()).thenReturn("Plan Plata");
+
+        // Contrato con seguro pero sin cliente
+        var contrato = new com.seguros.model.Contrato();
+        contrato.setId(302L);
+        contrato.setSeguro(seguro);
+        contrato.setCliente(null);  // <- clave
+
+        mockReembolso.setContrato(contrato);
+
+        Mockito.when(reembolsoService.buscarPorId(5L)).thenReturn(java.util.Optional.of(mockReembolso));
+
+        mockMvc.perform(get("/api/reembolsos/5")
+                        .header("Authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.seguroId").value(202L))
+                .andExpect(jsonPath("$.clienteId").doesNotExist()) // clave para verificar null
+                .andExpect(jsonPath("$.clienteNombre").doesNotExist());
+    }
+
+
 }

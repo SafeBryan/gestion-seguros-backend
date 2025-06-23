@@ -1,5 +1,6 @@
 package com.seguros.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seguros.dto.BeneficiarioDTO;
@@ -11,6 +12,8 @@ import com.seguros.repository.ContratoRepository;
 import com.seguros.repository.SeguroRepository;
 import com.seguros.repository.UsuarioRepository;
 import com.seguros.util.MensajesError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
@@ -23,6 +26,8 @@ public class ContratoService {
     private final ContratoRepository contratoRepository;
     private final UsuarioRepository usuarioRepository;
     private final SeguroRepository seguroRepository;
+    private static final Logger logger = LoggerFactory.getLogger(ContratoService.class);
+
 
     public ContratoService(ContratoRepository contratoRepository,
                            UsuarioRepository usuarioRepository,
@@ -133,8 +138,9 @@ public class ContratoService {
                 dto.setArchivos(archivosMap);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error al leer los archivos del contrato con ID: {}", contrato.getId(), e);
         }
+
 
         if (contrato.getBeneficiarios() != null) {
             List<BeneficiarioDTO> beneficiarios = contrato.getBeneficiarios().stream().map(b -> {
@@ -214,15 +220,19 @@ public class ContratoService {
 
         // Archivos
         if (dto.getArchivos() != null) {
-            try {
-                ObjectMapper mapper = new ObjectMapper();
-                contrato.setArchivos(mapper.writeValueAsString(dto.getArchivos()));
-            } catch (Exception e) {
-                e.printStackTrace();
+            // Archivos
+            if (dto.getArchivos() != null) {
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    contrato.setArchivos(mapper.writeValueAsString(dto.getArchivos()));
+                } catch (JsonProcessingException e) {
+                    logger.error("Error al convertir archivos del DTO a JSON para el contrato ID {}: {}", contrato.getId(), e.getMessage(), e);
+                }
             }
         }
 
-        // Beneficiarios (elimina y reemplaza todos)
+
+            // Beneficiarios (elimina y reemplaza todos)
         contrato.getBeneficiarios().clear();
         List<Beneficiario> nuevos = dto.getBeneficiarios().stream().map(b -> {
             Beneficiario beneficiario = new Beneficiario();
