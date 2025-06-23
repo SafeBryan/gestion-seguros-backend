@@ -18,6 +18,33 @@ services:
     networks:
       - seguros-net
 
+  backend:
+    build:
+      context: .
+    container_name: backend-seguros
+    ports:
+      - "8080:8080"
+    restart: always
+    networks:
+      - seguros-net
+    depends_on:
+      - mysql
+    env_file:
+      - .env
+
+
+  frontend:
+    build:
+      context: ./frontGestion
+    container_name: frontend-seguros
+    ports:
+      - "4200:8080"  # Puerto local 4200 -> puerto del contenedor 8080
+    restart: always
+    networks:
+      - seguros-net
+    depends_on:
+      - backend
+
 volumes:
   mysql_data:
 
