@@ -248,4 +248,23 @@ class ContratoControllerIT {
                 .andExpect(jsonPath("$.frecuenciaPago").value("ANUAL"))
                 .andExpect(jsonPath("$.beneficiarios.length()").value(1));
     }
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void testObtenerTodosContratos() throws Exception {
+        Contrato contrato = new Contrato();
+        contrato.setCliente(cliente);
+        contrato.setAgente(agente);
+        contrato.setSeguro(seguroExistente);
+        contrato.setFechaInicio(LocalDate.now());
+        contrato.setFechaFin(LocalDate.now().plusYears(1));
+        contrato.setFrecuenciaPago(FrecuenciaPago.MENSUAL);
+        contrato.setEstado(EstadoContrato.ACTIVO);
+        contrato.setFirmaElectronica("firma123");
+        contratoRepository.save(contrato);
+
+        mockMvc.perform(get("/api/contratos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1));
+    }
+
 }

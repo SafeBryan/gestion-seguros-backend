@@ -150,4 +150,23 @@ class AuthControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
+    @Test
+    void testLogin_noAutenticado_retornaUnauthorized() throws Exception {
+        String email = "test@unauth.com";
+        String password = "noauth";
+
+        // Autenticación devuelve un Authentication no autenticado
+        Authentication authentication = mock(Authentication.class);
+        when(authentication.isAuthenticated()).thenReturn(false); // <- ❗ clave
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(authentication);
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\": \"" + email + "\", \"password\": \"" + password + "\"}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("Credenciales inválidas"));
+    }
+
+
 }
