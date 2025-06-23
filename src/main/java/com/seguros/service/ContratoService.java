@@ -94,11 +94,6 @@ public class ContratoService {
         return contratoRepository.findContratosActivosPorCliente(clienteId);
     }
 
-    public List<Contrato> obtenerContratosPorVencer(int dias) {
-        LocalDate fechaLimite = LocalDate.now().plusDays(dias);
-        return contratoRepository.findContratosPorVencer(fechaLimite);
-    }
-
     @Transactional
     public Contrato actualizarEstado(Long contratoId, Contrato.EstadoContrato nuevoEstado) {
         Contrato contrato = contratoRepository.findById(contratoId)
@@ -254,4 +249,30 @@ public class ContratoService {
     public List<Contrato> obtenerTodos() {
         return contratoRepository.findAll();
     }
+
+    public List<ContratoDTO> obtenerContratosImpagos() {
+        List<Contrato> impagos = contratoRepository.findContratosImpagos();
+        return impagos.stream().map(this::convertirAContratoDTO).toList();
+    }
+
+    public List<ContratoDTO> obtenerContratosVencidos() {
+        LocalDate hoy = LocalDate.now();
+        List<Contrato> vencidos = contratoRepository.findByFechaFinBeforeAndEstado(hoy, Contrato.EstadoContrato.ACTIVO);
+        return vencidos.stream().map(this::convertirAContratoDTO).toList();
+    }
+
+    public List<ContratoDTO> obtenerContratosPorVencer() {
+        LocalDate hoy = LocalDate.now();
+        LocalDate fechaLimite = hoy.plusDays(30);
+
+        List<Contrato> porVencer = contratoRepository.findContratosPorVencer(hoy, fechaLimite);
+        return porVencer.stream().map(this::convertirAContratoDTO).toList();
+    }
+    public List<ContratoDTO> obtenerContratosPorVencer(int dias) {
+        LocalDate hoy = LocalDate.now();
+        LocalDate fechaLimite = hoy.plusDays(dias);
+        List<Contrato> porVencer = contratoRepository.findContratosPorVencer(hoy, fechaLimite);
+        return porVencer.stream().map(this::convertirAContratoDTO).toList();
+    }
+
 }

@@ -321,9 +321,10 @@ class ContratoServiceTest {
     @Test
     void testObtenerContratosPorVencer() {
         Contrato contrato = new Contrato();
-        when(contratoRepository.findContratosPorVencer(any())).thenReturn(List.of(contrato));
+        when(contratoRepository.findContratosPorVencer(any(LocalDate.class), any(LocalDate.class)))
+                .thenReturn(List.of(contrato));
+        List<ContratoDTO> result = contratoService.obtenerContratosPorVencer(15);
 
-        List<Contrato> result = contratoService.obtenerContratosPorVencer(15);
         assertEquals(1, result.size());
     }
 
@@ -402,13 +403,16 @@ class ContratoServiceTest {
     @Test
     void testObtenerContratosPorVencer_FechaLimiteCorrecta() {
         Contrato contrato = new Contrato();
-        when(contratoRepository.findContratosPorVencer(any())).thenReturn(List.of(contrato));
 
-        List<Contrato> result = contratoService.obtenerContratosPorVencer(15);
+        when(contratoRepository.findContratosPorVencer(any(LocalDate.class), any(LocalDate.class)))
+                .thenReturn(List.of(contrato));
+
+        List<ContratoDTO> result = contratoService.obtenerContratosPorVencer(15);
 
         assertEquals(1, result.size());
-        verify(contratoRepository).findContratosPorVencer(any(LocalDate.class));
+        verify(contratoRepository).findContratosPorVencer(any(LocalDate.class), any(LocalDate.class));
     }
+
 
     @Test
     void testConvertirAContratoDTO_ConArchivosYBeneficiarios() {
