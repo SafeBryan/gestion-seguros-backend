@@ -127,7 +127,9 @@ class ContratoControllerTest {
     void testObtenerPorVencer() throws Exception {
         mockSecurityContext();
 
-        List<Contrato> contratos = Arrays.asList(new Contrato());
+        ContratoDTO dto = new ContratoDTO();
+        dto.setId(1L); // opcional, pero útil
+        List<ContratoDTO> contratos = List.of(dto);
 
         Mockito.when(contratoService.obtenerContratosPorVencer(15)).thenReturn(contratos);
 
@@ -137,6 +139,7 @@ class ContratoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
     }
+
 
     @Test
     void testObtenerPorVencerDefault() throws Exception {

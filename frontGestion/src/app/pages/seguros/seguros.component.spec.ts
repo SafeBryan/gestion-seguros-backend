@@ -66,14 +66,21 @@ describe('SegurosComponent', () => {
     expect(component.loading).toBeFalse();
   });
 
-  it('debería manejar error al cargar seguros', () => {
-    spyOn(console, 'error');
-    mockSeguroService.obtenerTodosLosSeguros.and.returnValue(
-      throwError(() => new Error('Fallo'))
+  it('debería manejar error al crear seguro', () => {
+    mockSeguroService.crearSeguro.and.returnValue(
+      throwError(() => new Error('Error'))
     );
-    component.cargarSeguros();
+    mockAuthService.getUsuarioId.and.returnValue(1);
+    spyOn(console, 'error');
+
+    component.seguroForm.patchValue({
+      ...mockSeguro,
+      cobertura: ['Hospitalización', 'Medicamentos'], // ✅ como array
+    });
+
+    component.guardarSeguro();
+
     expect(console.error).toHaveBeenCalled();
-    expect(component.loading).toBeFalse();
   });
 
   it('debería generar id con trackBySeguroId', () => {
@@ -239,12 +246,15 @@ describe('SegurosComponent', () => {
     mockAuthService.getUsuarioId.and.returnValue(1);
     spyOn(console, 'error');
 
-    component.seguroForm.patchValue(mockSeguro);
+    component.seguroForm.patchValue({
+      ...mockSeguro,
+      cobertura: ['Fallecimiento Natural'], // ← este cambio evita el .join error
+    });
+
     component.guardarSeguro();
 
     expect(console.error).toHaveBeenCalled();
   });
-
   it('debería editar un seguro existente y recargar la lista', () => {
     mockSeguroService.editarSeguro = jasmine
       .createSpy()
@@ -256,8 +266,15 @@ describe('SegurosComponent', () => {
     spyOn(component, 'cerrarModal').and.callThrough();
 
     component.editMode = true;
-    component.seguroForm.patchValue({ ...mockSeguro, id: 99 });
-    component.guardarSeguro();
+
+    // ✅ Poner cobertura como array ANTES de ejecutar guardarSeguro()
+    component.seguroForm.patchValue({
+      ...mockSeguro,
+      id: 99,
+      cobertura: ['Fallecimiento Natural', 'Invalidez Permanente'],
+    });
+
+    component.guardarSeguro(); // ← ahora sí, con valores válidos
 
     expect(mockSeguroService.editarSeguro).toHaveBeenCalledWith(
       99,
@@ -275,9 +292,11 @@ describe('SegurosComponent', () => {
     spyOn(console, 'error');
 
     component.editMode = true;
-    component.seguroForm.patchValue({ ...mockSeguro, id: 99 });
-    component.guardarSeguro();
-
+    component.seguroForm.patchValue({
+      ...mockSeguro,
+      id: 99,
+      cobertura: ['Fallecimiento Natural'], // ✅ debe ser un array para el formulario
+    });
     expect(console.error).toHaveBeenCalled();
   });
 

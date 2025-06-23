@@ -321,12 +321,33 @@ class ContratoServiceTest {
     @Test
     void testObtenerContratosPorVencer() {
         Contrato contrato = new Contrato();
+
+        // Datos mínimos requeridos
+        Usuario cliente = new Usuario(); cliente.setId(1L);
+        Usuario agente = new Usuario(); agente.setId(2L);
+        Rol rol = new Rol(); rol.setId(1L); rol.setNombre("AGENTE");
+        agente.setRol(rol);
+        Seguro seguro = new SeguroVida(); seguro.setId(3L); seguro.setNombre("Seguro Vida");
+
+        contrato.setCliente(cliente);
+        contrato.setAgente(agente);
+        contrato.setSeguro(seguro);
+        contrato.setFechaInicio(LocalDate.now());
+        contrato.setFechaFin(LocalDate.now().plusDays(15));
+        contrato.setEstado(Contrato.EstadoContrato.ACTIVO);
+        contrato.setFrecuenciaPago(Contrato.FrecuenciaPago.MENSUAL);
+        contrato.setFirmaElectronica("firma");
+
+        contrato.setBeneficiarios(List.of(new Beneficiario())); // opcional, pero útil
+
         when(contratoRepository.findContratosPorVencer(any(LocalDate.class), any(LocalDate.class)))
                 .thenReturn(List.of(contrato));
+
         List<ContratoDTO> result = contratoService.obtenerContratosPorVencer(15);
 
         assertEquals(1, result.size());
     }
+
 
     @Test
     void testCrearContratoSinBeneficiarios_LanzaExcepcion() {
@@ -404,6 +425,23 @@ class ContratoServiceTest {
     void testObtenerContratosPorVencer_FechaLimiteCorrecta() {
         Contrato contrato = new Contrato();
 
+        Usuario cliente = new Usuario(); cliente.setId(1L);
+        Usuario agente = new Usuario(); agente.setId(2L);
+        Rol rol = new Rol(); rol.setId(1L); rol.setNombre("AGENTE");
+        agente.setRol(rol);
+        Seguro seguro = new SeguroVida(); seguro.setId(3L);
+
+        contrato.setCliente(cliente);
+        contrato.setAgente(agente);
+        contrato.setSeguro(seguro);
+        contrato.setFechaInicio(LocalDate.now());
+        contrato.setFechaFin(LocalDate.now().plusDays(15));
+        contrato.setEstado(Contrato.EstadoContrato.ACTIVO);
+        contrato.setFrecuenciaPago(Contrato.FrecuenciaPago.MENSUAL);
+        contrato.setFirmaElectronica("firma");
+
+        contrato.setBeneficiarios(List.of(new Beneficiario())); // opcional, pero evita otros NPE
+
         when(contratoRepository.findContratosPorVencer(any(LocalDate.class), any(LocalDate.class)))
                 .thenReturn(List.of(contrato));
 
@@ -412,6 +450,7 @@ class ContratoServiceTest {
         assertEquals(1, result.size());
         verify(contratoRepository).findContratosPorVencer(any(LocalDate.class), any(LocalDate.class));
     }
+
 
 
     @Test

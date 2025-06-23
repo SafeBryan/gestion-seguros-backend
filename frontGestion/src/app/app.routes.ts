@@ -4,12 +4,14 @@ import { HomeComponent } from './pages/home/home.component';
 import { authGuard } from './guards/auth.guard';
 import { SegurosComponent } from './pages/seguros/seguros.component';
 import { UsuariosComponent } from './pages/usuarios/usuarios.component';
-import { ContratosListComponent } from './pages/contratos/contratos-list/contratos-list.component';
 import { ContratosPageComponent } from './pages/contratos/contratos-page/contratos-page.component';
 import { ClientesListComponent } from './pages/clientes/clientes-list/clientes-list.component';
 import { ReembolsoCrearComponent } from './pages/reembolsos/reembolso-crear/reembolso-crear.component';
 import { ReembolsoHistorialComponent } from './pages/reembolsos/reembolso-historial/reembolso-historial.component';
 import { ReembolsosPendientesComponent } from './pages/reembolsos/reembolsos-pendientes/reembolsos-pendientes.component';
+
+// Importa el componente de reportes
+import { SegurosImpagosComponent } from './pages/reportes/seguros-impagos/seguros-impagos.component';
 
 export const routes: Routes = [
   {
@@ -56,9 +58,15 @@ export const routes: Routes = [
     component: ReembolsoHistorialComponent,
     canActivate: [authGuard],
   },
-    {
+  {
     path: 'reembolsos/pendientes',
     component: ReembolsosPendientesComponent,
+    canActivate: [authGuard],
+  },
+  // Nueva ruta para Seguros Impagos
+  {
+    path: 'reportes/seguros-impagos',
+    component: SegurosImpagosComponent,
     canActivate: [authGuard],
   },
   {

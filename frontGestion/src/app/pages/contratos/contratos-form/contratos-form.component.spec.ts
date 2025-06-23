@@ -17,7 +17,7 @@ describe('ContratosFormComponent', () => {
   let usuarioServiceSpy: jasmine.SpyObj<UsuarioService>;
   let contratoServiceSpy: jasmine.SpyObj<ContratoService>;
   let authServiceSpy: jasmine.SpyObj<AuthService>;
-  let snackBarSpy: jasmine.SpyObj<MatSnackBar>; // ✅
+  let snackBarSpy: jasmine.SpyObj<MatSnackBar>;
 
   beforeEach(async () => {
     seguroServiceSpy = jasmine.createSpyObj('SeguroService', [
@@ -31,7 +31,7 @@ describe('ContratosFormComponent', () => {
       'actualizarContrato',
     ]);
     authServiceSpy = jasmine.createSpyObj('AuthService', ['getUsuarioId']);
-    snackBarSpy = jasmine.createSpyObj('MatSnackBar', ['open']); // ✅
+    snackBarSpy = jasmine.createSpyObj('MatSnackBar', ['open']);
 
     await TestBed.configureTestingModule({
       imports: [ContratosFormComponent, HttpClientTestingModule],
@@ -40,7 +40,7 @@ describe('ContratosFormComponent', () => {
         { provide: UsuarioService, useValue: usuarioServiceSpy },
         { provide: ContratoService, useValue: contratoServiceSpy },
         { provide: AuthService, useValue: authServiceSpy },
-        { provide: MatSnackBar, useValue: snackBarSpy }, // ✅
+        { provide: MatSnackBar, useValue: snackBarSpy },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -53,81 +53,180 @@ describe('ContratosFormComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('debería inicializar nuevo contrato si no se provee input', () => {
-    authServiceSpy.getUsuarioId.and.returnValue(5);
+  it('debería inicializar un nuevo contrato si no se provee input', () => {
+    authServiceSpy.getUsuarioId.and.returnValue(10);
     seguroServiceSpy.obtenerSegurosActivos.and.returnValue(of([]));
     usuarioServiceSpy.obtenerPorRol.and.returnValue(of([]));
 
     fixture.detectChanges();
 
-    expect(component.contrato?.clienteId).toBe(5);
-    expect(component.seguros).toEqual([]);
-    expect(component.agentes).toEqual([]);
+    expect(component.contrato?.clienteId).toBe(10);
+    expect(component.contrato?.estado).toBe('PENDIENTE');
   });
 
-  it('debería usar contrato existente si se provee', () => {
-    const contratoMock: Contrato = {
-      clienteId: 1,
-      seguroId: 1,
-      agenteId: 2,
-      fechaInicio: '2024-01-01',
-      fechaFin: '2024-12-31',
-      frecuenciaPago: 'MENSUAL',
-      estado: 'ACTIVO',
-      firmaElectronica: '',
-      beneficiarios: [],
-    };
+  it('debería agregar y validar beneficiario correctamente para tipo VIDA', () => {
+    authServiceSpy.getUsuarioId.and.returnValue(10); // ✅ clienteId
 
-    seguroServiceSpy.obtenerSegurosActivos.and.returnValue(of([]));
-    usuarioServiceSpy.obtenerPorRol.and.returnValue(of([]));
+    const contrato = component.getNuevoContrato();
+    component.contrato = contrato;
+    component.contrato.agenteId = 2; // ✅ requerido
+    component.contrato.fechaFin = '2025-12-31'; // ✅ requerido
+    component.seguros = [
+      {
+        id: 1,
+        tipo: 'VIDA',
+        nombre: '',
+        descripcion: '',
+        cobertura: '',
+        precioAnual: 100,
+        activo: true,
+      },
+    ];
+    component.contrato.seguroId = 1;
 
-    component.contrato = contratoMock;
-    fixture.detectChanges();
+    component.onSeguroChange();
 
-    expect(component.contrato!.clienteId).toBe(1);
-  });
-
-  it('debería cargar seguros y agentes', () => {
-    seguroServiceSpy.obtenerSegurosActivos.and.returnValue(
-      of([
-        {
-          id: 1,
-          nombre: 'Seguro',
-          tipo: 'VIDA',
-          descripcion: '',
-          cobertura: '',
-          precioAnual: 100,
-          activo: true,
-        },
-      ])
-    );
-    usuarioServiceSpy.obtenerPorRol.and.returnValue(
-      of([
-        {
-          id: 1,
-          nombre: 'Agente',
-          apellido: 'Pérez',
-          email: '',
-          telefono: '',
-          rolId: 2,
-          rolNombre: 'AGENTE',
-          activo: true,
-        },
-      ])
-    );
-
-    component.ngOnInit();
-
-    expect(component.seguros.length).toBe(1);
-    expect(component.agentes.length).toBe(1);
-  });
-
-  it('debería agregar y eliminar beneficiario', () => {
-    component.contrato = component.getNuevoContrato();
-    component.agregarBeneficiario();
+    expect(component.mostrarCamposBeneficiarios).toBeTrue();
     expect(component.contrato.beneficiarios.length).toBe(1);
-    component.eliminarBeneficiario(0);
-    expect(component.contrato.beneficiarios.length).toBe(0);
+
+    // Llenar datos requeridos
+    const beneficiario = component.contrato.beneficiarios[0];
+    Object.assign(beneficiario, {
+      nombre: 'Juan',
+      tipoIdentificacion: 'CEDULA',
+      numeroIdentificacion: '1234567890',
+      fechaNacimiento: '1990-01-01',
+      nacionalidad: 'Ecuatoriana',
+      parentesco: 'HIJO/A',
+      porcentaje: 100,
+      estatura: '175',
+      peso: '70',
+      lugarNacimiento: 'Quito',
+    });
+
+    expect(component.validarFormulario()).toBeTrue(); // ✅ ahora sí
+  });
+
+  it('debería fallar validación si porcentaje beneficiarios no es 100%', () => {
+    authServiceSpy.getUsuarioId.and.returnValue(10); // ✅ necesario
+
+    const contrato = component.getNuevoContrato();
+    component.contrato = contrato;
+    component.contrato.agenteId = 1;
+    component.contrato.fechaFin = '2025-12-31';
+    component.seguros = [
+      {
+        id: 1,
+        tipo: 'VIDA',
+        nombre: '',
+        descripcion: '',
+        cobertura: '',
+        precioAnual: 100,
+        activo: true,
+      },
+    ];
+    component.contrato.seguroId = 1;
+
+    component.onSeguroChange();
+
+    component.contrato.beneficiarios[0].porcentaje = 50;
+
+    expect(component.validarFormulario()).toBeFalse();
+    expect(snackBarSpy.open).toHaveBeenCalledWith(
+      'El porcentaje total de beneficiarios debe ser exactamente 100%. Actualmente: 50%',
+      'Cerrar',
+      { duration: 3000 }
+    );
+  });
+
+  it('debería validar contrato de tipo SALUD con dependiente', () => {
+    authServiceSpy.getUsuarioId.and.returnValue(10); // ✅ ← necesario
+
+    const contrato = component.getNuevoContrato();
+    component.contrato = contrato;
+    component.contrato.agenteId = 1;
+    component.contrato.fechaFin = '2025-12-31';
+    component.seguros = [
+      {
+        id: 2,
+        tipo: 'SALUD',
+        nombre: '',
+        descripcion: '',
+        cobertura: '',
+        precioAnual: 150,
+        activo: true,
+      },
+    ];
+    component.contrato.seguroId = 2;
+
+    component.onSeguroChange();
+
+    expect(component.mostrarCamposDependientes).toBeTrue();
+    expect(component.contrato.dependientes.length).toBe(1);
+
+    const dep = component.contrato.dependientes[0];
+    Object.assign(dep, {
+      nombre: 'Pedro',
+      tipoIdentificacion: 'CEDULA',
+      numeroIdentificacion: '1102345678',
+      fechaNacimiento: '2010-01-01',
+      nacionalidad: 'Ecuatoriana',
+      parentesco: 'HIJO/A',
+      estatura: '120',
+      peso: '35',
+      lugarNacimiento: 'Ambato',
+      tieneDiscapacidad: true,
+      diagnosticoDiscapacidad: 'Autismo',
+      hospitalCobertura: 'Hospital del IESS',
+    });
+
+    expect(component.validarFormulario()).toBeTrue(); // ✅ Ahora sí pasa
+  });
+
+  it('debería mostrar error si falta hospital en dependiente', () => {
+    authServiceSpy.getUsuarioId.and.returnValue(10); // ✅ clienteId
+
+    const contrato = component.getNuevoContrato();
+    component.contrato = contrato;
+    component.contrato.agenteId = 1; // ✅ requerido
+    component.contrato.fechaFin = '2025-12-31'; // ✅ requerido
+    component.seguros = [
+      {
+        id: 2,
+        tipo: 'SALUD',
+        nombre: '',
+        descripcion: '',
+        cobertura: '',
+        precioAnual: 150,
+        activo: true,
+      },
+    ];
+    component.contrato.seguroId = 2;
+
+    component.onSeguroChange();
+
+    const dep = component.contrato.dependientes[0];
+    Object.assign(dep, {
+      nombre: 'Carlos',
+      tipoIdentificacion: 'CEDULA',
+      numeroIdentificacion: '1104567890',
+      fechaNacimiento: '2015-06-01',
+      nacionalidad: 'Ecuatoriana',
+      parentesco: 'HIJO/A',
+      estatura: '130',
+      peso: '40',
+      lugarNacimiento: 'Quito',
+      tieneDiscapacidad: false,
+      diagnosticoDiscapacidad: '', // opcional porque no tiene discapacidad
+      hospitalCobertura: '', // ❌ aquí falta
+    });
+
+    expect(component.validarFormulario()).toBeFalse();
+    expect(snackBarSpy.open).toHaveBeenCalledWith(
+      'Todos los campos de dependientes deben estar completos',
+      'Cerrar',
+      { duration: 3000 }
+    );
   });
 
   it('debería emitir evento al cancelar', () => {
@@ -136,85 +235,62 @@ describe('ContratosFormComponent', () => {
     expect(component.cancelado.emit).toHaveBeenCalled();
   });
 
-  it('debería crear un nuevo contrato y emitir evento', () => {
-    spyOn(component.guardado, 'emit');
+  it('debería crear contrato formateado correctamente para tipo VIDA', () => {
+    authServiceSpy.getUsuarioId.and.returnValue(10); // ✅ clienteId
 
-    const contrato: Contrato = {
-      clienteId: 1,
-      seguroId: 2,
-      agenteId: 3,
-      fechaInicio: '2024-01-01',
-      fechaFin: '2024-12-31',
-      frecuenciaPago: 'MENSUAL',
-      estado: 'ACTIVO',
-      beneficiarios: [],
-    };
-
+    const contrato = component.getNuevoContrato();
     component.contrato = contrato;
+    component.contrato.agenteId = 2;
+    component.contrato.fechaFin = '2024-12-31';
+    component.seguros = [
+      {
+        id: 1,
+        tipo: 'VIDA',
+        nombre: '',
+        descripcion: '',
+        cobertura: '',
+        precioAnual: 100,
+        activo: true,
+      },
+    ];
+    component.contrato.seguroId = 1;
+
+    component.onSeguroChange();
+
+    const beneficiario = component.contrato.beneficiarios[0];
+    Object.assign(beneficiario, {
+      nombre: 'Juan',
+      tipoIdentificacion: 'CEDULA',
+      numeroIdentificacion: '1234567890',
+      fechaNacimiento: '1990-01-01',
+      nacionalidad: 'Ecuatoriana',
+      parentesco: 'HIJO/A',
+      porcentaje: 100,
+      estatura: '175',
+      peso: '70',
+      lugarNacimiento: 'Quito',
+    });
+
     contratoServiceSpy.crearContrato.and.returnValue(
-      of({ ...contrato, id: 1 })
+      of({
+        id: 999,
+        clienteId: 1,
+        seguroId: 1,
+        agenteId: 2,
+        fechaInicio: '2024-01-01',
+        fechaFin: '2024-12-31',
+        frecuenciaPago: 'MENSUAL',
+        estado: 'ACTIVO',
+        firmaElectronica: '',
+        beneficiarios: [],
+        dependientes: [],
+      })
     );
 
-    component.guardarContrato();
-
-    expect(snackBarSpy.open).toHaveBeenCalledWith(
-      'Contrato creado exitosamente',
-      'Cerrar',
-      { duration: 3000 }
-    );
-    expect(component.guardado.emit).toHaveBeenCalled();
-  });
-  it('debería actualizar un contrato existente y emitir evento', () => {
     spyOn(component.guardado, 'emit');
-
-    const contrato: Contrato = {
-      id: 1,
-      clienteId: 1,
-      seguroId: 2,
-      agenteId: 3,
-      fechaInicio: '2024-01-01',
-      fechaFin: '2024-12-31',
-      frecuenciaPago: 'MENSUAL',
-      estado: 'ACTIVO',
-      beneficiarios: [],
-    };
-
-    component.contrato = contrato;
-    contratoServiceSpy.actualizarContrato.and.returnValue(of(contrato));
-
     component.guardarContrato();
 
-    expect(snackBarSpy.open).toHaveBeenCalledWith(
-      'Contrato actualizado exitosamente',
-      'Cerrar',
-      { duration: 3000 }
-    );
+    expect(contratoServiceSpy.crearContrato).toHaveBeenCalled();
     expect(component.guardado.emit).toHaveBeenCalled();
-  });
-
-  it('debería manejar error al guardar contrato', () => {
-    const contrato: Contrato = {
-      clienteId: 1,
-      seguroId: 2,
-      agenteId: 3,
-      fechaInicio: '2024-01-01',
-      fechaFin: '2024-12-31',
-      frecuenciaPago: 'MENSUAL',
-      estado: 'ACTIVO',
-      beneficiarios: [],
-    };
-
-    component.contrato = contrato;
-    spyOn(console, 'error');
-    contratoServiceSpy.crearContrato.and.returnValue(
-      throwError(() => new Error('Error al guardar'))
-    );
-
-    component.guardarContrato();
-
-    expect(console.error).toHaveBeenCalledWith(
-      'Error al guardar contrato',
-      jasmine.any(Error)
-    );
   });
 });

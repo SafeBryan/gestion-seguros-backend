@@ -9,29 +9,39 @@ describe('MenuService', () => {
     service = TestBed.inject(MenuService);
   });
 
-  it('debería crearse el servicio', () => {
+  it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  it('debería devolver una copia del menú con getMenu()', () => {
-    const menu = service.getMenu();
-    expect(menu.length).toBe(4);
-    expect(menu[0].title).toBe('Inicio');
-
-    // verificar que no sea la misma referencia
-    menu.push({ title: 'Extra', url: '/extra', icon: 'extra' });
-    expect(service.getMenu().length).toBe(4);
+  it('should return admin menu for ADMIN role', () => {
+    const result: IMenu[] = service.getMenuByRol('ADMIN');
+    expect(result.length).toBeGreaterThan(0);
+    expect(result.some((item) => item.title === 'Usuario')).toBeTrue();
   });
 
-  it('debería encontrar el menú por URL ignorando mayúsculas/minúsculas', () => {
-    const menu = service.getMenuByUrl('/USUARIOS');
-    expect(menu).toBeTruthy();
-    expect(menu?.title).toBe('Usuario');
+  it('should return admin menu for AGENTE role', () => {
+    const result: IMenu[] = service.getMenuByRol('AGENTE');
+    expect(result.length).toBeGreaterThan(0);
+    expect(result.some((item) => item.title === 'Contratos')).toBeTrue();
   });
 
-  it('debería retornar undefined si no encuentra la URL', () => {
-    // eliminamos el cast forzado a IMenu para poder retornar undefined correctamente
-    const menu = service.getMenuByUrl('/no-existe');
-    expect(menu).toBeUndefined();
+  it('should return client menu for CLIENTE role', () => {
+    const result: IMenu[] = service.getMenuByRol('CLIENTE');
+    expect(result.length).toBeGreaterThan(0);
+    expect(result.some((item) => item.title === 'Mis Contratos')).toBeTrue();
+  });
+
+  it('should return default menu for unknown role', () => {
+    const result: IMenu[] = service.getMenuByRol('DESCONOCIDO');
+    expect(result.length).toBe(1);
+    expect(result[0].title).toBe('Inicio');
+    expect(result[0].url).toBe('/home');
+  });
+
+  it('should return a deep copy of menu (not reference)', () => {
+    const adminMenu = service.getMenuByRol('ADMIN');
+    adminMenu[0].title = 'Modificado';
+    const freshMenu = service.getMenuByRol('ADMIN');
+    expect(freshMenu[0].title).toBe('Inicio'); // original title, not modified
   });
 });

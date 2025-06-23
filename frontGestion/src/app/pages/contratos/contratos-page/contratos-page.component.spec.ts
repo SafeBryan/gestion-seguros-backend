@@ -61,14 +61,16 @@ describe('ContratosPageComponent', () => {
 
   it('debería cerrar modal al guardar', () => {
     spyOn(component, 'cerrarModalFormulario');
-    spyOn(document, 'querySelector').and.returnValue({
+
+    // Simular componente hijo y espiar su método
+    component.contratosListComponent = {
       cargarContratos: jasmine.createSpy('cargarContratos'),
-    } as any);
+    } as any;
 
     component.alGuardar();
 
     expect(component.cerrarModalFormulario).toHaveBeenCalled();
-    expect(document.querySelector).toHaveBeenCalledWith('app-contratos-list');
+    expect(component.contratosListComponent.cargarContratos).toHaveBeenCalled();
   });
 
   it('debería cerrar modal al cancelar formulario', () => {
