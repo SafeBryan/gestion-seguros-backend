@@ -1,60 +1,237 @@
-.cliente-form-container {
-  padding: 24px;
-  background-color: #fff;
-  border-radius: 10px;
-  max-width: 700px;
-  margin: 16px auto;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+.dialog-container {
+  padding: 0;
+  max-height: 90vh;
+  overflow: hidden;
 }
 
-.form-section {
-  margin-bottom: 20px;
-}
-
-label {
-  display: block;
-  margin-bottom: 4px;
+/* Header styles */
+h2[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  margin: 0 0 16px 0;
+  padding: 20px 24px 0 24px;
+  color: #023E8A;
   font-weight: 500;
-  color: #333;
+  font-size: 20px;
 }
 
-input,
-select,
-textarea {
-  width: 100%;
-  padding: 10px 12px;
+h2[mat-dialog-title] mat-icon {
+  margin-right: 8px;
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+/* Dialog content */
+.dialog-content {
+  padding: 0 24px;
+  max-height: 60vh;
+  overflow-y: auto;
+  margin: 0;
+}
+
+/* Loading container */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.loading-text {
+  margin-top: 16px;
+  color: #023E8A;
+  font-weight: 500;
+}
+
+/* Form styles */
+.cliente-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 16px;
+}
+
+/* Form sections */
+.form-section {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #fafafa;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  margin: 0 0 16px 0;
+  color: #023E8A;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.section-title mat-icon {
+  margin-right: 8px;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Form rows */
+.form-row {
+  display: flex;
+  gap: 16px;
   margin-bottom: 16px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
-  font-family: inherit;
 }
 
+.form-row:last-child {
+  margin-bottom: 0;
+}
+
+.form-row mat-form-field {
+  flex: 1;
+}
+
+.full-width {
+  width: 100% !important;
+  flex: 1 !important;
+}
+
+/* Form field styles */
+mat-form-field {
+  width: 100%;
+}
+
+/* Usuario option styles */
+.usuario-option {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.usuario-email {
+  font-size: 12px;
+  color: #666;
+  margin-top: 2px;
+}
+
+/* Textarea styles */
 textarea {
+  min-height: 80px !important;
   resize: vertical;
 }
 
-button[type="submit"] {
-  background-color: #3f51b5;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-weight: 500;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s ease;
+/* Dialog actions */
+.dialog-actions {
+  padding: 16px 24px 20px 24px;
+  border-top: 1px solid #e0e0e0;
+  background-color: #fafafa;
 }
 
-button[type="submit"]:hover {
-  background-color: #303f9f;
+.dialog-actions button {
+  margin-left: 8px;
 }
 
+.dialog-actions button mat-icon {
+  margin-right: 4px;
+}
+
+/* Success and error snackbar styles */
+::ng-deep .success-snackbar {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+::ng-deep .error-snackbar {
+  background-color: #f44336 !important;
+  color: white !important;
+}
+
+/* Custom scrollbar for dialog content */
+.dialog-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dialog-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.dialog-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.dialog-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Form field icons */
+mat-form-field mat-icon[matSuffix] {
+  color: #546e7a;
+}
+
+/* Date picker styles */
+.mat-form-field-suffix .mat-datepicker-toggle {
+  color: #546e7a;
+}
+
+/* Select option icons */
+mat-option mat-icon {
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* Responsive styles */
 @media (max-width: 600px) {
-  .cliente-form-container {
+  .dialog-container {
+    max-height: 95vh;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .dialog-content {
+    max-height: 70vh;
+    padding: 0 16px;
+  }
+  
+  h2[mat-dialog-title] {
+    padding: 16px 16px 0 16px;
+    font-size: 18px;
+  }
+  
+  .dialog-actions {
+    padding: 12px 16px 16px 16px;
+  }
+  
+  .form-section {
     padding: 12px;
   }
+}
 
-  button[type="submit"] {
-    width: 100%;
-  }
+/* Focus styles */
+mat-form-field.mat-focused .mat-form-field-outline-thick {
+  color: #023E8A;
+}
+
+mat-form-field.mat-focused .mat-form-field-label {
+  color: #023E8A;
+}
+
+/* Disabled state */
+button[disabled] {
+  opacity: 0.6;
+}
+
+/* Validation styles */
+mat-form-field.mat-form-field-invalid .mat-form-field-outline-thick {
+  color: #f44336;
+}
+
+mat-error {
+  font-size: 12px;
+  margin-top: 4px;
 }

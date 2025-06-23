@@ -1,60 +1,157 @@
-<div class="admin-container">
-  <h2 class="admin-title">Listado de Clientes</h2>
+<div class="clientes-container mat-elevation-z2">
+  <!-- Encabezado con título y botón de agregar -->
+  <div class="header-container">
+    <div class="title-section">
+      <mat-icon class="header-icon">people</mat-icon>
+      <h1 class="header-title">Gestión de Clientes</h1>
+    </div>
+    <button mat-raised-button color="primary" class="add-button" (click)="crearCliente()">
+      <mat-icon>person_add</mat-icon>
+      <span>Nuevo Cliente</span>
+    </button>
+  </div>
 
-  <button
-    mat-raised-button
-    color="primary"
-    (click)="abrirFormularioNuevoCliente()"
-  >
-    <mat-icon>add</mat-icon> Nuevo Cliente
-  </button>
+  <!-- Filtro de búsqueda -->
+  <mat-form-field class="search-filter" appearance="outline">
+    <mat-label>Buscar cliente</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Nombre, email, identificación..." #input>
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
 
-  <input
-    type="text"
-    [(ngModel)]="filtro"
-    (input)="filtrar()"
-    placeholder="Buscar por nombre, cédula o email"
-    class="buscador-input"
-  />
+  <!-- Spinner de carga -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p class="loading-text">Cargando clientes...</p>
+  </div>
 
-  <table class="tabla-clientes">
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>Cédula / ID</th>
-        <th>Email</th>
-        <th>Fecha Nacimiento</th>
-        <th>Estado Civil</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let cliente of clientesFiltrados">
-        <td>{{ cliente.nombre }} {{ cliente.apellido }}</td>
-        <td>{{ cliente.numeroIdentificacion }}</td>
-        <td>{{ cliente.email }}</td>
-        <td>{{ cliente.fechaNacimiento }}</td>
-        <td>{{ cliente.estadoCivil }}</td>
-        <td>
-          <button
-            mat-icon-button
-            color="primary"
-            (click)="editarCliente(cliente.id)"
-            matTooltip="Editar cliente"
-          >
+  <!-- Mensaje si no hay clientes -->
+  <div *ngIf="!loading && clientes.length === 0" class="no-data-container">
+    <mat-icon class="no-data-icon">sentiment_dissatisfied</mat-icon>
+    <p class="no-data-text">No se encontraron clientes en el sistema</p>
+    <button mat-stroked-button color="primary" (click)="crearCliente()">
+      <mat-icon>add</mat-icon> Agregar cliente
+    </button>
+  </div>
+
+  <!-- Tabla de clientes -->
+  <div class="table-container" *ngIf="!loading && clientes.length > 0">
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z1">
+      
+      <!-- ID Column -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> ID </th>
+        <td mat-cell *matCellDef="let cliente"> {{cliente.id}} </td>
+      </ng-container>
+      
+      <!-- Nombre Column -->
+      <ng-container matColumnDef="nombre">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre Completo </th>
+        <td mat-cell *matCellDef="let cliente"> 
+          <div class="nombre-content">
+            <mat-icon class="nombre-icon">person</mat-icon>
+            <span class="nombre-text">{{cliente.nombre}} {{cliente.apellido}}</span>
+          </div>
+        </td>
+      </ng-container>
+      
+      <!-- Email Column -->
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Email </th>
+        <td mat-cell *matCellDef="let cliente" class="email-cell"> 
+          <div class="email-content">
+            <mat-icon class="email-icon">email</mat-icon>
+            {{cliente.email}}
+          </div>
+        </td>
+      </ng-container>
+      
+      <!-- Identificación Column -->
+      <ng-container matColumnDef="identificacion">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Identificación </th>
+        <td mat-cell *matCellDef="let cliente"> 
+          <div class="identificacion-content">
+            <mat-icon class="id-icon">badge</mat-icon>
+            <div class="id-info">
+              <span class="id-tipo">{{cliente.tipoIdentificacion}}</span>
+              <span class="id-numero">{{cliente.numeroIdentificacion}}</span>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+      
+      <!-- Fecha Nacimiento Column -->
+      <ng-container matColumnDef="fechaNacimiento">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Edad / F. Nacimiento </th>
+        <td mat-cell *matCellDef="let cliente"> 
+          <div class="fecha-content">
+            <mat-icon class="fecha-icon">cake</mat-icon>
+            <div class="fecha-info">
+              <span class="edad">{{calcularEdad(cliente.fechaNacimiento)}} años</span>
+              <span class="fecha">{{formatearFecha(cliente.fechaNacimiento)}}</span>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+      
+      <!-- Estado Civil Column -->
+      <ng-container matColumnDef="estadoCivil">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Estado Civil </th>
+        <td mat-cell *matCellDef="let cliente"> 
+          <div class="estado-chip" [ngClass]="getEstadoCivilClass(cliente.estadoCivil)">
+            {{cliente.estadoCivil || 'No especificado'}}
+          </div>
+        </td>
+      </ng-container>
+      
+      <!-- Sexo Column -->
+      <ng-container matColumnDef="sexo">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Sexo </th>
+        <td mat-cell *matCellDef="let cliente"> 
+          <mat-chip-set>
+            <mat-chip [ngClass]="getSexoClass(cliente.sexo)" selected>
+              <mat-icon>{{cliente.sexo === 'Masculino' ? 'male' : 'female'}}</mat-icon>
+              {{cliente.sexo || 'No especificado'}}
+            </mat-chip>
+          </mat-chip-set>
+        </td>
+      </ng-container>
+      
+      <!-- Teléfono Column -->
+      <ng-container matColumnDef="telefono">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Teléfono </th>
+        <td mat-cell *matCellDef="let cliente"> 
+          <div class="phone-content">
+            <mat-icon class="phone-icon">phone</mat-icon>
+            {{cliente.telefono || 'No especificado'}}
+          </div>
+        </td>
+      </ng-container>
+      
+      <!-- Acciones Column -->
+      <ng-container matColumnDef="acciones">
+        <th mat-header-cell *matHeaderCellDef class="actions-header"> Acciones </th>
+        <td mat-cell *matCellDef="let cliente" class="actions-cell"> 
+          <button mat-icon-button color="primary" matTooltip="Editar" (click)="editarCliente(cliente)">
             <mat-icon>edit</mat-icon>
           </button>
-
-          <button
-            mat-icon-button
-            color="warn"
-            (click)="desactivarCliente(cliente.id)"
-            matTooltip="Desactivar cliente"
-          >
+          <button mat-icon-button color="warn" matTooltip="Desactivar" (click)="desactivarCliente(cliente)">
             <mat-icon>block</mat-icon>
           </button>
         </td>
+      </ng-container>
+      
+      <tr mat-header-row *matHeaderRowDef="columnas"></tr>
+      <tr mat-row *matRowDef="let cliente; columns: columnas;" class="cliente-row"></tr>
+      
+      <!-- Row shown when there is no matching data -->
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell no-results" colspan="9">No se encontraron resultados para "{{input.value}}"</td>
       </tr>
-    </tbody>
-  </table>
+    </table>
+
+    <!-- Paginador -->
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 50]" 
+                   aria-label="Seleccionar página de clientes"
+                   [showFirstLastButtons]="true"></mat-paginator>
+  </div>
 </div>
