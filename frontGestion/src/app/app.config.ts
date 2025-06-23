@@ -18,6 +18,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { MatNativeDateModule } from '@angular/material/core';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -26,7 +27,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     provideClientHydration(withEventReplay()),
     provideHttpClient(withFetch(), withInterceptorsFromDi()),
-    importProvidersFrom(MatIconModule, HttpClientModule),
+    importProvidersFrom(MatIconModule, HttpClientModule, MatNativeDateModule ),
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

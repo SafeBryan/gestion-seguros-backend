@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -18,12 +19,18 @@ public class ReembolsoService {
     private final ContratoService contratoService;
     private final UsuarioService usuarioService;
 
-    public ReembolsoService(ReembolsoRepository reembolsoRepository,
-                            ContratoService contratoService,
-                            UsuarioService usuarioService) {
+    private final ObjectMapper objectMapper;
+
+    public ReembolsoService(
+            ReembolsoRepository reembolsoRepository,
+            ContratoService contratoService,
+            UsuarioService usuarioService,
+            ObjectMapper objectMapper
+    ) {
         this.reembolsoRepository = reembolsoRepository;
         this.contratoService = contratoService;
         this.usuarioService = usuarioService;
+        this.objectMapper = objectMapper;
     }
 
 
@@ -44,8 +51,7 @@ public class ReembolsoService {
         // ✅ Usar JSON válido para los archivos
         try {
             if (dto.getArchivos() != null) {
-                ObjectMapper mapper = new ObjectMapper();
-                String archivosJson = mapper.writeValueAsString(dto.getArchivos());
+                String archivosJson = objectMapper.writeValueAsString(dto.getArchivos()); // CORREGIDO
                 reembolso.setArchivos(archivosJson);
             } else {
                 reembolso.setArchivos(null);
@@ -53,6 +59,7 @@ public class ReembolsoService {
         } catch (Exception e) {
             throw new RuntimeException("Error al convertir archivos a JSON", e);
         }
+
 
         // Datos médicos y de accidente
         reembolso.setNombreMedico(dto.getNombreMedico());
@@ -99,5 +106,46 @@ public class ReembolsoService {
     public Optional<Reembolso> buscarPorId(Long id) {
         return reembolsoRepository.findById(id);
     }
+
+    public ReembolsoResponseDTO convertirADTO(Reembolso r) {
+        ReembolsoResponseDTO dto = new ReembolsoResponseDTO();
+
+        dto.setId(r.getId());
+        dto.setMonto(r.getMonto());
+        dto.setDescripcion(r.getDescripcion());
+        dto.setEstado(r.getEstado());
+
+        try {
+            Map<String, String> archivosMap = objectMapper.readValue(r.getArchivos(), Map.class);
+            dto.setArchivos(archivosMap);
+        } catch (Exception e) {
+            dto.setArchivos(null); // o Collections.emptyMap()
+        }
+
+        if (r.getContrato() != null) {
+            dto.setContratoId(r.getContrato().getId());
+
+            if (r.getContrato().getSeguro() != null) {
+                dto.setSeguroId(r.getContrato().getSeguro().getId());
+                dto.setSeguroNombre(r.getContrato().getSeguro().getNombre());
+            }
+
+            if (r.getContrato().getCliente() != null) {
+                dto.setClienteId(r.getContrato().getCliente().getId());
+                dto.setClienteNombre(r.getContrato().getCliente().getNombre());
+            }
+        }
+
+        if (r.getAprobadoPor() != null) {
+            dto.setAprobadoPorNombre(r.getAprobadoPor().getNombre());
+        }
+
+        dto.setComentarioRevisor(r.getComentarioRevisor());
+        dto.setFechaSolicitud(r.getFechaSolicitud());
+        dto.setFechaRevision(r.getFechaRevision());
+
+        return dto;
+    }
+
 
 }

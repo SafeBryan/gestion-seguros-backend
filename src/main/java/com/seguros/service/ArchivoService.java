@@ -15,6 +15,13 @@ public class ArchivoService {
 
     private final Path directorio = Paths.get("uploads/reembolsos");
 
+    public class ArchivoStorageException extends RuntimeException {
+        public ArchivoStorageException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
+
+
     public ArchivoService() throws IOException {
         if (!Files.exists(directorio)) {
             Files.createDirectories(directorio);
@@ -28,7 +35,7 @@ public class ArchivoService {
             Files.copy(archivo.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
             return destino.toString(); // Ruta local del archivo
         } catch (IOException e) {
-            throw new RuntimeException("Error al guardar archivo", e);
+            throw new ArchivoStorageException("Error al guardar archivo", e);
         }
     }
 }

@@ -36,12 +36,10 @@ public class ContratoController {
 
     @GetMapping("/por-vencer")
     public ResponseEntity<List<ContratoDTO>> obtenerPorVencer(@RequestParam(defaultValue = "30") int dias) {
-        List<Contrato> contratos = contratoService.obtenerContratosPorVencer(dias);
-        List<ContratoDTO> dtos = contratos.stream()
-                .map(contratoService::convertirAContratoDTO)
-                .toList();
-        return ResponseEntity.ok(dtos);
+        List<ContratoDTO> contratos = contratoService.obtenerContratosPorVencer(dias);
+        return ResponseEntity.ok(contratos);
     }
+
 
 
     @PutMapping("/{id}/estado")
@@ -75,5 +73,6 @@ public class ContratoController {
                 .toList();
         return ResponseEntity.ok(dtos);
     }
+
 
 }

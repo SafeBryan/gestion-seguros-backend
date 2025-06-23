@@ -1,0 +1,46 @@
+<div class="container mx-auto p-4">
+  <h2 class="text-2xl font-semibold mb-4">Seguros Impagos</h2>
+
+  <div *ngIf="cargando" class="text-gray-500">Cargando datos...</div>
+
+  <table
+    *ngIf="!cargando && segurosImpagos.length > 0"
+    class="table-auto w-full border-collapse border border-gray-300 shadow-sm"
+  >
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="border px-4 py-2">ID Contrato</th>
+        <th class="border px-4 py-2">Seguro</th>
+        <th class="border px-4 py-2">Agente</th>
+        <th class="border px-4 py-2">Fecha Inicio</th>
+        <th class="border px-4 py-2">Fecha Fin</th>
+        <th class="border px-4 py-2">Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let seguro of segurosImpagos" class="hover:bg-gray-50">
+        <td class="border px-4 py-2">{{ seguro.id }}</td>
+        <td class="border px-4 py-2">{{ seguro.seguro?.nombre }}</td>
+        <td class="border px-4 py-2">
+          {{ seguro.agente?.nombre }} {{ seguro.agente?.apellido }}
+        </td>
+        <td class="border px-4 py-2">
+          {{ seguro.fechaInicio | date : "mediumDate" }}
+        </td>
+        <td class="border px-4 py-2">
+          {{ seguro.fechaFin | date : "mediumDate" }}
+        </td>
+        <td class="border px-4 py-2">
+          <span class="text-red-600 font-semibold">Impago</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div
+    *ngIf="!cargando && segurosImpagos.length === 0"
+    class="text-gray-500 mt-4"
+  >
+    No hay seguros impagos actualmente.
+  </div>
+</div>

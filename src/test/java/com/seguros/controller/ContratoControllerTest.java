@@ -127,7 +127,9 @@ class ContratoControllerTest {
     void testObtenerPorVencer() throws Exception {
         mockSecurityContext();
 
-        List<Contrato> contratos = Arrays.asList(new Contrato());
+        ContratoDTO dto = new ContratoDTO();
+        dto.setId(1L); // opcional, pero útil
+        List<ContratoDTO> contratos = List.of(dto);
 
         Mockito.when(contratoService.obtenerContratosPorVencer(15)).thenReturn(contratos);
 
@@ -137,6 +139,7 @@ class ContratoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
     }
+
 
     @Test
     void testObtenerPorVencerDefault() throws Exception {
@@ -294,4 +297,29 @@ class ContratoControllerTest {
                 .andExpect(content().string("Contrato no encontrado"));
     }
 
+    @Test
+    void testObtenerTodos() throws Exception {
+        mockSecurityContext();
+
+        Contrato contrato1 = new Contrato();
+        contrato1.setId(1L);
+        Contrato contrato2 = new Contrato();
+        contrato2.setId(2L);
+
+        ContratoDTO dto1 = new ContratoDTO();
+        dto1.setId(1L);
+        ContratoDTO dto2 = new ContratoDTO();
+        dto2.setId(2L);
+
+        Mockito.when(contratoService.obtenerTodos()).thenReturn(List.of(contrato1, contrato2));
+        Mockito.when(contratoService.convertirAContratoDTO(contrato1)).thenReturn(dto1);
+        Mockito.when(contratoService.convertirAContratoDTO(contrato2)).thenReturn(dto2);
+
+        mockMvc.perform(get("/api/contratos")
+                        .header("Authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[1].id").value(2));
+    }
 }

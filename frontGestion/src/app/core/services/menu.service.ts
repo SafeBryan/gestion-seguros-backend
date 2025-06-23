@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 
 export interface IMenu {
   title: string;
-  url: string;
+  url?: string;
   icon: string;
+  children?: IMenu[];
 }
 
 @Injectable({
@@ -17,6 +18,37 @@ export class MenuService {
     { title: 'Contratos', url: '/contratos', icon: 'description' },
     { title: 'Clientes', url: '/clientes', icon: 'people' },
     { title: 'Reembolsos', url: '/reembolsos/pendientes', icon: 'receipt' },
+    {
+      title: 'Reportes',
+      icon: 'bar_chart',
+      children: [
+        {
+          title: 'Seguros Impagos',
+          url: '/reportes/seguros-impagos',
+          icon: 'payment',
+        },
+        {
+          title: 'Contratos por Cliente',
+          url: '/reportes/contratos-por-cliente',
+          icon: 'assignment_ind',
+        },
+        {
+          title: 'Reembolsos Pendientes',
+          url: '/reportes/reembolsos-pendientes',
+          icon: 'pending_actions',
+        },
+        {
+          title: 'Contratos Vencidos',
+          url: '/reportes/contratos-vencidos',
+          icon: 'event_busy',
+        },
+        {
+          title: 'Contratos por Vencer',
+          url: '/reportes/contratos-por-vencer',
+          icon: 'event_note',
+        },
+      ],
+    },
   ];
 
   private clienteMenu: IMenu[] = [
