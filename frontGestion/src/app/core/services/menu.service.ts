@@ -54,6 +54,11 @@ export class MenuService {
   private clienteMenu: IMenu[] = [
     { title: 'Inicio', url: '/home', icon: 'home' },
     { title: 'Mis Contratos', url: '/contratos', icon: 'assignment' },
+        {
+      title: 'Realizar Pagos',
+      url: '/pagos',
+      icon: 'money',
+    },
     {
       title: 'Pedir Reembolso',
       url: '/reembolsos/crear',
