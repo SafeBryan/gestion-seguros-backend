@@ -1,0 +1,22 @@
+<mat-dialog-content class="preview-container">
+  <!-- Para PDF -->
+  <ng-container *ngIf="data.contentType === 'application/pdf'">
+    <iframe
+      [src]="safeUrl"
+      class="preview-frame">
+    </iframe>
+  </ng-container>
+
+  <!-- Para imágenes -->
+  <ng-container *ngIf="data.contentType.startsWith('image/')">
+    <img
+      [src]="safeUrl"
+      alt="Comprobante"
+      class="preview-image" />
+  </ng-container>
+
+  <!-- Fallback -->
+  <ng-container *ngIf="!data.contentType.startsWith('image/') && data.contentType !== 'application/pdf'">
+    <p>Previsualización no disponible para este tipo de archivo.</p>
+  </ng-container>
+</mat-dialog-content>

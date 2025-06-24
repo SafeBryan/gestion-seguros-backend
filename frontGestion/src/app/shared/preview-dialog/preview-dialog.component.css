@@ -1,0 +1,19 @@
+.preview-container {
+  padding: 0;              /* quita márgenes extra */
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-frame {
+  border: none;
+  width: 100%;
+  flex: 1;                 /* ocupa todo el espacio vertical restante */
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}

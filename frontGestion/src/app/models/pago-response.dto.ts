@@ -8,6 +8,7 @@ export interface PagoResponseDTO {
   metodo: string;
   referencia?: string;
   comprobante?: string;
+  comprobanteTipoContenido?: string;    
   estado: 'COMPLETADO' | 'REVERTIDO' | string;
   observaciones?: string;
 }
