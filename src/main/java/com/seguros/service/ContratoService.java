@@ -37,6 +37,15 @@ public class ContratoService {
         this.seguroRepository = seguroRepository;
     }
 
+    public List<Contrato> obtenerTodosPorCliente(Long clienteId) {
+        return contratoRepository.findAllByClienteId(clienteId);
+    }
+
+    public Contrato obtenerPorId(Long id) {
+        return contratoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Contrato no encontrado"));
+    }
+
     @Transactional
     public Contrato crearContrato(ContratoDTO contratoDTO) {
 

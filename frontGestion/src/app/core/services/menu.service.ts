@@ -18,6 +18,7 @@ export class MenuService {
     { title: 'Contratos', url: '/contratos', icon: 'description' },
     { title: 'Clientes', url: '/clientes', icon: 'people' },
     { title: 'Reembolsos', url: '/reembolsos/pendientes', icon: 'receipt' },
+    { title: 'Depositos', url: '/depositos', icon: 'money' },
     {
       title: 'Reportes',
       icon: 'bar_chart',
@@ -54,6 +55,11 @@ export class MenuService {
   private clienteMenu: IMenu[] = [
     { title: 'Inicio', url: '/home', icon: 'home' },
     { title: 'Mis Contratos', url: '/contratos', icon: 'assignment' },
+        {
+      title: 'Realizar Pagos',
+      url: '/pagos',
+      icon: 'money',
+    },
     {
       title: 'Pedir Reembolso',
       url: '/reembolsos/crear',

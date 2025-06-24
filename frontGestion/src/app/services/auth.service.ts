@@ -88,12 +88,18 @@ export class AuthService {
   isLoggedIn(): Observable<boolean> {
     return this.loggedIn.asObservable();
   }
-
-  // Generate Authorization header with token
-  getAuthHeaders(): HttpHeaders {
-    const token = this.getToken();
-    return new HttpHeaders().set('Authorization', `Bearer ${token ?? ''}`);
+  
+// auth.service.ts
+getAuthHeaders(): HttpHeaders {
+  const token = this.getToken(); // Asume que tienes un método para obtener el token
+  if (!token) {
+    throw new Error('No authentication token available');
   }
+  
+  return new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  });
+}
 
   // Get user ID from decoded JWT
   getUsuarioId(): number {

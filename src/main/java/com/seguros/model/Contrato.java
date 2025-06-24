@@ -37,7 +37,7 @@ public class Contrato {
     private FrecuenciaPago frecuenciaPago;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('ACTIVO', 'VENCIDO', 'CANCELADO') default 'ACTIVO'")
+    @Column(name = "estado", nullable = false)
     private EstadoContrato estado = EstadoContrato.ACTIVO;
 
     @Column(name = "firma_electronica", columnDefinition = "TEXT")
@@ -68,7 +68,13 @@ public class Contrato {
     }
 
     public enum EstadoContrato {
-        ACTIVO, VENCIDO, CANCELADO
+        ACTIVO,
+        PENDIENTE,
+        ACEPTADO,
+        RECHAZO,       // opcional, si prefieres esta variante
+        RECHAZADO,
+        VENCIDO,
+        CANCELADO
     }
 
     public boolean isActivo() {

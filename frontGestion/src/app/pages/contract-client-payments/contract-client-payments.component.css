@@ -1,0 +1,56 @@
+.loading, .no-data {
+  text-align: center;
+  margin: 1rem 0;
+  color: #666;
+}
+
+.block {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.main-table, .payments-table {
+  width: 100%;
+  margin-top: 0.5rem;
+  border-collapse: collapse;
+}
+
+.main-table th, .main-table td,
+.payments-table th, .payments-table td {
+  padding: 0.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.payments {
+  margin-top: 1rem;
+}
+
+.no-payments {
+  color: #999;
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 600px) {
+  .main-table th, .main-table td,
+  .payments-table th, .payments-table td {
+    padding: 0.3rem;
+    font-size: 0.85rem;
+  }
+}
+
+.preview-dialog-panel .mat-dialog-container {
+  padding: 0;
+  overflow: hidden;
+}
+
+::ng-deep .preview-dialog-panel .mat-dialog-container {
+  padding: 0;
+  overflow: hidden;
+  /* fuerza altura completa */
+  width: 80vw !important;
+  height: 90vh !important;
+  max-width: 95vw !important;
+  max-height: 95vh !important;
+}
