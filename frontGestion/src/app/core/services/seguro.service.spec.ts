@@ -190,4 +190,30 @@ describe('SeguroService', () => {
     expect(req.request.method).toBe('DELETE');
     req.flush(null); // respuesta vacía del backend
   });
+
+  it('debería manejar error 404 en obtenerSeguroPorId', (done) => {
+    const errorMessage = 'El recurso solicitado no fue encontrado.';
+
+    service.obtenerSeguroPorId(999).subscribe({
+      next: () => {
+        fail('Debería haber fallado con error 404');
+        done();
+      },
+      error: (error) => {
+        expect(error).toBeTruthy();
+        expect(error.message).toBe(errorMessage);
+        done();
+      },
+    });
+
+    // Primer intento fallido (retry lo reintenta)
+    const req1 = httpMock.expectOne('http://localhost:8080/api/seguros/999');
+    expect(req1.request.method).toBe('GET');
+    req1.flush({}, { status: 404, statusText: 'Not Found' });
+
+    // Segundo intento (retry)
+    const req2 = httpMock.expectOne('http://localhost:8080/api/seguros/999');
+    expect(req2.request.method).toBe('GET');
+    req2.flush({}, { status: 404, statusText: 'Not Found' });
+  });
 });

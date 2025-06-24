@@ -231,7 +231,11 @@ describe('SegurosComponent', () => {
     spyOn(component, 'cargarSeguros').and.callThrough();
     spyOn(component, 'cerrarModal').and.callThrough();
 
-    component.seguroForm.patchValue(mockSeguro); // rellena formulario sin id
+    component.seguroForm.patchValue({
+      ...mockSeguro,
+      cobertura: ['Hospitalización', 'Medicamentos'], // ✅ cambio clave
+    });
+
     component.guardarSeguro();
 
     expect(mockSeguroService.crearSeguro).toHaveBeenCalled();
@@ -295,8 +299,11 @@ describe('SegurosComponent', () => {
     component.seguroForm.patchValue({
       ...mockSeguro,
       id: 99,
-      cobertura: ['Fallecimiento Natural'], // ✅ debe ser un array para el formulario
+      cobertura: ['Fallecimiento Natural'],
     });
+
+    component.guardarSeguro(); // ✅ llamada faltante
+
     expect(console.error).toHaveBeenCalled();
   });
 

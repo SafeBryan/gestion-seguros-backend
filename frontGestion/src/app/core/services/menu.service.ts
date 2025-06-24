@@ -66,9 +66,9 @@ export class MenuService {
     switch (rol.toUpperCase()) {
       case 'ADMIN':
       case 'AGENTE':
-        return [...this.adminMenu];
+        return JSON.parse(JSON.stringify(this.adminMenu));
       case 'CLIENTE':
-        return [...this.clienteMenu];
+        return JSON.parse(JSON.stringify(this.clienteMenu));
       default:
         return [{ title: 'Inicio', url: '/home', icon: 'home' }];
     }

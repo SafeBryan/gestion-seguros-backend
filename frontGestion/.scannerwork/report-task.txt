@@ -2,5 +2,5 @@ projectKey=GestionSegurosFront
 serverUrl=http://localhost:9000
 serverVersion=25.5.0.107428
 dashboardUrl=http://localhost:9000/dashboard?id=GestionSegurosFront
-ceTaskId=aa4271c5-6777-4c11-a9b7-2d571461dd6e
-ceTaskUrl=http://localhost:9000/api/ce/task?id=aa4271c5-6777-4c11-a9b7-2d571461dd6e
+ceTaskId=52705641-a410-4a4d-8014-87620c081ca3
+ceTaskUrl=http://localhost:9000/api/ce/task?id=52705641-a410-4a4d-8014-87620c081ca3
