@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReporteService } from '../../../core/services/reporte.service';
+import { PdfService } from '../../../core/services/pdf.service';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -54,7 +55,10 @@ export class SegurosImpagosComponent implements OnInit {
   fechaInicio: Date | null = null;
   fechaFin: Date | null = null;
 
-  constructor(private reporteService: ReporteService) {}
+  constructor(
+    private reporteService: ReporteService,
+    private pdfService: PdfService
+  ) {}
 
   ngOnInit(): void {
     this.cargarSegurosImpagos();
@@ -154,5 +158,49 @@ export class SegurosImpagosComponent implements OnInit {
   getTotalClientesAfectados(): number {
     const ids = this.segurosImpagosFiltrados.map(s => s.clienteId);
     return Array.from(new Set(ids)).length;
+  }
+
+  // Método para generar PDF
+  generarPdf(): void {
+    const titulo = 'Reporte de Seguros Impagos';
+    const subtitulo = 'Listado detallado de seguros con pagos pendientes';
+    
+    // Preparar datos para el PDF
+    const datos = this.segurosImpagosFiltrados.map(seguro => [
+      `Cliente ID: ${seguro.clienteId}`,
+      seguro.seguro.nombre,
+      `${seguro.agente.nombre} ${seguro.agente.apellido}`,
+      this.formatearFecha(seguro.fechaInicio),
+      this.formatearFecha(seguro.fechaFin),
+      seguro.frecuenciaPago,
+      'Impago'
+    ]);
+
+    const columnas = [
+      'Cliente',
+      'Seguro',
+      'Agente',
+      'Fecha Inicio',
+      'Fecha Fin',
+      'Frecuencia',
+      'Estado'
+    ];
+
+    // Preparar resumen
+    const resumen = {
+      'Total Seguros Impagos': this.totalSeguros,
+      'Contratos Activos': this.getContratosActivos(),
+      'Clientes Afectados': this.getTotalClientesAfectados(),
+      'Fecha de Generación': new Date().toLocaleDateString('es-ES')
+    };
+
+    this.pdfService.generarPdfCompleto(
+      titulo,
+      subtitulo,
+      resumen,
+      datos,
+      columnas,
+      'seguros-impagos'
+    );
   }
 }

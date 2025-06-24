@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReporteService } from '../../../core/services/reporte.service';
+import { PdfService } from '../../../core/services/pdf.service';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -62,7 +63,11 @@ export class ContratosPorClienteComponent implements OnInit {
   clientes: ClienteResponseDTO[] = [];
   cargandoClientes = true;
 
-  constructor(private reporteService: ReporteService, private clienteService: ClienteService) {}
+  constructor(
+    private reporteService: ReporteService,
+    private clienteService: ClienteService,
+    private pdfService: PdfService
+  ) {}
 
   ngOnInit(): void {
     this.cargarClientes();
@@ -211,5 +216,56 @@ export class ContratosPorClienteComponent implements OnInit {
     if (id > 0) {
       this.buscarContratosPorCliente(id);
     }
+  }
+
+  // Método para generar PDF
+  generarPdf(): void {
+    const clienteSeleccionado = this.clientes.find(c => c.id === this.clienteId);
+    const nombreCliente = clienteSeleccionado ? `${clienteSeleccionado.nombre} ${clienteSeleccionado.apellido}` : `Cliente ID: ${this.clienteId}`;
+    
+    const titulo = 'Reporte de Contratos por Cliente';
+    const subtitulo = `Contratos del cliente: ${nombreCliente}`;
+    
+    // Preparar datos para el PDF
+    const datos = this.contratosPorClienteFiltrados.map(contrato => [
+      `Contrato #${contrato.id}`,
+      contrato.seguro.nombre,
+      `${contrato.agente.nombre} ${contrato.agente.apellido}`,
+      this.formatearFecha(contrato.fechaInicio),
+      this.formatearFecha(contrato.fechaFin),
+      `${this.getDiasHastaVencimiento(contrato.fechaFin)} días`,
+      contrato.frecuenciaPago,
+      this.getEstadoContrato(contrato.estado)
+    ]);
+
+    const columnas = [
+      'Contrato ID',
+      'Seguro',
+      'Agente',
+      'Fecha Inicio',
+      'Fecha Fin',
+      'Días Restantes',
+      'Frecuencia',
+      'Estado'
+    ];
+
+    // Preparar resumen
+    const resumen = {
+      'Cliente': nombreCliente,
+      'Total Contratos': this.totalContratos,
+      'Contratos Activos': this.getContratosActivos(),
+      'Contratos Vencidos': this.getContratosVencidos(),
+      'Valor Total': `$${this.formatearPrecio(this.getValorTotalContratos())}`,
+      'Fecha de Generación': new Date().toLocaleDateString('es-ES')
+    };
+
+    this.pdfService.generarPdfCompleto(
+      titulo,
+      subtitulo,
+      resumen,
+      datos,
+      columnas,
+      `contratos-cliente-${this.clienteId}`
+    );
   }
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReporteService } from '../../../core/services/reporte.service';
+import { PdfService } from '../../../core/services/pdf.service';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -54,7 +55,10 @@ export class ContratosVencidosComponent implements OnInit {
   fechaInicio: Date | null = null;
   fechaFin: Date | null = null;
 
-  constructor(private reporteService: ReporteService) {}
+  constructor(
+    private reporteService: ReporteService,
+    private pdfService: PdfService
+  ) {}
 
   ngOnInit(): void {
     this.cargarContratosVencidos();
@@ -161,6 +165,53 @@ export class ContratosVencidosComponent implements OnInit {
   getTotalClientesAfectados(): number {
     const ids = this.contratosVencidosFiltrados.map(c => c.clienteId);
     return Array.from(new Set(ids)).length;
+  }
+
+  // Método para generar PDF
+  generarPdf(): void {
+    const titulo = 'Reporte de Contratos Vencidos';
+    const subtitulo = 'Listado detallado de contratos que han vencido';
+    
+    // Preparar datos para el PDF
+    const datos = this.contratosVencidosFiltrados.map(contrato => [
+      `Cliente ID: ${contrato.clienteId}`,
+      contrato.seguro.nombre,
+      `${contrato.agente.nombre} ${contrato.agente.apellido}`,
+      this.formatearFecha(contrato.fechaInicio),
+      this.formatearFecha(contrato.fechaFin),
+      `${this.getDiasVencido(contrato.fechaFin)} días`,
+      contrato.frecuenciaPago,
+      'Vencido'
+    ]);
+
+    const columnas = [
+      'Cliente',
+      'Seguro',
+      'Agente',
+      'Fecha Inicio',
+      'Fecha Fin',
+      'Días Vencido',
+      'Frecuencia',
+      'Estado'
+    ];
+
+    // Preparar resumen
+    const resumen = {
+      'Total Contratos Vencidos': this.totalContratos,
+      'Clientes Afectados': this.getTotalClientesAfectados(),
+      'Vencidos < 30 días': this.getContratosVencidosMenosOIgual30Dias(),
+      'Vencidos > 30 días': this.getContratosVencidosMasDe30Dias(),
+      'Fecha de Generación': new Date().toLocaleDateString('es-ES')
+    };
+
+    this.pdfService.generarPdfCompleto(
+      titulo,
+      subtitulo,
+      resumen,
+      datos,
+      columnas,
+      'contratos-vencidos'
+    );
   }
 
   // Método para refrescar datos

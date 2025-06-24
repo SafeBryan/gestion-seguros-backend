@@ -10,6 +10,9 @@
           <div class="badge bg-danger p-2 me-3 d-inline-block">
             <i class="bi bi-event-busy me-1"></i> {{ today | date: 'dd/MM/yyyy' }}
           </div>
+          <button mat-mini-fab color="primary" matTooltip="Generar PDF" (click)="generarPdf()" class="me-2">
+            <mat-icon>picture_as_pdf</mat-icon>
+          </button>
           <button mat-mini-fab color="warn" matTooltip="Refrescar datos" (click)="refreshData()">
             <mat-icon>refresh</mat-icon>
           </button>

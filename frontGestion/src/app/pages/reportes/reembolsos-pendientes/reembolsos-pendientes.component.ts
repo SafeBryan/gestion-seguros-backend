@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReporteService } from '../../../core/services/reporte.service';
+import { PdfService } from '../../../core/services/pdf.service';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -55,7 +56,10 @@ export class ReembolsosPendientesComponent implements OnInit {
   fechaInicio: Date | null = null;
   fechaFin: Date | null = null;
 
-  constructor(private reporteService: ReporteService) {}
+  constructor(
+    private reporteService: ReporteService,
+    private pdfService: PdfService
+  ) {}
 
   ngOnInit(): void {
     this.cargarReembolsosPendientes();
@@ -154,6 +158,51 @@ export class ReembolsosPendientesComponent implements OnInit {
   getTotalClientesAfectados(): number {
     const ids = this.reembolsosPendientesFiltrados.map(r => r.clienteId);
     return Array.from(new Set(ids)).length;
+  }
+
+  // Método para generar PDF
+  generarPdf(): void {
+    const titulo = 'Reporte de Reembolsos Pendientes';
+    const subtitulo = 'Listado detallado de reembolsos en espera de aprobación';
+    
+    // Preparar datos para el PDF
+    const datos = this.reembolsosPendientesFiltrados.map(reembolso => [
+      reembolso.clienteNombre,
+      reembolso.seguroNombre,
+      this.formatearPrecio(reembolso.monto),
+      reembolso.descripcion,
+      this.formatearFecha(reembolso.fechaSolicitud),
+      `${this.getDiasTranscurridos(reembolso.fechaSolicitud)} días`,
+      this.getEstadoReembolso(reembolso.estado)
+    ]);
+
+    const columnas = [
+      'Cliente',
+      'Seguro',
+      'Monto',
+      'Descripción',
+      'Fecha Solicitud',
+      'Días Transcurridos',
+      'Estado'
+    ];
+
+    // Preparar resumen
+    const resumen = {
+      'Total Reembolsos': this.totalReembolsos,
+      'Monto Total': `$${this.formatearPrecio(this.totalMonto)}`,
+      'Clientes Afectados': this.getTotalClientesAfectados(),
+      'Promedio por Reembolso': `$${this.formatearPrecio(this.totalReembolsos > 0 ? this.totalMonto / this.totalReembolsos : 0)}`,
+      'Fecha de Generación': new Date().toLocaleDateString('es-ES')
+    };
+
+    this.pdfService.generarPdfCompleto(
+      titulo,
+      subtitulo,
+      resumen,
+      datos,
+      columnas,
+      'reembolsos-pendientes'
+    );
   }
 
   // Método para refrescar datos

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReporteService } from '../../../core/services/reporte.service';
+import { PdfService } from '../../../core/services/pdf.service';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -54,7 +55,10 @@ export class ContratosPorVencerComponent implements OnInit {
   fechaInicio: Date | null = null;
   fechaFin: Date | null = null;
 
-  constructor(private reporteService: ReporteService) {}
+  constructor(
+    private reporteService: ReporteService,
+    private pdfService: PdfService
+  ) {}
 
   ngOnInit(): void {
     this.cargarContratosPorVencer();
@@ -174,5 +178,52 @@ export class ContratosPorVencerComponent implements OnInit {
   getTotalClientesAfectados(): number {
     const ids = this.contratosPorVencerFiltrados.map(c => c.clienteId);
     return Array.from(new Set(ids)).length;
+  }
+
+  // Método para generar PDF
+  generarPdf(): void {
+    const titulo = 'Reporte de Contratos por Vencer';
+    const subtitulo = 'Listado detallado de contratos próximos a vencer';
+    
+    // Preparar datos para el PDF
+    const datos = this.contratosPorVencerFiltrados.map(contrato => [
+      `Cliente ID: ${contrato.clienteId}`,
+      contrato.seguro.nombre,
+      `${contrato.agente.nombre} ${contrato.agente.apellido}`,
+      this.formatearFecha(contrato.fechaInicio),
+      this.formatearFecha(contrato.fechaFin),
+      `${this.getDiasHastaVencimiento(contrato.fechaFin)} días`,
+      contrato.frecuenciaPago,
+      this.getEstadoContrato(contrato.estado)
+    ]);
+
+    const columnas = [
+      'Cliente',
+      'Seguro',
+      'Agente',
+      'Fecha Inicio',
+      'Fecha Fin',
+      'Días Restantes',
+      'Frecuencia',
+      'Estado'
+    ];
+
+    // Preparar resumen
+    const resumen = {
+      'Total Contratos por Vencer': this.totalContratos,
+      'Clientes Afectados': this.getTotalClientesAfectados(),
+      'Vencen en menos o igual a 7 días': this.getContratosPorVencerEn7Dias(),
+      'Vencen en 8-30 días': this.getContratosPorVencerEn8a30Dias(),
+      'Fecha de Generación': new Date().toLocaleDateString('es-ES')
+    };
+
+    this.pdfService.generarPdfCompleto(
+      titulo,
+      subtitulo,
+      resumen,
+      datos,
+      columnas,
+      'contratos-por-vencer'
+    );
   }
 }
