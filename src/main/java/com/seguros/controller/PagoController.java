@@ -38,7 +38,6 @@ public class PagoController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PagoDTO> registrarPago(@RequestBody PagoDTO dto) {
         Pago pago = pagoService.registrarPago(dto);
         return ResponseEntity.ok(pagoService.convertToDto(pago));

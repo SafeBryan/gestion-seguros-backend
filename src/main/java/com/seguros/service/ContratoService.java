@@ -37,6 +37,9 @@ public class ContratoService {
         this.seguroRepository = seguroRepository;
     }
 
+    public List<Contrato> obtenerTodosPorCliente(Long clienteId) {
+        return contratoRepository.findAllByClienteId(clienteId);
+    }
     @Transactional
     public Contrato crearContrato(ContratoDTO contratoDTO) {
 

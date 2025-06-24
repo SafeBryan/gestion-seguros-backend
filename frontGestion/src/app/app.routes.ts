@@ -13,7 +13,7 @@ import { ReembolsosPendientesComponent } from './pages/reembolsos/reembolsos-pen
 // Importa el componente de reportes
 import { SegurosImpagosComponent } from './pages/reportes/seguros-impagos/seguros-impagos.component';
 import { PagoComponent } from './pages/pago/pago.component';
-
+import { AcceptedContractsComponent  } from './pages/accepted-contracts/accepted-contracts.component';
 
 export const routes: Routes = [
   {
@@ -52,7 +52,7 @@ export const routes: Routes = [
   },
     {
   path: 'pagos',
-  component: PagoComponent,
+  component: AcceptedContractsComponent,
   canActivate: [authGuard],
 },
   {
@@ -70,12 +70,6 @@ export const routes: Routes = [
     component: ReembolsosPendientesComponent,
     canActivate: [authGuard],
   },
-
-      {
-  path: 'pagos',
-  component: PagoComponent,
-  canActivate: [authGuard],
-},
   // Nueva ruta para Seguros Impagos
   {
     path: 'reportes/seguros-impagos',

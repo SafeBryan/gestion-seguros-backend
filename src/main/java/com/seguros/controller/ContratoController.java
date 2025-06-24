@@ -40,7 +40,18 @@ public class ContratoController {
         return ResponseEntity.ok(contratos);
     }
 
+    @GetMapping("/cliente/{clienteId}/aceptados")
+    public ResponseEntity<List<ContratoDTO>> obtenerAceptadosPorCliente(
+            @PathVariable Long clienteId) {
 
+        List<Contrato> todos = contratoService.obtenerTodosPorCliente(clienteId);
+        List<ContratoDTO> dtos = todos.stream()
+                .filter(c -> c.getEstado() == Contrato.EstadoContrato.ACEPTADO)
+                .map(contratoService::convertirAContratoDTO)
+                .toList();
+
+        return ResponseEntity.ok(dtos);
+    }
 
     @PutMapping("/{id}/estado")
     public ResponseEntity<ContratoDTO> actualizarEstado(

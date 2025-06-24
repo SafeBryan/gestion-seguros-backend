@@ -1,0 +1,4 @@
+/* src/app/pages/accepted-contracts/accepted-contracts.component.css */
+.wrapper { padding: 16px; }
+.center  { display: flex; justify-content: center; margin-top: 20px; }
+table   { width: 100%; margin-top: 16px; }

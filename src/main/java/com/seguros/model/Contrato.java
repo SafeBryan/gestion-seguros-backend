@@ -37,19 +37,7 @@ public class Contrato {
     private FrecuenciaPago frecuenciaPago;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "estado",
-            nullable = false,
-            columnDefinition = """
-                ENUM(
-                  'ACTIVO',
-                  'PENDIENTE',
-                  'ACEPTADO',
-                  'RECHAZADO',
-                  'VENCIDO',
-                  'CANCELADO'
-                ) DEFAULT 'ACTIVO'
-            """
-    )
+    @Column(name = "estado", nullable = false)
     private EstadoContrato estado = EstadoContrato.ACTIVO;
 
     @Column(name = "firma_electronica", columnDefinition = "TEXT")

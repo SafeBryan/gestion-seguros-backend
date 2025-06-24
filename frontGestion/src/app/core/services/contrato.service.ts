@@ -36,6 +36,13 @@ export class ContratoService {
     );
   }
 
+  obtenerAceptadosPorCliente(clienteId: number): Observable<Contrato[]> {
+    return this.http.get<Contrato[]>(
+      `${this.baseUrl}/cliente/${clienteId}/aceptados`,
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
   obtenerContratosPorVencer(dias: number): Observable<Contrato[]> {
     return this.http.get<Contrato[]>(
       `${this.baseUrl}/por-vencer?dias=${dias}`,

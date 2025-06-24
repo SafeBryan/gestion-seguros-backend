@@ -21,7 +21,6 @@ export class PagoService {
 
 // pago.service.ts
 crearPago(pagoData: any): Observable<any> {
-  // Asegurar que los nombres de campos coincidan con el DTO del backend
   const payload = {
     contratoId: pagoData.contratoId,
     monto: pagoData.monto,

@@ -19,7 +19,7 @@ export interface Beneficiario {
 }
 
 export type FrecuenciaPago = 'MENSUAL' | 'TRIMESTRAL' | 'SEMESTRAL' | 'ANUAL';
-export type EstadoContrato = 'PENDIENTE' | 'ACTIVO' | 'VENCIDO' | 'CANCELADO';
+export type EstadoContrato = 'PENDIENTE' | 'ACTIVO' | 'VENCIDO' | 'CANCELADO'  | 'ACEPTADO';
 
 export interface Dependiente {
   nombre: string;
