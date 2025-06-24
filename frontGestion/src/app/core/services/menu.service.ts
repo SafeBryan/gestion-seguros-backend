@@ -23,6 +23,11 @@ export class MenuService {
       icon: 'bar_chart',
       children: [
         {
+          title: 'Reporte general',
+          url: '/reportes/dashboard-reportes',
+          icon: 'bar_chart',
+        },
+        {
           title: 'Seguros Impagos',
           url: '/reportes/seguros-impagos',
           icon: 'payment',
