@@ -67,6 +67,7 @@ export class ContratosPorVencerComponent implements OnInit {
 
   // Método para formatear precio
   formatearPrecio(precio: number): string {
+    if (precio == null) return '-';
     return precio.toLocaleString('es-ES', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
