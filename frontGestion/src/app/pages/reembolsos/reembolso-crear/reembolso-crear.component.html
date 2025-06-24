@@ -1,111 +1,255 @@
-<h2>Solicitar Reembolso</h2>
-
-<form [formGroup]="form" (ngSubmit)="enviar()">
-  <!-- Contrato -->
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Contrato</mat-label>
-    <mat-select formControlName="contratoId" required>
-      <mat-option *ngFor="let contrato of contratos" [value]="contrato.id">
-        {{ contrato.seguro?.nombre }} - {{ contrato.estado }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <!-- Descripción -->
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Descripción</mat-label>
-    <textarea
-      matInput
-      formControlName="descripcion"
-      rows="3"
-      required
-    ></textarea>
-  </mat-form-field>
-
-  <!-- Monto -->
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Monto</mat-label>
-    <input matInput type="number" formControlName="monto" required />
-  </mat-form-field>
-
-  <!-- Nombre del médico -->
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Nombre del médico</mat-label>
-    <input matInput formControlName="nombreMedico" />
-  </mat-form-field>
-
-  <!-- Motivo de consulta -->
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Motivo de la consulta</mat-label>
-    <input matInput formControlName="motivoConsulta" />
-  </mat-form-field>
-
-  <!-- Código CIE-10 -->
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Código CIE-10</mat-label>
-    <input matInput formControlName="cie10" />
-  </mat-form-field>
-
-  <!-- Fecha de atención -->
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Fecha de atención</mat-label>
-    <input
-      matInput
-      [matDatepicker]="fechaPicker"
-      formControlName="fechaAtencion"
-    />
-    <mat-datepicker-toggle
-      matSuffix
-      [for]="fechaPicker"
-    ></mat-datepicker-toggle>
-    <mat-datepicker #fechaPicker></mat-datepicker>
-  </mat-form-field>
-
-  <!-- Inicio de síntomas -->
-  <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Inicio de síntomas</mat-label>
-    <input
-      matInput
-      [matDatepicker]="sintomasPicker"
-      formControlName="inicioSintomas"
-    />
-    <mat-datepicker-toggle
-      matSuffix
-      [for]="sintomasPicker"
-    ></mat-datepicker-toggle>
-    <mat-datepicker #sintomasPicker></mat-datepicker>
-  </mat-form-field>
-
-  <!-- Factura médica -->
-  <div class="full-width">
-    <label>Factura médica (PDF)</label><br />
-    <input
-      type="file"
-      (change)="onFileSelected($event)"
-      accept="application/pdf"
-    />
+<div class="reembolso-container mat-elevation-z2">
+  <!-- Encabezado con título -->
+  <div class="header-container">
+    <div class="title-section">
+      <mat-icon class="header-icon">request_quote</mat-icon>
+      <h1 class="header-title">Solicitar Reembolso</h1>
+    </div>
   </div>
 
-  <!-- ¿Fue un accidente? -->
-  <mat-checkbox [formControl]="esAccidenteControl">
-    ¿Fue un accidente?
-  </mat-checkbox>
-
-  <!-- Detalle del accidente -->
-  <div *ngIf="form.get('esAccidente')?.value">
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Detalle del accidente</mat-label>
-      <textarea matInput formControlName="detalleAccidente" rows="2"></textarea>
-    </mat-form-field>
+  <!-- Spinner de carga para contratos -->
+  <div *ngIf="loadingContratos" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p class="loading-text">Cargando contratos disponibles...</p>
   </div>
 
-  <!-- Botón enviar -->
-  <button
-    mat-raised-button
-    color="primary"
-    type="submit"
-    [disabled]="form.invalid || !archivoSeleccionado"
-  >
-    Enviar Solicitud
-  </button>
-</form>
+  <!-- Mensaje si no hay contratos -->
+  <div *ngIf="!loadingContratos && contratos.length === 0" class="no-data-container">
+    <mat-icon class="no-data-icon">sentiment_dissatisfied</mat-icon>
+    <p class="no-data-text">No tienes contratos activos disponibles</p>
+    <p class="no-data-subtext">Contacta con soporte para obtener más información</p>
+  </div>
+
+  <!-- Formulario principal -->
+  <div *ngIf="!loadingContratos && contratos.length > 0" class="form-container">
+    <form [formGroup]="form" (ngSubmit)="enviar()" class="reembolso-form">
+      
+      <!-- Información del contrato -->
+      <mat-card class="form-section">
+        <mat-card-header>
+          <div mat-card-avatar>
+            <mat-icon class="section-icon">assignment</mat-icon>
+          </div>
+          <mat-card-title>Información del Contrato</mat-card-title>
+          <mat-card-subtitle>Selecciona el contrato para el reembolso</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Contrato de Seguro</mat-label>
+              <mat-select formControlName="contratoId" required>
+                <mat-option *ngFor="let contrato of contratos" [value]="contrato.id">
+                  <div class="contrato-option">
+                    <strong>{{ contrato.seguro?.nombre }}</strong>
+                    <span class="contrato-estado">{{ contrato.estado }}</span>
+                  </div>
+                </mat-option>
+              </mat-select>
+              <mat-icon matSuffix>business</mat-icon>
+              <mat-error>{{ getErrorMessage('contratoId') }}</mat-error>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Información del reembolso -->
+      <mat-card class="form-section">
+        <mat-card-header>
+          <div mat-card-avatar>
+            <mat-icon class="section-icon">monetization_on</mat-icon>
+          </div>
+          <mat-card-title>Detalles del Reembolso</mat-card-title>
+          <mat-card-subtitle>Información básica de la solicitud</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Descripción del gasto médico</mat-label>
+              <textarea 
+                matInput 
+                formControlName="descripcion" 
+                rows="3" 
+                required
+                placeholder="Describe detalladamente el motivo del gasto médico...">
+              </textarea>
+              <mat-icon matSuffix>description</mat-icon>
+              <mat-error>{{ getErrorMessage('descripcion') }}</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Monto Total</mat-label>
+              <input 
+                matInput 
+                type="number" 
+                formControlName="monto" 
+                required 
+                step="0.01"
+                min="0.01"
+                max="999999"
+                placeholder="0.00" />
+              <span matTextPrefix>$&nbsp;</span>
+              <mat-icon matSuffix>attach_money</mat-icon>
+              <mat-error>{{ getErrorMessage('monto') }}</mat-error>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Información médica -->
+      <mat-card class="form-section">
+        <mat-card-header>
+          <div mat-card-avatar>
+            <mat-icon class="section-icon">medical_services</mat-icon>
+          </div>
+          <mat-card-title>Información Médica</mat-card-title>
+          <mat-card-subtitle>Detalles de la atención recibida</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Nombre del médico/centro</mat-label>
+              <input matInput formControlName="nombreMedico" required />
+              <mat-icon matSuffix>person</mat-icon>
+              <mat-error>{{ getErrorMessage('nombreMedico') }}</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Motivo de la consulta</mat-label>
+              <input matInput formControlName="motivoConsulta" required />
+              <mat-icon matSuffix>healing</mat-icon>
+              <mat-error>{{ getErrorMessage('motivoConsulta') }}</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Código CIE-10 (opcional)</mat-label>
+              <input 
+                matInput 
+                formControlName="cie10" 
+                placeholder="Ej: J06.9"
+                matTooltip="Clasificación Internacional de Enfermedades" />
+              <mat-icon matSuffix>code</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Fecha de atención</mat-label>
+              <input 
+                matInput 
+                [matDatepicker]="fechaPicker" 
+                formControlName="fechaAtencion"
+                required />
+              <mat-datepicker-toggle matSuffix [for]="fechaPicker"></mat-datepicker-toggle>
+              <mat-datepicker #fechaPicker></mat-datepicker>
+              <mat-error>{{ getErrorMessage('fechaAtencion') }}</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Inicio de síntomas (opcional)</mat-label>
+              <input 
+                matInput 
+                [matDatepicker]="sintomasPicker" 
+                formControlName="inicioSintomas" />
+              <mat-datepicker-toggle matSuffix [for]="sintomasPicker"></mat-datepicker-toggle>
+              <mat-datepicker #sintomasPicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Documentación -->
+      <mat-card class="form-section">
+        <mat-card-header>
+          <div mat-card-avatar>
+            <mat-icon class="section-icon">attach_file</mat-icon>
+          </div>
+          <mat-card-title>Documentación</mat-card-title>
+          <mat-card-subtitle>Adjunta la factura médica (PDF, máx. 5MB)</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="file-upload-container">
+            <div class="file-input-wrapper">
+              <input 
+                type="file" 
+                (change)="onFileSelected($event)" 
+                accept="application/pdf"
+                id="file-input"
+                class="file-input" />
+              <label for="file-input" class="file-label">
+                <mat-icon>cloud_upload</mat-icon>
+                <span>{{ archivoSeleccionado ? archivoSeleccionado.name : 'Seleccionar archivo PDF' }}</span>
+              </label>
+            </div>
+            <div *ngIf="archivoSeleccionado" class="file-info">
+              <mat-icon class="file-success-icon">check_circle</mat-icon>
+              <span>Archivo seleccionado: {{ archivoSeleccionado.name }}</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Información de accidente -->
+      <mat-card class="form-section">
+        <mat-card-header>
+          <div mat-card-avatar>
+            <mat-icon class="section-icon">warning</mat-icon>
+          </div>
+          <mat-card-title>Información Adicional</mat-card-title>
+          <mat-card-subtitle>¿La atención fue por un accidente?</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="checkbox-container">
+            <mat-checkbox [formControl]="esAccidenteControl" class="accident-checkbox">
+              <strong>¿Fue consecuencia de un accidente?</strong>
+            </mat-checkbox>
+          </div>
+
+          <div *ngIf="esAccidente" class="accident-details" [@slideIn]>
+            <mat-divider></mat-divider>
+            <div class="form-row" style="margin-top: 16px;">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Describe detalladamente el accidente</mat-label>
+                <textarea 
+                  matInput 
+                  formControlName="detalleAccidente" 
+                  rows="3"
+                  placeholder="Describe cómo ocurrió el accidente, lugar, circunstancias, etc.">
+                </textarea>
+                <mat-icon matSuffix>report</mat-icon>
+                <mat-error>{{ getErrorMessage('detalleAccidente') }}</mat-error>
+              </mat-form-field>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Botones de acción -->
+      <div class="actions-container">
+        <button 
+          mat-stroked-button 
+          type="button" 
+          class="cancel-button"
+          (click)="limpiarFormulario()"
+          [disabled]="enviandoSolicitud">
+          <mat-icon>clear</mat-icon>
+          Limpiar Formulario
+        </button>
+
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit"
+          class="submit-button"
+          [disabled]="!puedeEnviar">
+          <mat-spinner *ngIf="enviandoSolicitud" diameter="20" class="button-spinner"></mat-spinner>
+          <mat-icon *ngIf="!enviandoSolicitud">send</mat-icon>
+          <span>{{ enviandoSolicitud ? 'Enviando...' : 'Enviar Solicitud' }}</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
