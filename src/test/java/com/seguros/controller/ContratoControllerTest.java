@@ -322,4 +322,64 @@ class ContratoControllerTest {
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[1].id").value(2));
     }
+    @Test
+    void testObtenerAceptadosPorCliente() throws Exception {
+        mockSecurityContext();
+
+        Contrato contratoAceptado = new Contrato();
+        contratoAceptado.setId(1L);
+        contratoAceptado.setEstado(EstadoContrato.ACEPTADO);
+
+        Contrato contratoRechazado = new Contrato();
+        contratoRechazado.setId(2L);
+        contratoRechazado.setEstado(EstadoContrato.RECHAZADO);
+
+        Mockito.when(contratoService.obtenerTodosPorCliente(1L))
+                .thenReturn(List.of(contratoAceptado, contratoRechazado));
+
+        ContratoDTO dtoAceptado = new ContratoDTO();
+        dtoAceptado.setId(1L);
+        dtoAceptado.setEstado(EstadoContrato.ACEPTADO);
+
+        Mockito.when(contratoService.convertirAContratoDTO(contratoAceptado)).thenReturn(dtoAceptado);
+
+        mockMvc.perform(get("/api/contratos/cliente/1/aceptados")
+                        .header("Authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").value(1));
+    }
+
+    @Test
+    void testObtenerContratoPorId() throws Exception {
+        mockSecurityContext();
+
+        Contrato contrato = new Contrato();
+        contrato.setId(1L);
+
+        ContratoDTO dto = new ContratoDTO();
+        dto.setId(1L);
+
+        Mockito.when(contratoService.obtenerPorId(1L)).thenReturn(contrato);
+        Mockito.when(contratoService.convertirAContratoDTO(contrato)).thenReturn(dto);
+
+        mockMvc.perform(get("/api/contratos/1")
+                        .header("Authorization", token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1));
+    }
+
+    @Test
+    void testObtenerContratoPorIdNoExiste() throws Exception {
+        mockSecurityContext();
+
+        Mockito.when(contratoService.obtenerPorId(99L))
+                .thenThrow(new RuntimeException("Contrato no encontrado"));
+
+        mockMvc.perform(get("/api/contratos/99")
+                        .header("Authorization", token))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Contrato no encontrado"));
+    }
+
 }

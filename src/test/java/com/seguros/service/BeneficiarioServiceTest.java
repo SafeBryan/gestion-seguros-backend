@@ -128,9 +128,11 @@ class BeneficiarioServiceTest {
     void testActualizarBeneficiarios_SumaNo100() {
         BeneficiarioDTO dto = crearDTO(); // 40%
 
-        RuntimeException ex = assertThrows(RuntimeException.class, () -> {
-            beneficiarioService.actualizarBeneficiarios(1L, List.of(dto));
-        });
+        List<BeneficiarioDTO> beneficiarios = List.of(dto);
+
+        RuntimeException ex = assertThrows(RuntimeException.class, () ->
+                beneficiarioService.actualizarBeneficiarios(1L, beneficiarios)
+        );
 
         assertEquals("La suma total de porcentajes debe ser exactamente 100%", ex.getMessage());
     }

@@ -6,6 +6,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.*;
 import java.util.Comparator;
 import java.util.stream.Stream;
@@ -29,7 +30,10 @@ class ArchivoServiceTest {
                 paths.sorted(Comparator.reverseOrder()).forEach(path -> {
                     try {
                         Files.delete(path);
-                    } catch (IOException ignored) {}
+                    } catch (IOException e) {
+                        throw new UncheckedIOException("Error al eliminar archivo: " + path, e);
+                    }
+
                 });
             }
         }

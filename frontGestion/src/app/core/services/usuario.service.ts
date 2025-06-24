@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Usuario } from '../../models/usuario.model';
 import { AuthService } from '../../services/auth.service';
+import { Usuario } from '../../models/usuario.model';
+
 
 export interface RegistroDTO {
   email: string;

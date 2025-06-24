@@ -13,6 +13,7 @@ import { HeaderComponent } from './shared/components/header/header.component';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from './services/auth.service';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
@@ -30,9 +31,10 @@ import { CommonModule } from '@angular/common';
     HeaderComponent,
     CommonModule,
     MatIconModule,
+    ReactiveFormsModule,
   ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
+  styleUrl: './app.component.css', 
 })
 export class AppComponent {
   isSidenavOpen = true;

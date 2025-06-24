@@ -12,6 +12,9 @@ import { ReembolsosPendientesComponent } from './pages/reembolsos/reembolsos-pen
 
 // Importa el componente de reportes
 import { SegurosImpagosComponent } from './pages/reportes/seguros-impagos/seguros-impagos.component';
+import { PagoComponent } from './pages/pago/pago.component';
+import { AcceptedContractsComponent } from './pages/accepted-contracts/accepted-contracts.component';
+import { ContractsClientsPaymentsComponent } from './pages/contract-client-payments/contract-client-payments.component';
 
 export const routes: Routes = [
   {
@@ -49,6 +52,16 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'pagos',
+    component: AcceptedContractsComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'depositos',
+    component: ContractsClientsPaymentsComponent,
+    canActivate: [authGuard],
+  },
+  {
     path: 'reembolsos/crear',
     component: ReembolsoCrearComponent,
     canActivate: [authGuard],
@@ -73,4 +86,7 @@ export const routes: Routes = [
     path: '**',
     redirectTo: 'login',
   },
+
+
+
 ];

@@ -1,0 +1,125 @@
+/* -----------------------------
+   DIÁLOGO (contenedor mat-dialog)
+   ----------------------------- */
+:host ::ng-deep .mat-dialog-container {
+  width: 90vw !important;        /* 90% de la pantalla */
+  max-width: 600px !important;   /* nunca más ancho que esto */
+  padding: 0 !important;
+  border-radius: 12px !important;
+  box-sizing: border-box;
+}
+
+/* -----------------------------
+   FORMULARIO INTERNO
+   ----------------------------- */
+.pago-container {
+  padding: 1.5rem;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* Centrar y limitar el ancho del form */
+.pago-container form {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 550px;
+}
+
+/* Grid en pantallas medianas y mayores */
+@media (min-width: 600px) {
+  .pago-container form {
+    display: grid;
+    /* Dos columnas iguales */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem 2rem;
+    align-items: start;
+  }
+  /* Haz que ciertos grupos ocupen las dos columnas */
+  .seguro-valor-group,
+  .checkbox-group,
+  .form-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+/* En móviles, cada campo full width */
+.pago-container .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+/* Label */
+.pago-container label {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+/* Inputs, selects, textareas */
+.pago-container input,
+.pago-container select,
+.pago-container textarea {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* El campo readonly */
+.pago-container .readonly {
+  background-color: #f5f5f5;
+}
+
+/* Nombre de archivo */
+.pago-container .file-name {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #555;
+}
+
+/* Checkbox inline */
+.checkbox-group {
+  flex-direction: row;
+  align-items: center;
+}
+.checkbox-group input {
+  margin-right: 0.5rem;
+}
+
+/* Botón centrado */
+.pago-container .form-actions {
+  display: flex;
+  justify-content: center;
+}
+.pago-container button {
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  background-color: #3f51b5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.pago-container button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Valor del seguro destacado */
+.seguro-valor-group {
+  margin-bottom: 1rem;
+}
+.seguro-valor {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+/* Mensaje de feedback */
+.mensaje {
+  margin-top: 1rem;
+  text-align: center;
+  color: #d32f2f;
+}

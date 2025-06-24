@@ -1,0 +1,65 @@
+<!-- src/app/pages/accepted-contracts/accepted-contracts.component.html -->
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Mis Contratos Aceptados</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <div *ngIf="loading" class="spinner-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <div *ngIf="!loading && contratos.length === 0" class="no-data">
+      <p>No tienes contratos aceptados.</p>
+    </div>
+
+    <table
+      mat-table
+      *ngIf="!loading && contratos.length > 0"
+      [dataSource]="contratos"
+      class="mat-elevation-z1"
+    >
+      <!-- ID -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>#</th>
+        <td mat-cell *matCellDef="let c">{{ c.id }}</td>
+      </ng-container>
+
+      <!-- Seguro -->
+      <ng-container matColumnDef="seguro">
+        <th mat-header-cell *matHeaderCellDef>Seguro</th>
+        <td mat-cell *matCellDef="let c">
+          {{ c.seguro?.nombre || '—' }}
+        </td>
+      </ng-container>
+
+      <!-- Fecha Inicio -->
+      <ng-container matColumnDef="inicio">
+        <th mat-header-cell *matHeaderCellDef>Inicio</th>
+        <td mat-cell *matCellDef="let c">{{ c.fechaInicio }}</td>
+      </ng-container>
+
+      <!-- Fecha Fin -->
+      <ng-container matColumnDef="fin">
+        <th mat-header-cell *matHeaderCellDef>Fin</th>
+        <td mat-cell *matCellDef="let c">{{ c.fechaFin }}</td>
+      </ng-container>
+
+      <!-- Acción -->
+      <ng-container matColumnDef="accion">
+        <th mat-header-cell *matHeaderCellDef>Acción</th>
+        <td mat-cell *matCellDef="let c">
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="abrirPagarModal(c)"
+          >
+            Agregar Pago
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </mat-card-content>
+</mat-card>

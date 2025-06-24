@@ -1,13 +1,17 @@
 package com.seguros.service;
 
 import com.seguros.dto.PagoDTO;
-import com.seguros.model.*;
-import com.seguros.repository.PagoRepository;
+import com.seguros.exception.ComprobanteInvalidoException;
+import com.seguros.model.Contrato;
+import com.seguros.model.Pago;
 import com.seguros.repository.ContratoRepository;
+import com.seguros.repository.PagoRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -30,10 +34,22 @@ public class PagoService {
         pago.setContrato(contrato);
         pago.setMonto(dto.getMonto());
         pago.setMetodo(dto.getMetodo());
-        pago.setReferencia(dto.getReferencia());
-        pago.setComprobante(dto.getComprobante());
-        pago.setEstado(dto.getEstado());
         pago.setObservaciones(dto.getObservaciones());
+        pago.setReferencia(dto.getReferencia());  // Nuevo campo
+
+        // Procesar comprobante
+        if (dto.getComprobante() != null && !dto.getComprobante().isEmpty()) {
+            try {
+                byte[] comprobanteBytes = Base64.getDecoder().decode(dto.getComprobante());
+                pago.setComprobante(comprobanteBytes);
+                pago.setComprobanteNombre(dto.getComprobanteNombre());
+                pago.setComprobanteTipoContenido(dto.getComprobanteTipoContenido());
+            } catch (IllegalArgumentException e) {
+                throw new ComprobanteInvalidoException("Formato de comprobante inválido", e);
+            }
+        }
+
+        pago.setEstado(dto.getEstado() != null ? dto.getEstado() : Pago.EstadoPago.COMPLETADO);
 
         if (dto.getFechaPago() != null) {
             pago.setFechaPago(dto.getFechaPago());
@@ -42,20 +58,24 @@ public class PagoService {
         return pagoRepository.save(pago);
     }
 
-    public List<Pago> obtenerPagosPorContrato(Long contratoId) {
-        return pagoRepository.findByContratoId(contratoId);
+    public List<PagoDTO> obtenerPagosPorContrato(Long contratoId) {
+        List<Pago> pagos = pagoRepository.findByContratoId(contratoId);
+        return pagos.stream().map(this::convertToDto).toList();
     }
 
-    public List<Pago> obtenerPagosPorCliente(Long clienteId) {
-        return pagoRepository.findByClienteId(clienteId);
+    public List<PagoDTO> obtenerPagosPorCliente(Long clienteId) {
+        List<Pago> pagos = pagoRepository.findByClienteId(clienteId);
+        return pagos.stream().map(this::convertToDto).toList();
     }
 
     public BigDecimal obtenerTotalPagadoPorContrato(Long contratoId) {
-        return pagoRepository.sumPagosCompletadosByContratoId(contratoId);
+        BigDecimal total = pagoRepository.sumPagosCompletadosByContratoId(contratoId);
+        return total != null ? total : BigDecimal.ZERO;
     }
 
-    public List<Pago> generarReportePagos(LocalDateTime fechaInicio, LocalDateTime fechaFin) {
-        return pagoRepository.findByFechaPagoBetween(fechaInicio, fechaFin);
+    public List<PagoDTO> generarReportePagos(LocalDateTime fechaInicio, LocalDateTime fechaFin) {
+        List<Pago> pagos = pagoRepository.findByFechaPagoBetween(fechaInicio, fechaFin);
+        return pagos.stream().map(this::convertToDto).toList();
     }
 
     @Transactional
@@ -71,4 +91,42 @@ public class PagoService {
         pago.setObservaciones("REVERTIDO - Motivo: " + motivo);
         pagoRepository.save(pago);
     }
+
+    public PagoDTO convertToDto(Pago pago) {
+        PagoDTO dto = new PagoDTO();
+
+        // Mapeo de campos básicos
+        dto.setId(pago.getId());
+        dto.setMonto(pago.getMonto());
+        dto.setFechaPago(pago.getFechaPago());
+        dto.setMetodo(pago.getMetodo());
+        dto.setEstado(pago.getEstado());
+        dto.setObservaciones(pago.getObservaciones());
+        dto.setReferencia(pago.getReferencia()); // Añadido el campo referencia
+
+        // Mapeo de relación con Contrato
+        if (pago.getContrato() != null) {
+            dto.setContratoId(pago.getContrato().getId());
+            dto.setContratoReferencia(pago.getReferencia()); // Usar referencia real del contrato
+
+            // Mapeo de información del Cliente si existe
+            if (pago.getContrato().getCliente() != null) {
+                dto.setClienteNombre(pago.getContrato().getCliente().getNombre());
+            }
+        }
+
+        // Mapeo del comprobante (optimizado)
+        if (pago.getComprobante() != null && pago.getComprobante().length > 0) {
+            dto.setComprobante(Base64.getEncoder().encodeToString(pago.getComprobante()));
+            dto.setComprobanteNombre(pago.getComprobanteNombre());
+            dto.setComprobanteTipoContenido(pago.getComprobanteTipoContenido());
+        } else {
+            dto.setComprobante(null);
+            dto.setComprobanteNombre(null);
+            dto.setComprobanteTipoContenido(null);
+        }
+
+        return dto;
+    }
+
 }

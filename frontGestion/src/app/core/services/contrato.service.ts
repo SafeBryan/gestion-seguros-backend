@@ -36,6 +36,19 @@ export class ContratoService {
     );
   }
 
+    obtenerPorId(id: number): Observable<Contrato> {
+    return this.http.get<Contrato>(`${this.baseUrl}/${id}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  obtenerAceptadosPorCliente(clienteId: number): Observable<Contrato[]> {
+    return this.http.get<Contrato[]>(
+      `${this.baseUrl}/cliente/${clienteId}/aceptados`,
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
   obtenerContratosPorVencer(dias: number): Observable<Contrato[]> {
     return this.http.get<Contrato[]>(
       `${this.baseUrl}/por-vencer?dias=${dias}`,
@@ -69,4 +82,10 @@ export class ContratoService {
       headers: this.getAuthHeaders(),
     });
   }
+
+  obtenerTodos(): Observable<Contrato[]> {
+  return this.http.get<Contrato[]>(`${this.baseUrl}`, {
+    headers: this.getAuthHeaders(),
+  });
+}
 }

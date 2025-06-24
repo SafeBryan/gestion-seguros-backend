@@ -1,0 +1,101 @@
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>Contratos, Clientes y Pagos</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <div *ngIf="loading" class="loading">Cargando datos…</div>
+        <div *ngIf="!loading && data.length===0" class="no-data">
+            No hay contratos registrados.
+        </div>
+
+        <div *ngFor="let item of data" class="block mat-elevation-z1">
+            <!-- Tabla de contrato + cliente -->
+            <table mat-table [dataSource]="[item]" class="main-table">
+                <!-- ID Contrato -->
+                <ng-container matColumnDef="id">
+                    <th mat-header-cell *matHeaderCellDef>ID</th>
+                    <td mat-cell *matCellDef="let x">{{ x.contrato.id }}</td>
+                </ng-container>
+                <!-- Seguro -->
+                <ng-container matColumnDef="seguro">
+                    <th mat-header-cell *matHeaderCellDef>Seguro</th>
+                    <td mat-cell *matCellDef="let x">{{ x.contrato.seguro?.nombre }}</td>
+                </ng-container>
+                <!-- Cliente -->
+                <ng-container matColumnDef="cliente">
+                    <th mat-header-cell *matHeaderCellDef>Cliente</th>
+                    <td mat-cell *matCellDef="let x">{{ x.cliente.nombre }} {{ x.cliente.apellido }}</td>
+                </ng-container>
+                <!-- Inicio -->
+                <ng-container matColumnDef="inicio">
+                    <th mat-header-cell *matHeaderCellDef>Inicio</th>
+                    <td mat-cell *matCellDef="let x">{{ x.contrato.fechaInicio }}</td>
+                </ng-container>
+                <!-- Fin -->
+                <ng-container matColumnDef="fin">
+                    <th mat-header-cell *matHeaderCellDef>Fin</th>
+                    <td mat-cell *matCellDef="let x">{{ x.contrato.fechaFin }}</td>
+                </ng-container>
+                <!-- Estado -->
+                <ng-container matColumnDef="estado">
+                    <th mat-header-cell *matHeaderCellDef>Estado</th>
+                    <td mat-cell *matCellDef="let x">{{ x.contrato.estado }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="contratoCols"></tr>
+                <tr mat-row *matRowDef="let row; columns: contratoCols"></tr>
+            </table>
+
+            <mat-divider></mat-divider>
+
+            <!-- Pagos por contrato -->
+            <div *ngIf="item.pagos.length>0" class="payments">
+                <h4>Pagos registrados</h4>
+                <table mat-table [dataSource]="item.pagos" class="payments-table">
+                    <!-- ID Pago -->
+                    <ng-container matColumnDef="id">
+                        <th mat-header-cell *matHeaderCellDef>#Pago</th>
+                        <td mat-cell *matCellDef="let p">{{ p.id }}</td>
+                    </ng-container>
+                    <!-- Fecha Pago -->
+                    <ng-container matColumnDef="fechaPago">
+                        <th mat-header-cell *matHeaderCellDef>Fecha</th>
+                        <td mat-cell *matCellDef="let p">{{ p.fechaPago | date:'shortDate' }}</td>
+                    </ng-container>
+                    <!-- Método -->
+                    <ng-container matColumnDef="metodo">
+                        <th mat-header-cell *matHeaderCellDef>Método</th>
+                        <td mat-cell *matCellDef="let p">{{ p.metodo }}</td>
+                    </ng-container>
+                    <!-- Monto -->
+                    <ng-container matColumnDef="monto">
+                        <th mat-header-cell *matHeaderCellDef>Monto</th>
+                        <td mat-cell *matCellDef="let p">{{ p.monto | currency }}</td>
+                    </ng-container>
+                    <!-- Estado Pago -->
+                    <ng-container matColumnDef="estado">
+                        <th mat-header-cell *matHeaderCellDef>Estado</th>
+                        <td mat-cell *matCellDef="let p">{{ p.estado }}</td>
+                    </ng-container>
+
+                    <!-- … dentro de la sección de pagos … -->
+                    <ng-container matColumnDef="archivo">
+                        <th mat-header-cell *matHeaderCellDef>Archivo</th>
+                        <td mat-cell *matCellDef="let p">
+                            <button mat-button color="accent" (click)="verComprobante(p)" [disabled]="!p.comprobante">
+                                Ver Archivo
+                            </button>
+                        </td>
+                    </ng-container>
+
+
+                    <tr mat-header-row *matHeaderRowDef="pagoCols"></tr>
+                    <tr mat-row *matRowDef="let row; columns: pagoCols"></tr>
+                </table>
+            </div>
+            <div *ngIf="item.pagos.length===0" class="no-payments">
+                <em>No hay pagos para este contrato.</em>
+            </div>
+        </div>
+    </mat-card-content>
+</mat-card>

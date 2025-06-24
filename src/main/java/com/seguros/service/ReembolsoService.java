@@ -2,6 +2,7 @@ package com.seguros.service;
 
 import com.seguros.dto.ReembolsoRequestDTO;
 import com.seguros.dto.ReembolsoResponseDTO;
+import com.seguros.exception.JsonConversionException;
 import com.seguros.model.*;
 import com.seguros.repository.ReembolsoRepository;
 import jakarta.transaction.Transactional;
@@ -50,14 +51,14 @@ public class ReembolsoService {
 
         // ✅ Usar JSON válido para los archivos
         try {
-            if (dto.getArchivos() != null) {
-                String archivosJson = objectMapper.writeValueAsString(dto.getArchivos()); // CORREGIDO
+            if (dto.getArchivos() != null && !dto.getArchivos().isEmpty()) {
+                String archivosJson = objectMapper.writeValueAsString(dto.getArchivos());
                 reembolso.setArchivos(archivosJson);
             } else {
                 reembolso.setArchivos(null);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error al convertir archivos a JSON", e);
+            throw new JsonConversionException("Error al convertir archivos a JSON", e);
         }
 
 

@@ -13,9 +13,11 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
     List<Contrato> findByAgente(Usuario agente);
     List<Contrato> findBySeguroId(Long seguroId);
 
+    @Query("SELECT c FROM Contrato c WHERE c.cliente.id = :clienteId")
+    List<Contrato> findAllByClienteId(Long clienteId);
+
     @Query("SELECT c FROM Contrato c WHERE c.fechaFin BETWEEN :hoy AND :fechaLimite AND c.estado = 'ACTIVO'")
     List<Contrato> findContratosPorVencer(@Param("hoy") LocalDate hoy, @Param("fechaLimite") LocalDate fechaLimite);
-
 
     @Query("SELECT c FROM Contrato c WHERE c.cliente.id = :clienteId AND c.estado = 'ACTIVO'")
     List<Contrato> findContratosActivosPorCliente(Long clienteId);

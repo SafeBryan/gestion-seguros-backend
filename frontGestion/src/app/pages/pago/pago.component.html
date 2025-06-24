@@ -1,0 +1,118 @@
+<div class="pago-container">
+  <h2>Registro de Pago</h2>
+
+  <!-- Valor del Seguro -->
+  <div *ngIf="data.contrato.seguro?.precioAnual !== undefined" class="form-group seguro-valor-group">
+    <label>Valor Anual del Seguro:</label>
+    <span class="seguro-valor">
+      {{ data.contrato.seguro?.precioAnual| currency:'USD':'symbol':'1.0-0' }}
+    </span>
+  </div>
+
+  <form [formGroup]="pagoForm" (ngSubmit)="onSubmit()" novalidate>
+    <!-- ID del Contrato (solo lectura) -->
+    <div class="form-group">
+      <label for="contratoId">ID del Contrato<span class="required">*</span></label>
+      <input
+        type="number"
+        id="contratoId"
+        formControlName="contratoId"
+        readonly
+        class="readonly"
+      />
+    </div>
+
+    <!-- Método de Pago -->
+    <div class="form-group">
+      <label for="metodo">Método de Pago<span class="required">*</span></label>
+      <select id="metodo" formControlName="metodo">
+        <option value="Débito">Débito</option>
+        <option value="Transferencia">Transferencia</option>
+        <option value="Efectivo">Efectivo</option>
+        <option value="Tarjeta">Tarjeta</option>
+      </select>
+    </div>
+
+    <!-- Monto -->
+    <div class="form-group">
+      <label for="monto">Monto<span class="required">*</span></label>
+      <input
+        type="number"
+        step="0.01"
+        id="monto"
+        formControlName="monto"
+        placeholder="0.00"
+      />
+    </div>
+
+    <!-- Referencia -->
+    <div class="form-group">
+      <label for="referencia">Referencia</label>
+      <input
+        type="text"
+        id="referencia"
+        formControlName="referencia"
+        placeholder="Opcional"
+      />
+    </div>
+
+    <!-- Observaciones -->
+    <div class="form-group">
+      <label for="observaciones">Observaciones</label>
+      <textarea
+        id="observaciones"
+        formControlName="observaciones"
+        rows="3"
+        placeholder="Opcional"
+      ></textarea>
+    </div>
+
+    <!-- Fecha de Pago -->
+    <div class="form-group">
+      <label for="fechaPago">Fecha de Pago</label>
+      <input
+        type="date"
+        id="fechaPago"
+        formControlName="fechaPago"
+      />
+    </div>
+
+    <!-- Comprobante -->
+    <div class="form-group">
+      <label for="comprobante">Comprobante (Archivo)</label>
+      <input
+        type="file"
+        id="comprobante"
+        (change)="onFileChange($event)"
+      />
+      <small *ngIf="comprobanteNombre" class="file-name">
+        {{ comprobanteNombre }}
+      </small>
+    </div>
+
+    <!-- Términos y condiciones -->
+    <div class="form-group checkbox-group">
+      <input
+        type="checkbox"
+        id="acepto"
+        formControlName="acepto"
+      />
+      <label for="acepto">
+        Acepto términos y condiciones<span class="required">*</span>
+      </label>
+    </div>
+
+    <!-- Botón de envío -->
+    <div class="form-actions">
+      <button
+        type="submit"
+        [disabled]="pagoForm.invalid || cargando"
+      >
+        {{ cargando ? 'Registrando...' : 'Registrar Pago' }}
+      </button>
+    </div>
+  </form>
+
+  <!-- Mensaje de feedback -->
+  <p class="mensaje" *ngIf="mensaje">{{ mensaje }}</p>
+</div>
