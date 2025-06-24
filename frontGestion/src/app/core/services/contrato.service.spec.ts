@@ -55,8 +55,9 @@ describe('ContratoService', () => {
     });
 
     const req = httpMock.expectOne(
-      `http://localhost:8080/api/contratos/cliente/${clienteId}`
+      `http://localhost:8080/api/contratos/cliente/${clienteId}?todos=true`
     );
+
     expect(req.request.method).toBe('GET');
     expect(req.request.headers.has('Authorization')).toBeTrue();
     expect(req.request.headers.get('Authorization')).toBe('Bearer test-token');

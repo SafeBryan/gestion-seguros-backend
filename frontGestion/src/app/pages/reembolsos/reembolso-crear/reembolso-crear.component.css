@@ -1,0 +1,235 @@
+/* Container principal */
+.reembolso-container {
+  padding: 20px;
+  margin: 20px;
+  background-color: white;
+  border-radius: 8px;
+  max-width: 1200px;
+  margin: 20px auto;
+}
+
+/* Header styles */
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.title-section {
+  display: flex;
+  align-items: center;
+}
+
+.header-icon {
+  font-size: 32px;
+  height: 32px;
+  width: 32px;
+  margin-right: 12px;
+  color: #023E8A;
+}
+
+.header-title {
+  margin: 0;
+  font-weight: 500;
+  color: #023E8A;
+  font-size: 24px;
+}
+
+/* Loading container */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.loading-text {
+  margin-top: 16px;
+  color: #023E8A;
+  font-weight: 500;
+}
+
+/* No data container */
+.no-data-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.no-data-icon {
+  font-size: 56px;
+  height: 56px;
+  width: 56px;
+  color: #90a4ae;
+  margin-bottom: 16px;
+}
+
+.no-data-text {
+  color: #546e7a;
+  font-size: 18px;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.no-data-subtext {
+  color: #90a4ae;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+/* Form container */
+.form-container {
+  width: 100%;
+}
+
+.reembolso-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Form sections */
+.form-section {
+  margin-bottom: 16px;
+}
+
+.form-section .mat-mdc-card-header {
+  padding-bottom: 8px;
+}
+
+.section-icon {
+  color: #023E8A;
+  font-size: 24px;
+  height: 24px;
+  width: 24px;
+}
+
+.mat-mdc-card-title {
+  color: #023E8A;
+  font-weight: 500;
+}
+
+.mat-mdc-card-subtitle {
+  color: #546e7a;
+  font-size: 13px;
+}
+
+/* Form rows */
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.form-row mat-form-field {
+  flex: 1;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* Contrato option styling */
+.contrato-option {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0;
+}
+
+.contrato-estado {
+  font-size: 12px;
+  color: #546e7a;
+  margin-top: 2px;
+}
+
+/* File upload */
+.file-upload-container {
+  width: 100%;
+}
+
+.file-input-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.file-input {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+}
+
+.file-label {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border: 2px dashed #90a4ae;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #fafafa;
+  color: #546e7a;
+  font-size: 14px;
+}
+
+.file-label:hover {
+  border-color: #023E8A;
+  background-color: #f0f7ff;
+  color: #023E8A;
+}
+
+.file-label mat-icon {
+  margin-right: 8px;
+  font-size: 20px;
+  height: 20px;
+  width: 20px;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  padding: 8px;
+  background-color: #e8f5e8;
+  border-radius: 4px;
+  color: #2e7d32;
+  font-size: 13px;
+}
+
+.file-success-icon {
+  color: #4caf50;
+  margin-right: 8px;
+  font-size: 18px;
+  height: 18px;
+  width: 18px;
+}
+
+/* Checkbox styling */
+.checkbox-container {
+  margin: 8px 0;
+}
+
+.accident-checkbox {
+  color: #023E8A;
+}
+
+.accident-details {
+  margin-top: 16px;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

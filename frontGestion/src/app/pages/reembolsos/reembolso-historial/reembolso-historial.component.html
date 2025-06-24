@@ -1,21 +1,126 @@
-<h2>Mis Reembolsos</h2>
+<div class="reembolsos-container mat-elevation-z2">
+  <!-- Encabezado con título -->
+  <div class="header-container">
+    <div class="title-section">
+      <mat-icon class="header-icon">receipt_long</mat-icon>
+      <h1 class="header-title">Mis Reembolsos</h1>
+    </div>
+    <div class="stats-section">
+      <div class="stat-chip">
+        <mat-icon>receipt</mat-icon>
+        <span>{{reembolsos.length}} Total</span>
+      </div>
+    </div>
+  </div>
 
-<div *ngIf="cargando" class="spinner-container">
-  <mat-spinner></mat-spinner>
+  <!-- Filtro de búsqueda -->
+  <mat-form-field class="search-filter" appearance="outline">
+    <mat-label>Buscar reembolso</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Descripción, monto, estado..." #input>
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+
+  <!-- Spinner de carga -->
+  <div *ngIf="cargando" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p class="loading-text">Cargando reembolsos...</p>
+  </div>
+
+  <!-- Mensaje si no hay reembolsos -->
+  <div *ngIf="!cargando && reembolsos.length === 0" class="no-data-container">
+    <mat-icon class="no-data-icon">sentiment_dissatisfied</mat-icon>
+    <p class="no-data-text">No tienes solicitudes de reembolso aún</p>
+    <p class="no-data-subtitle">Las solicitudes que realices aparecerán aquí</p>
+  </div>
+
+  <!-- Grid de reembolsos -->
+  <div class="reembolsos-grid" *ngIf="!cargando && filteredReembolsos.length > 0">
+    <mat-card *ngFor="let r of filteredReembolsos; trackBy: trackByReembolsoId" class="reembolso-card mat-elevation-z2">
+      <!-- Header de la card -->
+      <mat-card-header class="card-header">
+        <div mat-card-avatar class="card-avatar" [ngClass]="getEstadoClass(r.estado)">
+          <mat-icon>{{getEstadoIcon(r.estado)}}</mat-icon>
+        </div>
+        <mat-card-title class="card-title">
+          <span class="descripcion">{{r.descripcion}}</span>
+          <div class="estado-chip" [ngClass]="getEstadoClass(r.estado)">
+            {{r.estado}}
+          </div>
+        </mat-card-title>
+        <mat-card-subtitle class="card-subtitle">
+          Solicitud #{{r.id}} • {{r.fechaSolicitud | date:'dd/MM/yyyy'}}
+        </mat-card-subtitle>
+      </mat-card-header>
+      
+      <!-- Contenido de la card -->
+      <mat-card-content class="card-content">
+        <div class="info-grid">
+          <div class="info-item">
+            <mat-icon class="info-icon">attach_money</mat-icon>
+            <div class="info-text">
+              <span class="label">Monto</span>
+              <span class="value">${{r.monto | number:'1.2-2'}}</span>
+            </div>
+          </div>
+          
+          <div class="info-item">
+            <mat-icon class="info-icon">assignment</mat-icon>
+            <div class="info-text">
+              <span class="label">Contrato</span>
+              <span class="value">#{{r.contratoId}}</span>
+            </div>
+          </div>
+          
+          <div class="info-item" *ngIf="r.fechaRevision">
+            <mat-icon class="info-icon">schedule</mat-icon>
+            <div class="info-text">
+              <span class="label">Fecha Revisión</span>
+              <span class="value">{{r.fechaRevision | date:'dd/MM/yyyy'}}</span>
+            </div>
+          </div>
+
+          <div class="info-item" *ngIf="r.aprobadoPorNombre">
+            <mat-icon class="info-icon">person</mat-icon>
+            <div class="info-text">
+              <span class="label">Revisado por</span>
+              <span class="value">{{r.aprobadoPorNombre}}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comentario del revisor si existe -->
+        <div class="comentario-section" *ngIf="r.comentarioRevisor">
+          <mat-divider></mat-divider>
+          <div class="comentario-content">
+            <mat-icon class="comentario-icon">comment</mat-icon>
+            <div class="comentario-text">
+              <span class="comentario-label">Comentario del revisor:</span>
+              <p class="comentario-value">{{r.comentarioRevisor}}</p>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <!-- Acciones -->
+      <mat-card-actions class="card-actions">
+        <button mat-button color="primary" (click)="verDetalles(r)">
+          <mat-icon>visibility</mat-icon>
+          Ver Detalles
+        </button>
+        <button mat-button *ngIf="getArchivosCount(r.archivos) > 0" (click)="verArchivos(r)">
+          <mat-icon>attachment</mat-icon>
+          Archivos ({{getArchivosCount(r.archivos)}})
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- Mensaje cuando no hay resultados de búsqueda -->
+  <div *ngIf="!cargando && reembolsos.length > 0 && filteredReembolsos.length === 0" class="no-results-container">
+    <mat-icon class="no-results-icon">search_off</mat-icon>
+    <p class="no-results-text">No se encontraron reembolsos que coincidan con "{{searchTerm}}"</p>
+    <button mat-stroked-button (click)="clearFilter()">
+      <mat-icon>clear</mat-icon> Limpiar filtro
+    </button>
+  </div>
 </div>
-
-<div *ngIf="!cargando && reembolsos.length === 0">
-  <p>No tienes solicitudes de reembolso aún.</p>
-</div>
-
-<mat-card *ngFor="let r of reembolsos" class="reembolso-card">
-  <mat-card-title>
-    <mat-icon>receipt</mat-icon> {{ r.descripcion }}
-  </mat-card-title>
-  <mat-card-content>
-    <p><strong>Monto:</strong> ${{ r.monto }}</p>
-    <p><strong>Estado:</strong> {{ r.estado }}</p>
-    <p><strong>Contrato ID:</strong> {{ r.contratoId }}</p>
-    <p><strong>Fecha Solicitud:</strong> {{ r.fechaSolicitud | date }}</p>
-  </mat-card-content>
-</mat-card>
