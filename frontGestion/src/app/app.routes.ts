@@ -14,6 +14,7 @@ import { ReembolsosPendientesComponent } from './pages/reembolsos/reembolsos-pen
 import { SegurosImpagosComponent } from './pages/reportes/seguros-impagos/seguros-impagos.component';
 import { PagoComponent } from './pages/pago/pago.component';
 
+
 export const routes: Routes = [
   {
     path: '',
@@ -49,6 +50,11 @@ export const routes: Routes = [
     component: ClientesListComponent,
     canActivate: [authGuard],
   },
+    {
+  path: 'pagos',
+  component: PagoComponent,
+  canActivate: [authGuard],
+},
   {
     path: 'reembolsos/crear',
     component: ReembolsoCrearComponent,
@@ -80,4 +86,7 @@ export const routes: Routes = [
     path: '**',
     redirectTo: 'login',
   },
+
+
+
 ];
