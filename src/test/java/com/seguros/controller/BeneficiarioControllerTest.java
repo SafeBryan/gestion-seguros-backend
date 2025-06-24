@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(BeneficiarioController.class)
 @Import(SecurityTestConfig.class)
-public class BeneficiarioControllerTest {
+class BeneficiarioControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

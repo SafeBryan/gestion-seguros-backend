@@ -1,6 +1,7 @@
 package com.seguros.service;
 
 import com.seguros.dto.PagoDTO;
+import com.seguros.exception.ComprobanteInvalidoException;
 import com.seguros.model.Contrato;
 import com.seguros.model.Pago;
 import com.seguros.repository.ContratoRepository;
@@ -12,7 +13,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PagoService {
@@ -45,7 +45,7 @@ public class PagoService {
                 pago.setComprobanteNombre(dto.getComprobanteNombre());
                 pago.setComprobanteTipoContenido(dto.getComprobanteTipoContenido());
             } catch (IllegalArgumentException e) {
-                throw new RuntimeException("Formato de comprobante inválido", e);
+                throw new ComprobanteInvalidoException("Formato de comprobante inválido", e);
             }
         }
 
@@ -60,12 +60,12 @@ public class PagoService {
 
     public List<PagoDTO> obtenerPagosPorContrato(Long contratoId) {
         List<Pago> pagos = pagoRepository.findByContratoId(contratoId);
-        return pagos.stream().map(this::convertToDto).collect(Collectors.toList());
+        return pagos.stream().map(this::convertToDto).toList();
     }
 
     public List<PagoDTO> obtenerPagosPorCliente(Long clienteId) {
         List<Pago> pagos = pagoRepository.findByClienteId(clienteId);
-        return pagos.stream().map(this::convertToDto).collect(Collectors.toList());
+        return pagos.stream().map(this::convertToDto).toList();
     }
 
     public BigDecimal obtenerTotalPagadoPorContrato(Long contratoId) {
@@ -75,7 +75,7 @@ public class PagoService {
 
     public List<PagoDTO> generarReportePagos(LocalDateTime fechaInicio, LocalDateTime fechaFin) {
         List<Pago> pagos = pagoRepository.findByFechaPagoBetween(fechaInicio, fechaFin);
-        return pagos.stream().map(this::convertToDto).collect(Collectors.toList());
+        return pagos.stream().map(this::convertToDto).toList();
     }
 
     @Transactional

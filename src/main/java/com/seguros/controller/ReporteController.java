@@ -2,14 +2,12 @@ package com.seguros.controller;
 
 import com.seguros.dto.ContratoDTO;
 import com.seguros.dto.ReembolsoResponseDTO;
-import com.seguros.model.Contrato;
 import com.seguros.model.Reembolso;
 import com.seguros.service.ContratoService;
 import com.seguros.service.ReembolsoService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/reportes")
@@ -38,7 +36,7 @@ public class ReporteController {
     @GetMapping("/reembolsos-pendientes")
     public List<ReembolsoResponseDTO> getReembolsosPendientes() {
         List<Reembolso> pendientes = reembolsoService.obtenerReembolsosPendientes();
-        return pendientes.stream().map(reembolsoService::convertirADTO).collect(Collectors.toList());
+        return pendientes.stream().map(reembolsoService::convertirADTO).toList();
     }
 
     @GetMapping("/contratos-vencidos")

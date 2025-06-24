@@ -2,6 +2,7 @@ package com.seguros.service;
 
 import com.seguros.dto.RegistroDTO;
 import com.seguros.dto.UsuarioDTO;
+import com.seguros.exception.EmailExistenteException;
 import com.seguros.model.Rol;
 import com.seguros.model.Usuario;
 import com.seguros.repository.RolRepository;
@@ -98,7 +99,7 @@ public class UsuarioService {
         // Actualizar el email solo si es diferente y no existe en otro usuario
         if (!usuario.getEmail().equals(usuarioDTO.getEmail())) {
             if (usuarioRepository.existsByEmail(usuarioDTO.getEmail())) {
-                throw new RuntimeException("El email ya está registrado");
+                throw new EmailExistenteException("El email ya está registrado");
             }
             usuario.setEmail(usuarioDTO.getEmail());
         }

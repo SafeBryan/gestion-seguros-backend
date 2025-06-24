@@ -2,15 +2,16 @@ package com.seguros.service;
 
 import com.seguros.dto.ClienteRequestDTO;
 import com.seguros.dto.ClienteResponseDTO;
+import com.seguros.exception.*;
 import com.seguros.model.Cliente;
 import com.seguros.model.Usuario;
 import com.seguros.repository.ClienteRepository;
 import com.seguros.repository.UsuarioRepository;
+import com.seguros.util.MensajesError;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ClienteService {
@@ -26,18 +27,18 @@ public class ClienteService {
     @Transactional
     public ClienteResponseDTO crearCliente(ClienteRequestDTO dto) {
         if (clienteRepository.existsByNumeroIdentificacion(dto.getNumeroIdentificacion())) {
-            throw new RuntimeException("El número de identificación ya está registrado.");
+            throw new NumeroIdentificacionExistenteException(MensajesError.NUMERO_IDENTIFICACION_REPETIDO);
         }
 
         Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new UsuarioNoEncontradoException(MensajesError.USUARIO_NO_ENCONTRADO));
 
         if (!usuario.getRol().getNombre().equals("CLIENTE")) {
-            throw new RuntimeException("El usuario no tiene rol CLIENTE.");
+            throw new RolInvalidoException(MensajesError.ROL_INVALIDO_PARA_CLIENTE);
         }
 
         if (clienteRepository.existsById(usuario.getId())) {
-            throw new RuntimeException("Este usuario ya tiene datos de cliente registrados.");
+            throw new ClienteYaRegistradoException(MensajesError.CLIENTE_YA_REGISTRADO_PARA_USUARIO);
         }
 
         Cliente cliente = new Cliente();
@@ -60,23 +61,26 @@ public class ClienteService {
     public List<ClienteResponseDTO> listarClientes() {
         return clienteRepository.findAll().stream()
                 .map(this::convertirAResponse)
-                .collect(Collectors.toList());
+                .toList(); // ✅ si usas Java 16+
     }
 
     public ClienteResponseDTO obtenerCliente(Long id) {
         Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+                .orElseThrow(() -> new RuntimeException(MensajesError.CLIENTE_NO_ENCONTRADO));
         return convertirAResponse(cliente);
     }
+
 
     @Transactional
     public ClienteResponseDTO actualizarCliente(Long id, ClienteRequestDTO dto) {
         Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+                .orElseThrow(() -> new ClienteNoEncontradoException(MensajesError.CONTRATO_NO_ENCONTRADO));
 
-        if (!cliente.getNumeroIdentificacion().equals(dto.getNumeroIdentificacion()) &&
-                clienteRepository.existsByNumeroIdentificacion(dto.getNumeroIdentificacion())) {
-            throw new RuntimeException("El número de identificación ya está registrado.");
+        boolean identificacionCambiada = !cliente.getNumeroIdentificacion().equals(dto.getNumeroIdentificacion());
+        boolean identificacionYaExiste = clienteRepository.existsByNumeroIdentificacion(dto.getNumeroIdentificacion());
+
+        if (identificacionCambiada && identificacionYaExiste) {
+            throw new NumeroIdentificacionExistenteException(MensajesError.NUMERO_IDENTIFICACION_REPETIDO);
         }
 
         cliente.setTipoIdentificacion(dto.getTipoIdentificacion());

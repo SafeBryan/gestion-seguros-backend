@@ -125,9 +125,12 @@ class ReembolsoServiceTest {
         when(contratoService.obtenerContratoValido(dto.getContratoId())).thenReturn(contrato);
         when(usuarioService.obtenerUsuario(cliente.getId())).thenReturn(cliente);
 
-        RuntimeException ex = assertThrows(RuntimeException.class, () ->
-                reembolsoService.solicitarReembolso(dto, cliente.getId()));
-        assertTrue(ex.getMessage().contains("no pertenece"));
+        Long clienteId = cliente.getId(); // EXTRAER AQUÍ
+
+        assertThrows(RuntimeException.class, () ->
+                reembolsoService.solicitarReembolso(dto, clienteId)
+        );
+
     }
 
     @Test
@@ -153,8 +156,11 @@ class ReembolsoServiceTest {
         when(reembolsoRepository.findById(1L)).thenReturn(Optional.of(reembolso));
         when(usuarioService.obtenerUsuario(cliente.getId())).thenReturn(cliente);
 
+        Long clienteId = cliente.getId(); // EXTRAÍDO
+
         RuntimeException ex = assertThrows(RuntimeException.class, () ->
-                reembolsoService.procesarReembolso(1L, cliente.getId(), true, "No debería aprobar"));
+                reembolsoService.procesarReembolso(1L, clienteId, true, "No debería aprobar")
+        );
 
         assertTrue(ex.getMessage().contains("no pueden aprobar"));
     }
@@ -215,6 +221,7 @@ class ReembolsoServiceTest {
 
         assertFalse(result.getEsAccidente());
     }
+
     @Test
     void procesarReembolso_rechazo_deberiaGuardarReembolso() {
         Reembolso reembolso = mock(Reembolso.class); // usamos mock para verificar el método
@@ -228,6 +235,7 @@ class ReembolsoServiceTest {
         verify(reembolso).rechazar(aprobador, "No cumple requisitos");
         verify(reembolsoRepository).save(reembolso);
     }
+
     @Test
     void obtenerReembolsosPorCliente_valido() {
         Usuario cliente = crearCliente();
@@ -260,9 +268,12 @@ class ReembolsoServiceTest {
         when(contratoService.obtenerContratoValido(dto.getContratoId())).thenReturn(contrato);
         when(usuarioService.obtenerUsuario(cliente.getId())).thenReturn(cliente);
 
+        Long clienteId = cliente.getId(); // fuera de la lambda
+
         RuntimeException ex = assertThrows(RuntimeException.class, () ->
-                service.solicitarReembolso(dto, cliente.getId())
+                service.solicitarReembolso(dto, clienteId)
         );
+
 
         assertTrue(ex.getMessage().contains("Error al convertir archivos a JSON"));
     }

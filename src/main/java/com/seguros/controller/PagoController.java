@@ -4,13 +4,11 @@ import com.seguros.dto.PagoDTO;
 import com.seguros.model.Pago;
 import com.seguros.service.PagoService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -26,11 +24,6 @@ public class PagoController {
     @PostMapping("/test-upload")
     public ResponseEntity<String> testFileUpload(@RequestParam("file") MultipartFile file) {
         try {
-            System.out.println("Nombre archivo: " + file.getOriginalFilename());
-            System.out.println("Tipo contenido: " + file.getContentType());
-            System.out.println("Tamaño: " + file.getSize() + " bytes");
-            System.out.println("Primeros bytes: " + Arrays.toString(Arrays.copyOfRange(file.getBytes(), 0, 10)));
-
             return ResponseEntity.ok("Archivo recibido: " + file.getOriginalFilename());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());

@@ -14,7 +14,6 @@
         private BigDecimal monto;
         private LocalDateTime fechaPago;
         private MetodoPago metodo;
-        //private byte[] comprobante;
         private String comprobanteTipoContenido;
         private String comprobanteNombre;
         private EstadoPago estado;
@@ -52,8 +51,6 @@
         public MetodoPago getMetodo() { return metodo; }
         public void setMetodo(MetodoPago metodo) { this.metodo = metodo; }
 
-       //public byte[] getComprobante() { return comprobante; }
-        //public void setComprobante(byte[] comprobante) { this.comprobante = comprobante; }
 
         public String getComprobanteTipoContenido() { return comprobanteTipoContenido; }
         public void setComprobanteTipoContenido(String comprobanteTipoContenido) { this.comprobanteTipoContenido = comprobanteTipoContenido; }

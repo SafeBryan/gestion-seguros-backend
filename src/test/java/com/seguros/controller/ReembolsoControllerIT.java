@@ -71,6 +71,7 @@ class ReembolsoControllerIT {
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
+    @BeforeEach
     void setUp() {
         reembolsoRepository.deleteAll();
         contratoRepository.deleteAll();

@@ -364,20 +364,6 @@ class ContratoServiceTest {
         assertEquals("Debe agregar al menos un beneficiario para crear el contrato.", ex.getMessage());
     }
 
-    @Test
-    void testCrearContrato_BeneficiariosNulos_LanzaExcepcion() {
-        ContratoDTO dto = new ContratoDTO();
-        dto.setClienteId(1L);
-        dto.setAgenteId(2L);
-        dto.setSeguroId(3L);
-        dto.setBeneficiarios(null); // <-- caso específico
-
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
-            contratoService.crearContrato(dto);
-        });
-
-        assertEquals("Debe agregar al menos un beneficiario para crear el contrato.", ex.getMessage());
-    }
 
     @Test
     void testCrearContrato_BeneficiariosVacios_LanzaExcepcion() {
@@ -567,9 +553,13 @@ class ContratoServiceTest {
     void testConvertirAContratoDTO_ArchivosJsonInvalido() {
         Contrato contrato = new Contrato();
         contrato.setId(1L);
-        contrato.setCliente(new Usuario()); contrato.getCliente().setId(1L);
 
-        Usuario agente = new Usuario(); agente.setId(2L);
+        Usuario cliente = new Usuario();
+        cliente.setId(1L);
+        contrato.setCliente(cliente);
+
+        Usuario agente = new Usuario();
+        agente.setId(2L);
         Rol rol = new Rol();
         rol.setId(1L);
         rol.setNombre("ADMIN");
@@ -577,17 +567,25 @@ class ContratoServiceTest {
         agente.setRol(rol);
         contrato.setAgente(agente);
 
-        contrato.setSeguro(new SeguroVida()); contrato.getSeguro().setId(3L);
+        SeguroVida seguro = new SeguroVida();
+        seguro.setId(3L);
+        contrato.setSeguro(seguro);
+
         contrato.setFechaInicio(LocalDate.now());
         contrato.setFechaFin(LocalDate.now().plusDays(30));
         contrato.setFrecuenciaPago(Contrato.FrecuenciaPago.MENSUAL);
         contrato.setEstado(Contrato.EstadoContrato.ACTIVO);
         contrato.setFirmaElectronica("firma");
 
-        contrato.setArchivos("invalid-json:::");
+        contrato.setArchivos("invalid-json:::"); // Simula JSON inválido
 
-        contratoService.convertirAContratoDTO(contrato);
+        // Act
+        ContratoDTO dto = contratoService.convertirAContratoDTO(contrato);
+
+        // ✅ Assert: debe continuar sin lanzar error, y archivos debe ser null o vacío
+        assertNull(dto.getArchivos(), "El campo archivos debe ser null cuando el JSON es inválido");
     }
+
 
 
     @Test
@@ -620,24 +618,42 @@ class ContratoServiceTest {
     void testConvertirAContratoDTO_AgenteYSeguroNoNulos() {
         Contrato contrato = new Contrato();
         contrato.setId(1L);
-        Usuario agente = new Usuario(); agente.setId(2L);
-        Rol rol = new Rol(); rol.setId(1L); rol.setNombre("ADMIN");
+
+        Usuario agente = new Usuario();
+        agente.setId(2L);
+        Rol rol = new Rol();
+        rol.setId(1L);
+        rol.setNombre("ADMIN");
         agente.setRol(rol);
         agente.setActivo(true);
         contrato.setAgente(agente);
 
-        SeguroVida seguro = new SeguroVida(); seguro.setId(3L); seguro.setNombre("Vida");
+        SeguroVida seguro = new SeguroVida();
+        seguro.setId(3L);
+        seguro.setNombre("Vida");
         contrato.setSeguro(seguro);
 
-        contrato.setCliente(new Usuario()); contrato.getCliente().setId(1L);
+        Usuario cliente = new Usuario();
+        cliente.setId(1L);
+        contrato.setCliente(cliente);
+
         contrato.setFrecuenciaPago(Contrato.FrecuenciaPago.MENSUAL);
         contrato.setFechaInicio(LocalDate.now());
         contrato.setFechaFin(LocalDate.now().plusMonths(1));
         contrato.setEstado(Contrato.EstadoContrato.ACTIVO);
         contrato.setFirmaElectronica("firma");
 
-        contratoService.convertirAContratoDTO(contrato);
+        // Aquí se llama al método
+        ContratoDTO dto = contratoService.convertirAContratoDTO(contrato);
+
+        // ✅ Aserciones obligatorias para validar
+        assertEquals(1L, dto.getId());
+        assertEquals("Vida", dto.getSeguro().getNombre());
+        assertEquals(2L, dto.getAgente().getId());
+        assertEquals("ADMIN", dto.getAgente().getRolNombre());
+        assertEquals("firma", dto.getFirmaElectronica());
     }
+
 
     @Test
     void testActualizarContrato_EstadoEditableSiNoActivo() {

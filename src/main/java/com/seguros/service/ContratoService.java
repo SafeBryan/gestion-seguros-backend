@@ -43,7 +43,7 @@ public class ContratoService {
 
     public Contrato obtenerPorId(Long id) {
         return contratoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Contrato no encontrado"));
+                .orElseThrow(() -> new RuntimeException(MensajesError.CONTRATO_NO_ENCONTRADO));
     }
 
     @Transactional
@@ -106,7 +106,7 @@ public class ContratoService {
     @Transactional
     public Contrato actualizarEstado(Long contratoId, Contrato.EstadoContrato nuevoEstado) {
         Contrato contrato = contratoRepository.findById(contratoId)
-                .orElseThrow(() -> new RuntimeException("Contrato no encontrado"));
+                .orElseThrow(() -> new RuntimeException(MensajesError.CONTRATO_NO_ENCONTRADO));
 
         contrato.setEstado(nuevoEstado);
         return contratoRepository.save(contrato);
@@ -114,7 +114,7 @@ public class ContratoService {
 
     public Contrato obtenerContratoValido(Long contratoId) {
         Contrato contrato = contratoRepository.findById(contratoId)
-                .orElseThrow(() -> new RuntimeException("Contrato no encontrado"));
+                .orElseThrow(() -> new RuntimeException(MensajesError.CONTRATO_NO_ENCONTRADO));
 
         if (!contrato.isActivo()) {
             throw new RuntimeException("El contrato no está activo");
@@ -222,9 +222,7 @@ public class ContratoService {
         contrato.setFrecuenciaPago(dto.getFrecuenciaPago());
         contrato.setFirmaElectronica(dto.getFirmaElectronica());
 
-        // Archivos
-        if (dto.getArchivos() != null) {
-            // Archivos
+
             if (dto.getArchivos() != null) {
                 try {
                     ObjectMapper mapper = new ObjectMapper();
@@ -233,7 +231,6 @@ public class ContratoService {
                     logger.error("Error al convertir archivos del DTO a JSON para el contrato ID {}: {}", contrato.getId(), e.getMessage(), e);
                 }
             }
-        }
 
 
             // Beneficiarios (elimina y reemplaza todos)
