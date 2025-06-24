@@ -27,18 +27,22 @@
             <div class="col-md-6">
               <mat-form-field appearance="outline" class="w-100">
                 <mat-label>Seleccionar Cliente</mat-label>
-                <input matInput type="number" [(ngModel)]="clienteId" (change)="onClienteChange($event)" placeholder="Ingrese el ID del cliente">
-                <mat-icon matSuffix>person</mat-icon>
+                <mat-select [(ngModel)]="clienteId" (selectionChange)="buscarContratosPorCliente(clienteId)" [disabled]="cargandoClientes">
+                  <mat-option *ngIf="cargandoClientes" disabled>Cargando clientes...</mat-option>
+                  <mat-option *ngFor="let cliente of clientes" [value]="cliente.id">
+                    {{cliente.nombre}} {{cliente.apellido}} (ID: {{cliente.id}})
+                  </mat-option>
+                </mat-select>
               </mat-form-field>
             </div>
             <div class="col-md-6">
-              <button mat-raised-button color="primary" (click)="buscarContratosPorCliente(clienteId)" class="me-2">
+              <button mat-raised-button color="primary" (click)="buscarContratosPorCliente(clienteId)" class="me-2" [disabled]="cargandoClientes || !clienteId">
                 <mat-icon>search</mat-icon>
                 Buscar Contratos
               </button>
-              <button mat-stroked-button color="accent" (click)="buscarContratosPorCliente(1)">
+              <button mat-stroked-button color="accent" (click)="cargarClientes()">
                 <mat-icon>refresh</mat-icon>
-                Cliente Demo (ID: 1)
+                Recargar Clientes
               </button>
             </div>
           </div>

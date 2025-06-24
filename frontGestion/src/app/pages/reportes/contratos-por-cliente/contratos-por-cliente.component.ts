@@ -15,6 +15,9 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
+import { ClienteService } from '../../../core/services/cliente.service';
+import { ClienteResponseDTO } from '../../../models/cliente-response.dto';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-contratos-por-cliente',
@@ -34,7 +37,8 @@ import { FormsModule } from '@angular/forms';
     MatSortModule,
     MatFormFieldModule,
     MatInputModule,
-    FormsModule
+    FormsModule,
+    MatSelectModule
   ],
   templateUrl: './contratos-por-cliente.component.html',
   styleUrl: './contratos-por-cliente.component.css'
@@ -46,11 +50,32 @@ export class ContratosPorClienteComponent implements OnInit {
   clienteId: number = 0;
   today = new Date();
 
-  constructor(private reporteService: ReporteService) {}
+  clientes: ClienteResponseDTO[] = [];
+  cargandoClientes = true;
+
+  constructor(private reporteService: ReporteService, private clienteService: ClienteService) {}
 
   ngOnInit(): void {
-    // Por defecto, buscar contratos del cliente ID 1
-    this.buscarContratosPorCliente(1);
+    this.cargarClientes();
+  }
+
+  cargarClientes(): void {
+    this.cargandoClientes = true;
+    this.clienteService.listarClientes().subscribe({
+      next: (clientes) => {
+        this.clientes = clientes;
+        this.cargandoClientes = false;
+        // Selecciona el primer cliente por defecto si hay clientes
+        if (clientes.length > 0) {
+          this.clienteId = clientes[0].id;
+          this.buscarContratosPorCliente(this.clienteId);
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar clientes', err);
+        this.cargandoClientes = false;
+      }
+    });
   }
 
   buscarContratosPorCliente(id: number): void {
