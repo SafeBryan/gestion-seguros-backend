@@ -33,7 +33,7 @@ const reportesRoutes: Routes = [
     },
     {
         path: '',
-        redirectTo: 'seguros-impagos',
+        redirectTo: 'dashboard-reportes',
         pathMatch: 'full'
     }
 ]
