@@ -18,6 +18,7 @@ export class MenuService {
     { title: 'Contratos', url: '/contratos', icon: 'description' },
     { title: 'Clientes', url: '/clientes', icon: 'people' },
     { title: 'Reembolsos', url: '/reembolsos/pendientes', icon: 'receipt' },
+    { title: 'Depositos', url: '/depositos', icon: 'money' },
     {
       title: 'Reportes',
       icon: 'bar_chart',

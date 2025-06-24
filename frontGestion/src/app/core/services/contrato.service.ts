@@ -82,4 +82,10 @@ export class ContratoService {
       headers: this.getAuthHeaders(),
     });
   }
+
+  obtenerTodos(): Observable<Contrato[]> {
+  return this.http.get<Contrato[]>(`${this.baseUrl}`, {
+    headers: this.getAuthHeaders(),
+  });
+}
 }
