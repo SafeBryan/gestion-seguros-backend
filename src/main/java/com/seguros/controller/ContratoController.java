@@ -85,5 +85,11 @@ public class ContratoController {
         return ResponseEntity.ok(dtos);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ContratoDTO> obtenerPorId(@PathVariable Long id) {
+        Contrato contrato = contratoService.obtenerPorId(id);
+        ContratoDTO dto = contratoService.convertirAContratoDTO(contrato);
+        return ResponseEntity.ok(dto);
+    }
 
 }

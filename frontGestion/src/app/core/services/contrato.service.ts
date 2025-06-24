@@ -36,6 +36,12 @@ export class ContratoService {
     );
   }
 
+    obtenerPorId(id: number): Observable<Contrato> {
+    return this.http.get<Contrato>(`${this.baseUrl}/${id}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
   obtenerAceptadosPorCliente(clienteId: number): Observable<Contrato[]> {
     return this.http.get<Contrato[]>(
       `${this.baseUrl}/cliente/${clienteId}/aceptados`,
