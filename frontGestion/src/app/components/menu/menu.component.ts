@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
+import { MatMenuModule } from '@angular/material/menu'; // <-- Importa MatMenuModule
 
 @Component({
   selector: 'app-menu',
@@ -15,6 +16,7 @@ import { CommonModule } from '@angular/common';
     MatButtonModule,
     CommonModule,
     MatIconModule,
+    MatMenuModule, // <-- Añade MatMenuModule a los imports
   ],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.css',
