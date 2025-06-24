@@ -216,4 +216,275 @@ describe('SeguroService', () => {
     expect(req2.request.method).toBe('GET');
     req2.flush({}, { status: 404, statusText: 'Not Found' });
   });
+
+  it('debería obtener estadísticas de seguros', () => {
+    const estadisticas = {
+      total: 10,
+      activos: 7,
+      inactivos: 3,
+      porTipo: { VIDA: 6, SALUD: 4 },
+    };
+
+    service.obtenerEstadisticas().subscribe((res) => {
+      expect(res).toEqual(estadisticas);
+    });
+
+    const req = httpMock.expectOne(
+      'http://localhost:8080/api/seguros/estadisticas'
+    );
+    expect(req.request.method).toBe('GET');
+    req.flush(estadisticas);
+  });
+  it('debería buscar seguros por término', () => {
+    const termino = 'vida';
+    const resultados: Seguro[] = [
+      {
+        id: 1,
+        nombre: 'Seguro Vida',
+        tipo: 'VIDA',
+        descripcion: 'Protección total',
+        cobertura: 'Cobertura vida',
+        precioAnual: 500,
+        activo: true,
+      },
+    ];
+
+    service.buscarSeguros(termino).subscribe((res) => {
+      expect(res).toEqual(resultados);
+    });
+
+    const req = httpMock.expectOne(
+      `http://localhost:8080/api/seguros/buscar?q=vida`
+    );
+    expect(req.request.method).toBe('GET');
+    req.flush(resultados);
+  });
+  it('debería duplicar un seguro', () => {
+    const seguroDuplicado: Seguro = {
+      id: 2,
+      nombre: 'Seguro Duplicado',
+      tipo: 'VIDA',
+      descripcion: 'Duplicado',
+      cobertura: 'Cobertura',
+      precioAnual: 500,
+      activo: true,
+    };
+
+    service.duplicarSeguro(1).subscribe((res) => {
+      expect(res).toEqual(seguroDuplicado);
+    });
+
+    const req = httpMock.expectOne(
+      'http://localhost:8080/api/seguros/1/duplicar'
+    );
+    expect(req.request.method).toBe('POST');
+    req.flush(seguroDuplicado);
+  });
+
+  it('debería activar múltiples seguros', () => {
+    const ids = [1, 2];
+    const seguros: Seguro[] = [
+      {
+        id: 1,
+        nombre: 'Seguro 1',
+        tipo: 'VIDA',
+        descripcion: '',
+        cobertura: '',
+        precioAnual: 100,
+        activo: true,
+      },
+      {
+        id: 2,
+        nombre: 'Seguro 2',
+        tipo: 'VIDA',
+        descripcion: '',
+        cobertura: '',
+        precioAnual: 200,
+        activo: true,
+      },
+    ];
+
+    service.activarMultiplesSeguros(ids).subscribe((res) => {
+      expect(res).toEqual(seguros);
+    });
+
+    const req = httpMock.expectOne(
+      'http://localhost:8080/api/seguros/activar-multiples'
+    );
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual({ ids });
+    req.flush(seguros);
+  });
+
+  it('debería desactivar múltiples seguros', () => {
+    const ids = [1, 2];
+    const seguros: Seguro[] = [
+      {
+        id: 1,
+        nombre: 'Seguro 1',
+        tipo: 'VIDA',
+        descripcion: '',
+        cobertura: '',
+        precioAnual: 100,
+        activo: false,
+      },
+      {
+        id: 2,
+        nombre: 'Seguro 2',
+        tipo: 'VIDA',
+        descripcion: '',
+        cobertura: '',
+        precioAnual: 200,
+        activo: false,
+      },
+    ];
+
+    service.desactivarMultiplesSeguros(ids).subscribe((res) => {
+      expect(res).toEqual(seguros);
+    });
+
+    const req = httpMock.expectOne(
+      'http://localhost:8080/api/seguros/desactivar-multiples'
+    );
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual({ ids });
+    req.flush(seguros);
+  });
+
+  it('debería manejar error 400 (Solicitud inválida)', (done) => {
+    const errorMessage = 'Solicitud inválida. Verifique los datos ingresados.';
+
+    service.obtenerSeguroPorId(1).subscribe({
+      next: () => {
+        fail('Debería haber fallado con error 400');
+        done();
+      },
+      error: (error) => {
+        expect(error).toBeTruthy();
+        expect(error.message).toBe(errorMessage);
+        done();
+      },
+    });
+
+    const req1 = httpMock.expectOne('http://localhost:8080/api/seguros/1');
+    expect(req1.request.method).toBe('GET');
+    req1.flush({}, { status: 400, statusText: 'Bad Request' });
+
+    const req2 = httpMock.expectOne('http://localhost:8080/api/seguros/1');
+    expect(req2.request.method).toBe('GET');
+    req2.flush({}, { status: 400, statusText: 'Bad Request' });
+  });
+  it('debería manejar error 401 (No autorizado)', (done) => {
+    const errorMessage = 'No autorizado. Inicie sesión nuevamente.';
+
+    service.obtenerSeguroPorId(1).subscribe({
+      next: () => {
+        fail('Debería haber fallado con error 401');
+        done();
+      },
+      error: (error) => {
+        expect(error).toBeTruthy();
+        expect(error.message).toBe(errorMessage);
+        done();
+      },
+    });
+
+    const req1 = httpMock.expectOne('http://localhost:8080/api/seguros/1');
+    expect(req1.request.method).toBe('GET');
+    req1.flush({}, { status: 401, statusText: 'Unauthorized' });
+
+    const req2 = httpMock.expectOne('http://localhost:8080/api/seguros/1');
+    expect(req2.request.method).toBe('GET');
+    req2.flush({}, { status: 401, statusText: 'Unauthorized' });
+  });
+  it('debería manejar error 403 (Prohibido)', (done) => {
+    const errorMessage = 'No tiene permisos para realizar esta acción.';
+
+    service.obtenerSeguroPorId(1).subscribe({
+      next: () => {
+        fail('Debería haber fallado con error 403');
+        done();
+      },
+      error: (error) => {
+        expect(error).toBeTruthy();
+        expect(error.message).toBe(errorMessage);
+        done();
+      },
+    });
+
+    const req1 = httpMock.expectOne('http://localhost:8080/api/seguros/1');
+    expect(req1.request.method).toBe('GET');
+    req1.flush({}, { status: 403, statusText: 'Forbidden' });
+
+    const req2 = httpMock.expectOne('http://localhost:8080/api/seguros/1');
+    expect(req2.request.method).toBe('GET');
+    req2.flush({}, { status: 403, statusText: 'Forbidden' });
+  });
+  it('debería manejar error 409 (Conflicto)', (done) => {
+    const errorMessage = 'El recurso ya existe o hay un conflicto.';
+
+    service.obtenerSeguroPorId(1).subscribe({
+      next: () => {
+        fail('Debería haber fallado con error 409');
+        done();
+      },
+      error: (error) => {
+        expect(error).toBeTruthy();
+        expect(error.message).toBe(errorMessage);
+        done();
+      },
+    });
+
+    const req1 = httpMock.expectOne('http://localhost:8080/api/seguros/1');
+    expect(req1.request.method).toBe('GET');
+    req1.flush({}, { status: 409, statusText: 'Conflict' });
+
+    const req2 = httpMock.expectOne('http://localhost:8080/api/seguros/1');
+    expect(req2.request.method).toBe('GET');
+    req2.flush({}, { status: 409, statusText: 'Conflict' });
+  });
+  it('debería manejar error 500 (Error interno del servidor)', (done) => {
+    const errorMessage = 'Error interno del servidor. Intente más tarde.';
+
+    service.obtenerSeguroPorId(1).subscribe({
+      next: () => {
+        fail('Debería haber fallado con error 500');
+        done();
+      },
+      error: (error) => {
+        expect(error).toBeTruthy();
+        expect(error.message).toBe(errorMessage);
+        done();
+      },
+    });
+
+    const req1 = httpMock.expectOne('http://localhost:8080/api/seguros/1');
+    expect(req1.request.method).toBe('GET');
+    req1.flush({}, { status: 500, statusText: 'Internal Server Error' });
+
+    const req2 = httpMock.expectOne('http://localhost:8080/api/seguros/1');
+    expect(req2.request.method).toBe('GET');
+    req2.flush({}, { status: 500, statusText: 'Internal Server Error' });
+  });
+  it('debería devolver todos los seguros si el término de búsqueda está vacío', () => {
+    const mockSeguros: Seguro[] = [
+      {
+        id: 1,
+        nombre: 'Seguro General',
+        tipo: 'VIDA',
+        descripcion: 'Básico',
+        cobertura: 'Cobertura completa',
+        precioAnual: 200,
+        activo: true,
+      },
+    ];
+
+    service.buscarSeguros('  ').subscribe((res) => {
+      expect(res).toEqual(mockSeguros);
+    });
+
+    const req = httpMock.expectOne('http://localhost:8080/api/seguros');
+    expect(req.request.method).toBe('GET');
+    req.flush(mockSeguros);
+  });
 });

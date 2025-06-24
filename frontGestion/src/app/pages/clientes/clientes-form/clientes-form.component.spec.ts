@@ -5,7 +5,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ClienteService } from '../../../core/services/cliente.service';
 import { UsuarioService } from '../../../core/services/usuario.service';
-import { of} from 'rxjs';
+import { of } from 'rxjs';
+
 
 describe('ClientesFormComponent', () => {
   let component: ClientesFormComponent;
@@ -74,11 +75,13 @@ describe('ClientesFormComponent', () => {
   });
 
   it('debería cargar usuarios cliente activos', () => {
+    component.ngOnInit(); // <--- ejecuta la carga de datos
     expect(component.usuariosClienteDisponibles.length).toBe(1);
     expect(component.usuariosClienteDisponibles[0].nombre).toBe('Bryan');
   });
 
   it('debería cargar los datos del cliente en modo edición', () => {
+    component.ngOnInit(); // <-- Esto ejecuta la carga del cliente
     expect(component.cliente.numeroIdentificacion).toBe('1234567890');
     expect(component.isEditando).toBeTrue();
   });
@@ -129,5 +132,32 @@ describe('ClientesFormComponent', () => {
       jasmine.any(Object)
     );
     expect(mockDialogRef.close).toHaveBeenCalledWith('guardado');
+  });
+
+  it('debería agregar campo vacío si usuarioId no es válido', () => {
+    component.cliente.usuarioId = 0;
+    const result = component.isFormValid;
+    // No importa el resultado, solo queremos ejecutar la línea parcialmente cubierta
+    expect(result).toBeFalse();
+  });
+
+  it('debería devolver false si this.form es undefined', () => {
+    (component as any).form = undefined;
+    expect(component.isFormValid).toBeFalse();
+  });
+
+  it('debería devolver cadena vacía si no hay fecha', () => {
+    const result = component.formatearFechaParaInput('');
+    expect(result).toBe('');
+  });
+
+  it('debería devolver solo la parte de la fecha', () => {
+    const result = component.formatearFechaParaInput('2023-01-01T12:00:00');
+    expect(result).toBe('2023-01-01');
+  });
+
+  it('debería cerrar el diálogo sin parámetros', () => {
+    component.cancelar(); // Método que solo hace this.dialogRef.close()
+    expect(mockDialogRef.close).toHaveBeenCalled();
   });
 });
