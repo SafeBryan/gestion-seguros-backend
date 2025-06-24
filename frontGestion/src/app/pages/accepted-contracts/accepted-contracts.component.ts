@@ -1,14 +1,13 @@
-// src/app/pages/accepted-contracts/accepted-contracts.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 // Angular Material
-import { MatCardModule } from '@angular/material/card';              // <-- aquí
+import { MatCardModule } from '@angular/material/card';             
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatDividerModule } from '@angular/material/divider';        // si usas <mat-divider>
+import { MatDividerModule } from '@angular/material/divider';       
 
 import { Contrato, EstadoContrato } from '../../models/contrato.model';
 import { ContratoService } from '../../core/services/contrato.service';
@@ -20,8 +19,8 @@ import { PagoComponent } from '../pago/pago.component';
   standalone: true,
   imports: [
     CommonModule,
-    MatCardModule,             // <-- agrégalo aquí
-    MatDividerModule,          // <-- y este si usas <mat-divider>
+    MatCardModule,             
+    MatDividerModule,          
     MatTableModule,
     MatButtonModule,
     MatProgressSpinnerModule,
