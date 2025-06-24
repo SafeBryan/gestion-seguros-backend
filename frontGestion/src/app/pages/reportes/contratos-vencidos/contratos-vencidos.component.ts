@@ -12,6 +12,11 @@ import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-contratos-vencidos',
@@ -28,16 +33,26 @@ import { MatSortModule } from '@angular/material/sort';
     MatTableModule,
     MatChipsModule,
     MatPaginatorModule,
-    MatSortModule
+    MatSortModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    FormsModule
   ],
   templateUrl: './contratos-vencidos.component.html',
   styleUrl: './contratos-vencidos.component.css'
 })
 export class ContratosVencidosComponent implements OnInit {
   contratosVencidos: any[] = [];
+  contratosVencidosFiltrados: any[] = [];
   cargando = true;
   totalContratos = 0;
   today = new Date();
+  
+  // Filtros de fecha
+  fechaInicio: Date | null = null;
+  fechaFin: Date | null = null;
 
   constructor(private reporteService: ReporteService) {}
 
@@ -50,7 +65,7 @@ export class ContratosVencidosComponent implements OnInit {
     this.reporteService.getContratosVencidos().subscribe({
       next: (contratos) => {
         this.contratosVencidos = contratos;
-        this.totalContratos = contratos.length;
+        this.aplicarFiltros();
         this.cargando = false;
       },
       error: (err) => {
@@ -58,6 +73,35 @@ export class ContratosVencidosComponent implements OnInit {
         this.cargando = false;
       }
     });
+  }
+
+  aplicarFiltros(): void {
+    let filtrados = [...this.contratosVencidos];
+
+    // Filtrar por fecha de vencimiento
+    if (this.fechaInicio) {
+      filtrados = filtrados.filter(contrato => {
+        const fechaVencimiento = new Date(contrato.fechaFin);
+        return fechaVencimiento >= this.fechaInicio!;
+      });
+    }
+
+    // Filtrar por fecha de fin
+    if (this.fechaFin) {
+      filtrados = filtrados.filter(contrato => {
+        const fechaVencimiento = new Date(contrato.fechaFin);
+        return fechaVencimiento <= this.fechaFin!;
+      });
+    }
+
+    this.contratosVencidosFiltrados = filtrados;
+    this.totalContratos = filtrados.length;
+  }
+
+  limpiarFiltros(): void {
+    this.fechaInicio = null;
+    this.fechaFin = null;
+    this.aplicarFiltros();
   }
 
   // Método para formatear fecha
@@ -107,15 +151,15 @@ export class ContratosVencidosComponent implements OnInit {
 
   // Métodos para el template (evitar expresiones complejas en HTML)
   getContratosVencidosMasDe30Dias(): number {
-    return this.contratosVencidos.filter(c => this.getDiasVencido(c.fechaFin) > 30).length;
+    return this.contratosVencidosFiltrados.filter(c => this.getDiasVencido(c.fechaFin) > 30).length;
   }
 
   getContratosVencidosMenosOIgual30Dias(): number {
-    return this.contratosVencidos.filter(c => this.getDiasVencido(c.fechaFin) <= 30).length;
+    return this.contratosVencidosFiltrados.filter(c => this.getDiasVencido(c.fechaFin) <= 30).length;
   }
 
   getTotalClientesAfectados(): number {
-    const ids = this.contratosVencidos.map(c => c.clienteId);
+    const ids = this.contratosVencidosFiltrados.map(c => c.clienteId);
     return Array.from(new Set(ids)).length;
   }
 

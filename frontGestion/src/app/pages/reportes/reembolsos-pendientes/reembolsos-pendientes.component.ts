@@ -12,6 +12,11 @@ import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-reembolsos-pendientes',
@@ -28,17 +33,27 @@ import { MatSortModule } from '@angular/material/sort';
     MatTableModule,
     MatChipsModule,
     MatPaginatorModule,
-    MatSortModule
+    MatSortModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    FormsModule
   ],
   templateUrl: './reembolsos-pendientes.component.html',
   styleUrl: './reembolsos-pendientes.component.css'
 })
 export class ReembolsosPendientesComponent implements OnInit {
   reembolsosPendientes: any[] = [];
+  reembolsosPendientesFiltrados: any[] = [];
   cargando = true;
   totalReembolsos = 0;
   totalMonto = 0;
   today = new Date();
+  
+  // Filtros de fecha
+  fechaInicio: Date | null = null;
+  fechaFin: Date | null = null;
 
   constructor(private reporteService: ReporteService) {}
 
@@ -51,8 +66,7 @@ export class ReembolsosPendientesComponent implements OnInit {
     this.reporteService.getReembolsosPendientes().subscribe({
       next: (reembolsos) => {
         this.reembolsosPendientes = reembolsos;
-        this.totalReembolsos = reembolsos.length;
-        this.totalMonto = reembolsos.reduce((sum, reembolso) => sum + reembolso.monto, 0);
+        this.aplicarFiltros();
         this.cargando = false;
       },
       error: (err) => {
@@ -60,6 +74,36 @@ export class ReembolsosPendientesComponent implements OnInit {
         this.cargando = false;
       }
     });
+  }
+
+  aplicarFiltros(): void {
+    let filtrados = [...this.reembolsosPendientes];
+
+    // Filtrar por fecha de solicitud
+    if (this.fechaInicio) {
+      filtrados = filtrados.filter(reembolso => {
+        const fechaReembolso = new Date(reembolso.fechaSolicitud);
+        return fechaReembolso >= this.fechaInicio!;
+      });
+    }
+
+    // Filtrar por fecha de fin
+    if (this.fechaFin) {
+      filtrados = filtrados.filter(reembolso => {
+        const fechaReembolso = new Date(reembolso.fechaSolicitud);
+        return fechaReembolso <= this.fechaFin!;
+      });
+    }
+
+    this.reembolsosPendientesFiltrados = filtrados;
+    this.totalReembolsos = filtrados.length;
+    this.totalMonto = filtrados.reduce((sum, reembolso) => sum + reembolso.monto, 0);
+  }
+
+  limpiarFiltros(): void {
+    this.fechaInicio = null;
+    this.fechaFin = null;
+    this.aplicarFiltros();
   }
 
   // Método para formatear fecha
@@ -108,7 +152,7 @@ export class ReembolsosPendientesComponent implements OnInit {
   }
 
   getTotalClientesAfectados(): number {
-    const ids = this.reembolsosPendientes.map(r => r.clienteId);
+    const ids = this.reembolsosPendientesFiltrados.map(r => r.clienteId);
     return Array.from(new Set(ids)).length;
   }
 

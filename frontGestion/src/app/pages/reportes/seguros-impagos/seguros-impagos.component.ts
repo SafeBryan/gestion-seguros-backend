@@ -12,6 +12,11 @@ import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-seguros-impagos',
@@ -28,16 +33,26 @@ import { MatSortModule } from '@angular/material/sort';
     MatTableModule,
     MatChipsModule,
     MatPaginatorModule,
-    MatSortModule
+    MatSortModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    FormsModule
   ],
   templateUrl: './seguros-impagos.component.html',
   styleUrl: './seguros-impagos.component.css'
 })
 export class SegurosImpagosComponent implements OnInit {
   segurosImpagos: any[] = [];
+  segurosImpagosFiltrados: any[] = [];
   cargando = true;
   totalSeguros = 0;
   today = new Date();
+  
+  // Filtros de fecha
+  fechaInicio: Date | null = null;
+  fechaFin: Date | null = null;
 
   constructor(private reporteService: ReporteService) {}
 
@@ -50,7 +65,7 @@ export class SegurosImpagosComponent implements OnInit {
     this.reporteService.getSegurosImpagos().subscribe({
       next: (seguros) => {
         this.segurosImpagos = seguros;
-        this.totalSeguros = seguros.length;
+        this.aplicarFiltros();
         this.cargando = false;
       },
       error: (err) => {
@@ -58,6 +73,35 @@ export class SegurosImpagosComponent implements OnInit {
         this.cargando = false;
       }
     });
+  }
+
+  aplicarFiltros(): void {
+    let filtrados = [...this.segurosImpagos];
+
+    // Filtrar por fecha de inicio
+    if (this.fechaInicio) {
+      filtrados = filtrados.filter(seguro => {
+        const fechaSeguro = new Date(seguro.fechaInicio);
+        return fechaSeguro >= this.fechaInicio!;
+      });
+    }
+
+    // Filtrar por fecha de fin
+    if (this.fechaFin) {
+      filtrados = filtrados.filter(seguro => {
+        const fechaSeguro = new Date(seguro.fechaFin);
+        return fechaSeguro <= this.fechaFin!;
+      });
+    }
+
+    this.segurosImpagosFiltrados = filtrados;
+    this.totalSeguros = filtrados.length;
+  }
+
+  limpiarFiltros(): void {
+    this.fechaInicio = null;
+    this.fechaFin = null;
+    this.aplicarFiltros();
   }
 
   // Método para formatear fecha
@@ -103,12 +147,12 @@ export class SegurosImpagosComponent implements OnInit {
 
   // Método para contar contratos activos
   getContratosActivos(): number {
-    return this.segurosImpagos.filter(s => s.estado === 'ACTIVO').length;
+    return this.segurosImpagosFiltrados.filter(s => s.estado === 'ACTIVO').length;
   }
 
   // Método para contar clientes únicos
   getTotalClientesAfectados(): number {
-    const ids = this.segurosImpagos.map(s => s.clienteId);
+    const ids = this.segurosImpagosFiltrados.map(s => s.clienteId);
     return Array.from(new Set(ids)).length;
   }
 }

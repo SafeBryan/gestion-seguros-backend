@@ -18,6 +18,8 @@ import { FormsModule } from '@angular/forms';
 import { ClienteService } from '../../../core/services/cliente.service';
 import { ClienteResponseDTO } from '../../../models/cliente-response.dto';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-contratos-por-cliente',
@@ -38,17 +40,24 @@ import { MatSelectModule } from '@angular/material/select';
     MatFormFieldModule,
     MatInputModule,
     FormsModule,
-    MatSelectModule
+    MatSelectModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   templateUrl: './contratos-por-cliente.component.html',
   styleUrl: './contratos-por-cliente.component.css'
 })
 export class ContratosPorClienteComponent implements OnInit {
   contratosPorCliente: any[] = [];
+  contratosPorClienteFiltrados: any[] = [];
   cargando = true;
   totalContratos = 0;
   clienteId: number = 0;
   today = new Date();
+  
+  // Filtros de fecha
+  fechaInicio: Date | null = null;
+  fechaFin: Date | null = null;
 
   clientes: ClienteResponseDTO[] = [];
   cargandoClientes = true;
@@ -84,7 +93,7 @@ export class ContratosPorClienteComponent implements OnInit {
     this.reporteService.getContratosPorCliente(id).subscribe({
       next: (contratos) => {
         this.contratosPorCliente = contratos;
-        this.totalContratos = contratos.length;
+        this.aplicarFiltros();
         this.cargando = false;
       },
       error: (err) => {
@@ -92,6 +101,35 @@ export class ContratosPorClienteComponent implements OnInit {
         this.cargando = false;
       }
     });
+  }
+
+  aplicarFiltros(): void {
+    let filtrados = [...this.contratosPorCliente];
+
+    // Filtrar por fecha de inicio
+    if (this.fechaInicio) {
+      filtrados = filtrados.filter(contrato => {
+        const fechaInicio = new Date(contrato.fechaInicio);
+        return fechaInicio >= this.fechaInicio!;
+      });
+    }
+
+    // Filtrar por fecha de fin
+    if (this.fechaFin) {
+      filtrados = filtrados.filter(contrato => {
+        const fechaFin = new Date(contrato.fechaFin);
+        return fechaFin <= this.fechaFin!;
+      });
+    }
+
+    this.contratosPorClienteFiltrados = filtrados;
+    this.totalContratos = filtrados.length;
+  }
+
+  limpiarFiltros(): void {
+    this.fechaInicio = null;
+    this.fechaFin = null;
+    this.aplicarFiltros();
   }
 
   // Método para formatear fecha
@@ -149,17 +187,17 @@ export class ContratosPorClienteComponent implements OnInit {
 
   // Método para calcular el total de contratos activos
   getContratosActivos(): number {
-    return this.contratosPorCliente.filter(c => c.estado === 'ACTIVO').length;
+    return this.contratosPorClienteFiltrados.filter(c => c.estado === 'ACTIVO').length;
   }
 
   // Método para calcular el total de contratos vencidos
   getContratosVencidos(): number {
-    return this.contratosPorCliente.filter(c => c.estado === 'VENCIDO').length;
+    return this.contratosPorClienteFiltrados.filter(c => c.estado === 'VENCIDO').length;
   }
 
   // Método para calcular el valor total de contratos
   getValorTotalContratos(): number {
-    return this.contratosPorCliente.reduce((sum, contrato) => sum + contrato.seguro.precioAnual, 0);
+    return this.contratosPorClienteFiltrados.reduce((sum, contrato) => sum + contrato.seguro.precioAnual, 0);
   }
 
   // Método para refrescar datos
