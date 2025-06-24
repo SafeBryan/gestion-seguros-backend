@@ -53,6 +53,10 @@ class ContratoControllerIT {
     @Autowired
     private ReembolsoRepository reembolsoRepository;
 
+    @Autowired
+    private PagoRepository pagoRepository;
+
+
     private Usuario cliente;
     private Usuario agente;
     private Seguro seguroExistente;
@@ -61,6 +65,7 @@ class ContratoControllerIT {
     void setUp() {
         // Limpieza en orden correcto
         reembolsoRepository.deleteAll();
+        pagoRepository.deleteAll();
         contratoRepository.deleteAll();
         seguroRepository.deleteAll();
         clienteRepository.deleteAll(); // 👈 ELIMINA CLIENTES PRIMERO
@@ -265,6 +270,59 @@ class ContratoControllerIT {
         mockMvc.perform(get("/api/contratos"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void testObtenerContratoPorId() throws Exception {
+        Contrato contrato = new Contrato();
+        contrato.setCliente(cliente);
+        contrato.setAgente(agente);
+        contrato.setSeguro(seguroExistente);
+        contrato.setFechaInicio(LocalDate.now());
+        contrato.setFechaFin(LocalDate.now().plusYears(1));
+        contrato.setFrecuenciaPago(FrecuenciaPago.MENSUAL);
+        contrato.setEstado(EstadoContrato.ACTIVO);
+        contrato.setFirmaElectronica("firma123");
+        contrato = contratoRepository.save(contrato);
+
+        mockMvc.perform(get("/api/contratos/" + contrato.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(contrato.getId()))
+                .andExpect(jsonPath("$.clienteId").value(cliente.getId()))
+                .andExpect(jsonPath("$.estado").value("ACTIVO"));
+    }
+    @Test
+    @WithMockUser(roles = "USER")
+    void testObtenerContratosAceptadosPorCliente() throws Exception {
+        // Contrato aceptado
+        Contrato contratoAceptado = new Contrato();
+        contratoAceptado.setCliente(cliente);
+        contratoAceptado.setAgente(agente);
+        contratoAceptado.setSeguro(seguroExistente);
+        contratoAceptado.setFechaInicio(LocalDate.now());
+        contratoAceptado.setFechaFin(LocalDate.now().plusYears(1));
+        contratoAceptado.setFrecuenciaPago(FrecuenciaPago.MENSUAL);
+        contratoAceptado.setEstado(EstadoContrato.ACEPTADO);
+        contratoAceptado.setFirmaElectronica("firmaAceptado");
+        contratoRepository.save(contratoAceptado);
+
+        // Contrato rechazado (no debe aparecer en la respuesta)
+        Contrato contratoRechazado = new Contrato();
+        contratoRechazado.setCliente(cliente);
+        contratoRechazado.setAgente(agente);
+        contratoRechazado.setSeguro(seguroExistente);
+        contratoRechazado.setFechaInicio(LocalDate.now());
+        contratoRechazado.setFechaFin(LocalDate.now().plusYears(1));
+        contratoRechazado.setFrecuenciaPago(FrecuenciaPago.MENSUAL);
+        contratoRechazado.setEstado(EstadoContrato.RECHAZADO);
+        contratoRechazado.setFirmaElectronica("firmaRechazado");
+        contratoRepository.save(contratoRechazado);
+
+        mockMvc.perform(get("/api/contratos/cliente/" + cliente.getId() + "/aceptados"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].estado").value("ACEPTADO"));
     }
 
 }

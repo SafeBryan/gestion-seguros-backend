@@ -284,4 +284,61 @@ class ReembolsoServiceTest {
         assertTrue(result.getEsAccidente());
     }
 
+    @Test
+    void testConvertirADTO_Exitoso() throws Exception {
+        Reembolso reembolso = new Reembolso();
+        reembolso.setId(10L);
+        reembolso.setMonto(BigDecimal.valueOf(150));
+        reembolso.setDescripcion("Consulta");
+        reembolso.setEstado(Reembolso.EstadoReembolso.APROBADO);
+        reembolso.setComentarioRevisor("Revisión OK");
+        reembolso.setFechaSolicitud(LocalDate.now().atStartOfDay());
+        reembolso.setFechaRevision(LocalDate.now().plusDays(1).atStartOfDay());
+
+
+        // Simular campos de relaciones
+        Usuario cliente = new Usuario(); cliente.setId(1L); cliente.setNombre("Carlos");
+        Usuario aprobador = new Usuario(); aprobador.setNombre("AgenteX");
+
+        Seguro seguro = new SeguroVida(); seguro.setId(5L); seguro.setNombre("Plan Vida");
+        Contrato contrato = new Contrato();
+        contrato.setId(99L);
+        contrato.setCliente(cliente);
+        contrato.setSeguro(seguro);
+        reembolso.setContrato(contrato);
+        reembolso.setAprobadoPor(aprobador);
+
+        // Simular JSON de archivos
+        String archivosJson = "{\"factura.pdf\":\"ruta/factura.pdf\"}";
+        reembolso.setArchivos(archivosJson);
+
+        Map<String, String> archivosMap = Map.of("factura.pdf", "ruta/factura.pdf");
+        when(objectMapper.readValue(archivosJson, Map.class)).thenReturn(archivosMap);
+
+        var dto = reembolsoService.convertirADTO(reembolso);
+
+        assertEquals(10L, dto.getId());
+        assertEquals(BigDecimal.valueOf(150), dto.getMonto());
+        assertEquals("Consulta", dto.getDescripcion());
+        assertEquals("Plan Vida", dto.getSeguroNombre());
+        assertEquals("Carlos", dto.getClienteNombre());
+        assertEquals("AgenteX", dto.getAprobadoPorNombre());
+        assertEquals("Revisión OK", dto.getComentarioRevisor());
+        assertNotNull(dto.getArchivos());
+        assertEquals("ruta/factura.pdf", dto.getArchivos().get("factura.pdf"));
+    }
+    @Test
+    void testConvertirADTO_JsonInvalido() throws Exception {
+        Reembolso reembolso = new Reembolso();
+        reembolso.setId(20L);
+        reembolso.setArchivos("json_malformado");
+
+        when(objectMapper.readValue(anyString(), eq(Map.class))).thenThrow(new RuntimeException("Error de parseo"));
+
+        var dto = reembolsoService.convertirADTO(reembolso);
+
+        assertNull(dto.getArchivos()); // Debe caer en el catch y poner null
+    }
+
+
 }
