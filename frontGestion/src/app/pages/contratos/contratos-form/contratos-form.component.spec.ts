@@ -293,4 +293,22 @@ describe('ContratosFormComponent', () => {
     expect(contratoServiceSpy.crearContrato).toHaveBeenCalled();
     expect(component.guardado.emit).toHaveBeenCalled();
   });
+
+  it('debería mostrar error si obtenerSegurosActivos falla', () => {
+    authServiceSpy.getUsuarioId.and.returnValue(10);
+    seguroServiceSpy.obtenerSegurosActivos.and.returnValue(
+      throwError(() => new Error('Error de red'))
+    );
+    usuarioServiceSpy.obtenerPorRol.and.returnValue(of([]));
+
+    fixture.detectChanges(); // esto ejecuta ngOnInit()
+
+    expect(snackBarSpy.open).toHaveBeenCalledWith(
+      'Error al cargar los seguros',
+      'Cerrar',
+      { duration: 3000 }
+    );
+  });
+
+  
 });
