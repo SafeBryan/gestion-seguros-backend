@@ -1,6 +1,32 @@
-<mat-nav-list class="">
-    <a *ngFor="let menu of listMenu" [routerLink]="menu.url" mat-list-item>
+<mat-nav-list>
+  <ng-container *ngFor="let menu of listMenu">
+    <a
+      *ngIf="menu.children && menu.children.length > 0"
+      mat-list-item
+      [matMenuTriggerFor]="subMenu"
+    >
+      <mat-icon>{{ menu.icon }}</mat-icon>
+      <span class="textAlign">{{ menu.title }}</span>
+      <mat-icon class="menu-dropdown-icon">arrow_drop_down</mat-icon>
+    </a>
+    <mat-menu #subMenu="matMenu">
+      <a
+        *ngFor="let child of menu.children"
+        mat-menu-item
+        [routerLink]="child.url"
+      >
+        <mat-icon>{{ child.icon }}</mat-icon>
+        <span>{{ child.title }}</span>
+      </a>
+    </mat-menu>
+
+    <a
+      *ngIf="!menu.children || menu.children.length === 0"
+      [routerLink]="menu.url"
+      mat-list-item
+    >
       <mat-icon>{{ menu.icon }}</mat-icon>
       <span class="textAlign">{{ menu.title }}</span>
     </a>
+  </ng-container>
 </mat-nav-list>

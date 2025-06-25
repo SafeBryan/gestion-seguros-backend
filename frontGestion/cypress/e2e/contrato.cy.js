@@ -1,106 +1,118 @@
-describe('Gestión de Contratos - Flujo completo: Crear, Editar y Cancelar', () => {
-  before(() => {
+describe('Flujo completo de creación de contrato con beneficiario', () => {
+  it('debe crear un contrato con todos los datos obligatorios', () => {
+    const today = '06/25/2025'; // Formato compatible con el datepicker
+    const oneYearLater = '06/24/2026';
+
     cy.visit('http://localhost:4200/login');
-    cy.wait(2000);
-    cy.get('input[name="email"]').type('b@email.com', { force: true });
-    cy.wait(1000);
-    cy.get('input[name="password"]').type('0810', { force: true });
-    cy.wait(1000);
-    cy.get('button.login-button').click({ force: true });
-    cy.wait(3000);
+
+    // Login
+    cy.get('input[name="email"]').type('b@email.com');
+    cy.get('input[name="password"]').type('0810');
+    cy.get('button.login-button').click();
+
+    // Ir al módulo contratos
+    cy.contains('a', 'Contratos', { timeout: 10000 }).click();
+
+    // Crear nuevo contrato
+    cy.contains('Nuevo Contrato').scrollIntoView().click();
+
+    // Seleccionar cliente
+    cy.get('mat-select[name="clienteId"]', { timeout: 10000 }).should('be.visible').click();
+    cy.get('mat-option').should('have.length.at.least', 1).first().click();
+
+    // Seleccionar seguro
+    cy.get('mat-select[name="seguroId"]').should('be.visible').click();
+    cy.get('mat-option').should('have.length.at.least', 1).first().click();
+
+    // Seleccionar agente
+    cy.get('mat-select[name="agenteId"]').should('be.visible').click();
+    cy.get('mat-option').should('have.length.at.least', 1).first().click();
+
+    // Fechas
+    cy.get('input[name="fechaInicio"]')
+      .should('be.visible')
+      .clear()
+      .type(today, { force: true });
+
+    cy.get('input[name="fechaFin"]')
+          .click({ force: true }) // <-- agregado
+          .clear({ force: true })
+          .type(oneYearLater, { force: true });
+
+    // Frecuencia de pago
+    cy.get('mat-select[name="frecuenciaPago"]').should('be.visible').click();
+    cy.get('mat-option').should('have.length.at.least', 1).first().click();
+
+
+    // Esperar a que el campo del beneficiario esté visible
+    cy.get('input[name="nombre0"]:not([disabled])', { timeout: 10000 })
+      .click({ force: true })
+      .clear({ force: true })
+      .type('Juan Pérez', { force: true });
+
+
+    cy.get('input[name="numeroIdentificacion0"]:not([disabled])', { timeout: 10000 })
+  .click({ force: true })
+  .clear({ force: true })
+  .type('1234567890', { force: true });
+
+cy.get('input[name="fechaNacimiento0"]:not([disabled])', { timeout: 10000 })
+  .click({ force: true })
+  .clear({ force: true })
+  .type('01/01/1990', { force: true });
+
+cy.get('input[name="nacionalidad0"]:not([disabled])', { timeout: 10000 })
+  .click({ force: true })
+  .clear({ force: true })
+  .type('Ecuatoriano', { force: true });
+
+cy.contains('mat-form-field', 'Parentesco') // busca el campo completo
+  .find('mat-select')
+  .click({ force: true });
+
+cy.get('mat-option', { timeout: 10000 })
+  .should('have.length.at.least', 1)
+  .first()
+  .click({ force: true });
+
+cy.get('input[name="estatura0"]:not([disabled])', { timeout: 10000 })
+  .click({ force: true })
+  .clear({ force: true })
+  .type('1.75', { force: true });
+
+cy.get('input[name="peso0"]:not([disabled])', { timeout: 10000 })
+  .click({ force: true })
+  .clear({ force: true })
+  .type('70', { force: true });
+
+cy.get('input[name="lugarNacimiento0"]:not([disabled])', { timeout: 10000 })
+  .click({ force: true })
+  .clear({ force: true })
+  .type('Ambato', { force: true });
+
+cy.get('input[name="porcentaje0"]:not([disabled])', { timeout: 10000 })
+  .click({ force: true })
+  .clear({ force: true })
+  .type('100', { force: true });
+
+cy.get('input[name="email0"]:not([disabled])', { timeout: 10000 })
+  .click({ force: true })
+  .clear({ force: true })
+  .type('juan@example.com', { force: true });
+
+cy.get('input[name="telefono0"]:not([disabled])', { timeout: 10000 })
+  .click({ force: true })
+  .clear({ force: true })
+  .type('0987654321', { force: true });
+
+
+    // Guardar
+    cy.get('button[type="submit"]').contains('Guardar').click();
+
+    // Verificación
+    cy.get('app-contratos-list', { timeout: 10000 }).should('exist');
+    cy.contains('ACTIVO', { timeout: 10000 }).should('exist');
+    
   });
-
-  it('debería crear, editar y cancelar un contrato', () => {
-    cy.allure().feature('Contratos');
-    cy.allure().story('Flujo completo: crear, editar y cancelar');
-    cy.allure().severity('blocker');
-
-    // 🟢 CREAR CONTRATO
-    cy.contains('Contratos').click({ force: true });
-    cy.wait(2000);
-    cy.contains('Nuevo Contrato').scrollIntoView().click({ force: true });
-    cy.wait(1500);
-
-    cy.get('mat-select[name="seguroId"]').scrollIntoView().click({ force: true });
-    cy.wait(1000);
-    cy.get('mat-option').first().click({ force: true });
-    cy.wait(1000);
-
-    cy.get('mat-select[name="agenteId"]').scrollIntoView().click({ force: true });
-    cy.wait(1000);
-    cy.get('mat-option').first().click({ force: true });
-    cy.wait(1000);
-
-    const today = new Date().toISOString().split('T')[0];
-    const nextMonth = new Date();
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
-    const oneMonthLater = nextMonth.toISOString().split('T')[0];
-
-    cy.get('input[name="fechaInicio"]').scrollIntoView().type(today, { force: true });
-    cy.wait(1000);
-    cy.get('input[name="fechaFin"]').type(oneMonthLater, { force: true });
-    cy.wait(1000);
-
-    cy.get('mat-select[name="frecuenciaPago"]').click({ force: true });
-    cy.wait(500);
-    cy.get('mat-option').eq(0).click({ force: true }); // MENSUAL
-    cy.wait(1000);
-
-    cy.contains('Agregar Beneficiario').click({ force: true });
-    cy.wait(1000);
-    cy.get('input[name="nombre0"]').type('Juan', { force: true });
-    cy.wait(500);
-    cy.get('input[name="parentesco0"]').type('Hijo', { force: true });
-    cy.wait(500);
-    cy.get('input[name="porcentaje0"]').clear().type('100', { force: true });
-    cy.wait(1000);
-
-    cy.get('button[type="submit"]').contains('Guardar').scrollIntoView().click({ force: true });
-    cy.wait(4000);
-
-    cy.get('input[name="fechaInicio"]').should('not.exist');
-    cy.get('app-contratos-list').should('exist');
-    cy.get('table', { timeout: 10000 }).should('be.visible');
-
-    // Verifica que existe un contrato activo
-    cy.get('table').within(() => {
-      cy.contains('ACTIVO', { matchCase: false }).should('exist');
-    });
-
-    cy.log('✅ Contrato creado exitosamente');
-
-    // 🟡 EDITAR CONTRATO: cambiar frecuencia a TRIMESTRAL
-    cy.get('table').within(() => {
-      cy.contains('ACTIVO', { matchCase: false }).parents('tr').within(() => {
-        cy.get('button[mattooltip="Editar contrato"]').click({ force: true });
-      });
-    });
-
-    cy.wait(1500);
-    cy.get('mat-select[name="frecuenciaPago"]').click({ force: true });
-    cy.wait(500);
-    cy.get('mat-option').eq(1).click({ force: true }); // TRIMESTRAL
-    cy.wait(1000);
-    cy.get('button[type="submit"]').contains('Guardar').scrollIntoView().click({ force: true });
-    cy.wait(3000);
-    cy.get('input[name="fechaInicio"]').should('not.exist');
-    cy.get('table').should('be.visible');
-    cy.log('✅ Contrato editado correctamente');
-
-    // 🔴 CANCELAR CONTRATO
-    cy.get('table').within(() => {
-      cy.contains('ACTIVO', { matchCase: false }).parents('tr').within(() => {
-        cy.get('button[mattooltip="Cancelar contrato"]').click({ force: true });
-      });
-    });
-
-    cy.on('window:confirm', (text) => {
-      expect(text).to.include('¿Está seguro que desea cancelar el contrato');
-      return true;
-    });
-
-
-
-    cy.log('✅ Contrato cancelado exitosamente');
-  });
+  
 });

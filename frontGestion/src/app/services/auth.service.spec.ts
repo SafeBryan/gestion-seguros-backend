@@ -88,4 +88,18 @@ describe('AuthService', () => {
       done();
     });
   });
+
+  it('debería retornar null si no es navegador en getToken()', () => {
+    spyOn(service as any, 'isBrowser').and.returnValue(false);
+    expect(service['getToken']()).toBeNull();
+  });
+
+  it('debería lanzar error si el token es inválido (mal formado)', () => {
+    const invalidToken = 'esto.noes.unTokenValido';
+    localStorage.setItem('jwtToken', invalidToken);
+
+    expect(() => service.getUsuarioId()).toThrowError('Token inválido');
+  });
+
+  
 });

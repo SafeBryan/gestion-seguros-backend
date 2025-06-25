@@ -4,7 +4,9 @@ mat-nav-list {
   overflow-y: auto;
 }
 
-a[mat-list-item] {
+/* Estilos para los elementos del menú principal */
+mat-nav-list > a[mat-list-item],
+mat-nav-list > a[mat-list-item][matMenuTriggerFor] {
   width: 100%;
   margin: 8px 0;
   border-radius: 0 24px 24px 0;
@@ -14,42 +16,56 @@ a[mat-list-item] {
   text-decoration: none;
   box-sizing: border-box;
   background-color: transparent;
+  color: #ffffff !important; /* Aplica el color blanco solo al menú principal */
+  font-size: 14px; /* Asegura el tamaño de fuente para el principal */
 }
 
-a[mat-list-item]:hover {
+mat-nav-list > a[mat-list-item]:hover,
+mat-nav-list > a[mat-list-item][matMenuTriggerFor]:hover {
   background-color: rgba(144, 224, 239, 0.2); /* azul claro translúcido */
 }
 
-mat-list-item img {
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
+mat-nav-list > a[mat-list-item] mat-icon,
+mat-nav-list > a[mat-list-item][matMenuTriggerFor] mat-icon {
+  color: #ffffff !important; /* Íconos blancos para el menú principal */
 }
 
-span {
+mat-nav-list > a[mat-list-item] span,
+mat-nav-list > a[mat-list-item][matMenuTriggerFor] span {
   display: inline-block;
   padding-left: 8px;
   font-size: 15px;
-}
-
-a,
-a:link,
-a:visited,
-a:active {
-  color: #FFFFFF !important;
-  font-size: 14px;
-  text-decoration: none;
+  color: #ffffff !important; /* Texto blanco para el menú principal */
 }
 
 .textAlign {
-  color: #FFFFFF !important;
+  color: #ffffff !important;
   font-size: 18px;
   text-align: center;
   font-weight: bold;
   letter-spacing: 3px;
 }
 
-/* NUEVO: iconos blancos */
-a[mat-list-item] mat-icon {
-  color: #FFFFFF !important;
+/* Estilos específicos para los elementos del submenú (mat-menu-item) */
+.mat-mdc-menu-item {
+  color: rgba(0, 0, 0, 0.87); /* Color de texto oscuro para submenús por defecto */
+}
+
+.mat-mdc-menu-item mat-icon {
+  color: rgba(0, 0, 0, 0.54); /* Color de íconos oscuro para submenús por defecto */
+}
+
+/* Clases existentes para el ícono de desplegable */
+.menu-dropdown-icon {
+  margin-left: auto; /* Empuja el ícono a la derecha */
+  transition: transform 0.2s ease-in-out;
+}
+
+.mat-menu-trigger[aria-expanded='true'] .menu-dropdown-icon {
+  transform: rotate(180deg);
+}
+
+/* NUEVO: Margen a la izquierda para el panel del submenú */
+.mat-mdc-menu-panel {
+  margin-left: 200px; /* Ajusta este valor según el margen deseado */
 }

@@ -114,4 +114,59 @@ describe('ContratoService', () => {
     expect(req.request.headers.get('Authorization')).toBe('Bearer test-token');
     req.flush(contrato);
   });
+  it('debería obtener contrato por ID (GET)', () => {
+    const contratoId = 1;
+    const mockContrato = { id: contratoId, clienteId: 2 } as Contrato;
+
+    service.obtenerPorId(contratoId).subscribe((res) => {
+      expect(res).toEqual(mockContrato);
+    });
+
+    const req = httpMock.expectOne(
+      `http://localhost:8080/api/contratos/${contratoId}`
+    );
+    expect(req.request.method).toBe('GET');
+    expect(req.request.headers.get('Authorization')).toBe('Bearer test-token');
+    req.flush(mockContrato);
+  });
+
+  it('debería obtener contratos aceptados por cliente (GET)', () => {
+    const clienteId = 5;
+    const mockContratos = [{ id: 1 }, { id: 2 }] as Contrato[];
+
+    service.obtenerAceptadosPorCliente(clienteId).subscribe((res) => {
+      expect(res.length).toBe(2);
+    });
+
+    const req = httpMock.expectOne(
+      `http://localhost:8080/api/contratos/cliente/${clienteId}/aceptados`
+    );
+    expect(req.request.method).toBe('GET');
+    expect(req.request.headers.get('Authorization')).toBe('Bearer test-token');
+    req.flush(mockContratos);
+  });
+  it('debería obtener todos los contratos del usuario (GET)', () => {
+    const mockContratos = [{ id: 1 }, { id: 2 }] as Contrato[];
+
+    service.obtenerTodosLosContratos().subscribe((res) => {
+      expect(res.length).toBe(2);
+    });
+
+    const req = httpMock.expectOne(`http://localhost:8080/api/contratos`);
+    expect(req.request.method).toBe('GET');
+    expect(req.request.headers.get('Authorization')).toBe('Bearer test-token');
+    req.flush(mockContratos);
+  });
+  it('debería obtener todos los contratos (GET)', () => {
+    const mockContratos = [{ id: 1 }] as Contrato[];
+
+    service.obtenerTodos().subscribe((res) => {
+      expect(res.length).toBe(1);
+    });
+
+    const req = httpMock.expectOne(`http://localhost:8080/api/contratos`);
+    expect(req.request.method).toBe('GET');
+    expect(req.request.headers.get('Authorization')).toBe('Bearer test-token');
+    req.flush(mockContratos);
+  });
 });
