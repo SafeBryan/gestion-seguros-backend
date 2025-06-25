@@ -39,7 +39,7 @@ describe('Flujo completo de gestión de usuarios', () => {
     cy.wait(500);
     cy.get('mat-select[name="rolId"]').click();
     cy.wait(500);
-    cy.get('mat-option').eq(1).click(); // Asigna un rol (ajustar si es necesario)
+    cy.get('mat-option').eq(2).click(); // Asigna un rol (ajustar si es necesario)
     cy.wait(500);
 
     // 6. Crear el usuario

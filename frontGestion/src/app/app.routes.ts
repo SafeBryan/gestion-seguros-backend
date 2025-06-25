@@ -76,7 +76,6 @@ export const routes: Routes = [
     component: ReembolsosPendientesComponent,
     canActivate: [authGuard],
   },
-  // Nueva ruta para Seguros Impagos
   {
     path: 'reportes',
     loadChildren: () => import('./pages/reportes/reportes.routes'),

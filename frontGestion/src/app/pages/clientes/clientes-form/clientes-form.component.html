@@ -172,7 +172,7 @@
       Cancelar
     </button>
     <button mat-raised-button color="primary" (click)="guardar()" 
-            [disabled]="!isFormValid || loading">
+            [disabled]="form?.invalid || loading">
       <mat-icon>save</mat-icon>
       {{ isEditando ? 'Actualizar' : 'Guardar' }}
     </button>
