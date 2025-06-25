@@ -11,7 +11,7 @@ import { AuthService } from '../../services/auth.service';
   providedIn: 'root',
 })
 export class PagoService {
-  private apiUrl = 'http://localhost:8080/api/pagos';
+  private apiUrl = 'http://192.168.1.37:8080/api/pagos';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
