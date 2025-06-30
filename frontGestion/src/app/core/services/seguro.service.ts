@@ -9,7 +9,7 @@ import { AuthService } from '../../services/auth.service';
   providedIn: 'root',
 })
 export class SeguroService {
-  private baseUrl = 'http://localhost:8080/api/seguros';
+  private baseUrl = 'http://192.168.1.37:8080/api/seguros';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 

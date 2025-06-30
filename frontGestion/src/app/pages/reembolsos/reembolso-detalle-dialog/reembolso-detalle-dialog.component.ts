@@ -52,7 +52,7 @@ export class ReembolsoDetalleDialogComponent {
 
     this.nombreArchivo = firstFileKey || 'Documento';
     this.archivoUrlCompleta = relativePath
-      ? `http://localhost:8080/${relativePath.replace(/\\/g, '/')}`
+      ? `http://192.168.1.37:8080/${relativePath.replace(/\\/g, '/')}`
       : '';
   }
 
