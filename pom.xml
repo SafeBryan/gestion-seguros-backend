@@ -11,7 +11,7 @@
     <groupId>com.seguros</groupId>
     <artifactId>gestion-seguros-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>Sistema Gestion Seguros</name>
     <description>Backend para sistema de gestión de seguros con Spring Boot</description>
     <url/>
