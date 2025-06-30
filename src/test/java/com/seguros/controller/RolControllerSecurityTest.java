@@ -9,6 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+
 
 import java.math.BigDecimal;
 
@@ -46,5 +48,44 @@ public class RolControllerSecurityTest {
                         .content(rolJson))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    @WithMockUser(roles = "CLIENTE")
+    void cuandoCliente_intentaActualizarRol_retornaForbidden() throws Exception {
+        mockMvc.perform(put("/api/roles/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+            {
+                "nombre": "TEST",
+                "descripcion": "Test rol"
+            }
+            """))
+                .andExpect(status().isForbidden());
+    }
+
+
+    @Test
+    @WithAnonymousUser
+    void cuandoNoAutenticado_intentaVerRoles_retornaStatus() throws Exception {
+        mockMvc.perform(post("/api/roles"))
+                .andExpect(status().isForbidden()); // o .isUnauthorized() dependiendo de tu config
+    }
+
+    @WithMockUser(roles = "ADMIN")
+    void cuandoAdmin_intentaCrearRol_retornaOk() throws Exception {
+        mockMvc.perform(post("/api/roles")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+            {
+                "nombre": "ADMIN_TEST_"  // Usa un nombre diferente cada vez
+                , "descripcion": "Test rol"
+            }
+            """))
+                .andExpect(status().isOk());
+    }
+
+
+
+
 }
 

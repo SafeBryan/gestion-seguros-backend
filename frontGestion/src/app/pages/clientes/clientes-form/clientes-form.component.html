@@ -1,0 +1,180 @@
+<div class="dialog-container">
+  <h2 mat-dialog-title>
+    <mat-icon>{{ isEditando ? 'edit' : 'person_add' }}</mat-icon>
+    {{ isEditando ? 'Editar Cliente' : 'Nuevo Cliente' }}
+  </h2>
+  
+  <mat-dialog-content class="dialog-content">
+    <!-- Spinner de carga -->
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p class="loading-text">{{ isEditando ? 'Cargando cliente...' : 'Cargando datos...' }}</p>
+    </div>
+
+    <form #form="ngForm" class="cliente-form" *ngIf="!loading">
+      <!-- Selección de Usuario (solo en modo creación) -->
+      <div class="form-section" *ngIf="!isEditando">
+        <h3 class="section-title">
+          <mat-icon>person</mat-icon>
+          Información de Usuario
+        </h3>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Usuario</mat-label>
+            <mat-select [(ngModel)]="cliente.usuarioId" name="usuarioId" required>
+              <mat-option [value]="0" disabled>Seleccione un usuario</mat-option>
+              <mat-option *ngFor="let usuario of usuariosClienteDisponibles" [value]="usuario.id">
+                <div class="usuario-option">
+                  <strong>{{ usuario.nombre }} {{ usuario.apellido }}</strong>
+                  <span class="usuario-email">{{ usuario.email }}</span>
+                </div>
+              </mat-option>
+            </mat-select>
+            <mat-icon matSuffix>account_circle</mat-icon>
+            <mat-error>Debe seleccionar un usuario</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Información de Identificación -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon>badge</mat-icon>
+          Información de Identificación
+        </h3>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Tipo de Identificación</mat-label>
+            <mat-select [(ngModel)]="cliente.tipoIdentificacion" name="tipoIdentificacion" required>
+              <mat-option *ngFor="let tipo of tiposIdentificacion" [value]="tipo.value">
+                {{ tipo.label }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matSuffix>credit_card</mat-icon>
+            <mat-error>Debe seleccionar el tipo de identificación</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Número de Identificación</mat-label>
+            <input matInput [(ngModel)]="cliente.numeroIdentificacion" name="numeroIdentificacion" required>
+            <mat-icon matSuffix>confirmation_number</mat-icon>
+            <mat-error>El número de identificación es requerido</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Información Personal -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon>person_outline</mat-icon>
+          Información Personal
+        </h3>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha de Nacimiento</mat-label>
+            <input matInput [matDatepicker]="picker" [(ngModel)]="cliente.fechaNacimiento" 
+                   name="fechaNacimiento" required readonly>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error>La fecha de nacimiento es requerida</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Nacionalidad</mat-label>
+            <input matInput [(ngModel)]="cliente.nacionalidad" name="nacionalidad">
+            <mat-icon matSuffix>flag</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Estado Civil</mat-label>
+            <mat-select [(ngModel)]="cliente.estadoCivil" name="estadoCivil">
+              <mat-option *ngFor="let estado of estadosCiviles" [value]="estado.value">
+                {{ estado.label }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matSuffix>favorite</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Sexo</mat-label>
+            <mat-select [(ngModel)]="cliente.sexo" name="sexo">
+              <mat-option *ngFor="let sexo of sexos" [value]="sexo.value">
+                <mat-icon>{{ sexo.value === 'Masculino' ? 'male' : 'female' }}</mat-icon>
+                {{ sexo.label }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matSuffix>wc</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Lugar de Nacimiento</mat-label>
+            <input matInput [(ngModel)]="cliente.lugarNacimiento" name="lugarNacimiento">
+            <mat-icon matSuffix>location_city</mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Información Física -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon>accessibility</mat-icon>
+          Información Física
+        </h3>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Estatura (metros)</mat-label>
+            <input matInput type="number" step="0.01" min="0" max="3" 
+                   [(ngModel)]="cliente.estatura" name="estatura">
+            <mat-icon matSuffix>height</mat-icon>
+            <mat-hint>Ingrese en metros (ej: 1.75)</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Peso (kilogramos)</mat-label>
+            <input matInput type="number" step="0.1" min="0" max="500" 
+                   [(ngModel)]="cliente.peso" name="peso">
+            <mat-icon matSuffix>monitor_weight</mat-icon>
+            <mat-hint>Ingrese en kilogramos</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Información de Contacto -->
+      <div class="form-section">
+        <h3 class="section-title">
+          <mat-icon>contact_mail</mat-icon>
+          Información de Contacto
+        </h3>
+        
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Dirección</mat-label>
+            <textarea matInput [(ngModel)]="cliente.direccion" name="direccion" 
+                      rows="3" placeholder="Ingrese la dirección completa"></textarea>
+            <mat-icon matSuffix>home</mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
+    </form>
+  </mat-dialog-content>
+  
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button (click)="cancelar()" [disabled]="loading">
+      <mat-icon>cancel</mat-icon>
+      Cancelar
+    </button>
+    <button mat-raised-button color="primary" (click)="guardar()" 
+            [disabled]="form?.invalid || loading">
+      <mat-icon>save</mat-icon>
+      {{ isEditando ? 'Actualizar' : 'Guardar' }}
+    </button>
+  </mat-dialog-actions>
+</div>

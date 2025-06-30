@@ -18,6 +18,9 @@ public class ContratoDTO {
     private String firmaElectronica;
     private Map<String, String> archivos;
     private List<BeneficiarioDTO> beneficiarios;
+    private SeguroDTO seguro;
+    private UsuarioDTO agente;
+
 
     // Getters y Setters
     public Long getId() { return id; }
@@ -42,4 +45,20 @@ public class ContratoDTO {
     public void setArchivos(Map<String, String> archivos) { this.archivos = archivos; }
     public List<BeneficiarioDTO> getBeneficiarios() { return beneficiarios; }
     public void setBeneficiarios(List<BeneficiarioDTO> beneficiarios) { this.beneficiarios = beneficiarios; }
+
+    public SeguroDTO getSeguro() {
+        return seguro;
+    }
+
+    public void setSeguro(SeguroDTO seguro) {
+        this.seguro = seguro;
+    }
+
+    public UsuarioDTO getAgente() {
+        return agente;
+    }
+
+    public void setAgente(UsuarioDTO agente) {
+        this.agente = agente;
+    }
 }

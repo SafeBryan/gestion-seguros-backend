@@ -1,0 +1,92 @@
+.contratos-list-container {
+  width: 100%;
+  padding: 16px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}
+
+.filtros-container {
+  margin-bottom: 16px;
+}
+
+.contratos-table {
+  width: 100%;
+}
+
+.contratos-table .mat-mdc-row:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.cancelled-row {
+  background-color: rgba(244, 67, 54, 0.1); /* Fondo rojo claro para contratos cancelados */
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.expired-row {
+  background-color: rgba(255, 152, 0, 0.1); /* Fondo naranja claro para contratos vencidos */
+}
+
+.expanded-row {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.detail-row {
+  height: 0;
+}
+
+.beneficiarios-detail {
+  overflow: hidden;
+}
+
+.beneficiarios-wrapper {
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.beneficiarios-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.beneficiarios-table th,
+.beneficiarios-table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.beneficiarios-table th {
+  background-color: #eee;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.no-contratos, .no-beneficiarios {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.no-data-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-top: 16px;
+}
+
+.seguro-info {
+  font-weight: 500;
+}

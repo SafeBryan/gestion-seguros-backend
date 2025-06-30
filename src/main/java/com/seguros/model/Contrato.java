@@ -37,7 +37,7 @@ public class Contrato {
     private FrecuenciaPago frecuenciaPago;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('ACTIVO', 'VENCIDO', 'CANCELADO') default 'ACTIVO'")
+    @Column(name = "estado", nullable = false)
     private EstadoContrato estado = EstadoContrato.ACTIVO;
 
     @Column(name = "firma_electronica", columnDefinition = "TEXT")
@@ -54,6 +54,10 @@ public class Contrato {
 
     @OneToMany(mappedBy = "contrato")
     private List<Reembolso> reembolsos;
+    
+    @OneToMany(mappedBy = "contrato", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Dependiente> dependientes;
+
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -64,7 +68,13 @@ public class Contrato {
     }
 
     public enum EstadoContrato {
-        ACTIVO, VENCIDO, CANCELADO
+        ACTIVO,
+        PENDIENTE,
+        ACEPTADO,
+        RECHAZO,       // opcional, si prefieres esta variante
+        RECHAZADO,
+        VENCIDO,
+        CANCELADO
     }
 
     public boolean isActivo() {

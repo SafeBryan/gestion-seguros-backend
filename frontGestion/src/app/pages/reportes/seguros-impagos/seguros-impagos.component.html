@@ -1,0 +1,225 @@
+<div class="container-fluid py-4">
+  <mat-card class="dashboard-header-card mb-4">
+    <div class="row align-items-center p-3">
+      <div class="col-md-8">
+        <h1 class="text-black fw-bold mb-1">Reporte de Seguros Impagos</h1>
+        <p class="text-muted mb-0">Listado detallado de seguros con pagos pendientes</p>
+      </div>
+      <div class="col-md-4 text-end">
+        <div class="d-flex justify-content-end align-items-center">
+          <div class="badge bg-danger p-2 me-3 d-inline-block">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ today | date: 'dd/MM/yyyy' }}
+          </div>
+          <button mat-mini-fab color="primary" matTooltip="Generar PDF" (click)="generarPdf()" class="me-2">
+            <mat-icon>picture_as_pdf</mat-icon>
+          </button>
+          <button mat-mini-fab color="warn" matTooltip="Refrescar datos" (click)="refreshData()">
+            <mat-icon>refresh</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </mat-card>
+
+  <!-- Filtros de fecha -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <mat-card-title>
+            <div class="d-flex align-items-center">
+              <mat-icon class="me-2 text-primary">filter_list</mat-icon>
+              <span class="fw-bold">Filtros de Fecha</span>
+            </div>
+          </mat-card-title>
+          <mat-card-subtitle>Filtrar seguros por rango de fechas</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="row align-items-end">
+            <div class="col-md-3">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Fecha de Inicio</mat-label>
+                <input matInput [matDatepicker]="pickerInicio" [(ngModel)]="fechaInicio" (dateChange)="aplicarFiltros()">
+                <mat-datepicker-toggle matSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+                <mat-datepicker #pickerInicio></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div class="col-md-3">
+              <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Fecha de Fin</mat-label>
+                <input matInput [matDatepicker]="pickerFin" [(ngModel)]="fechaFin" (dateChange)="aplicarFiltros()">
+                <mat-datepicker-toggle matSuffix [for]="pickerFin"></mat-datepicker-toggle>
+                <mat-datepicker #pickerFin></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div class="col-md-3">
+              <button mat-stroked-button color="warn" class="w-100" (click)="limpiarFiltros()">
+                <mat-icon>clear</mat-icon>
+                Limpiar Filtros
+              </button>
+            </div>
+            <div class="col-md-3">
+              <div class="text-end">
+                <span class="badge bg-primary p-2">
+                  <i class="bi bi-funnel me-1"></i>
+                  {{totalSeguros}} resultados
+                </span>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Card de resumen -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <mat-card appearance="outlined">
+        <mat-card-content>
+          <div class="row text-center">
+            <div class="col-md-4">
+              <div class="d-flex align-items-center">
+                <div class="rounded-circle bg-danger p-3 me-3 d-flex align-items-center justify-content-center">
+                  <mat-icon class="text-white">warning</mat-icon>
+                </div>
+                <div class="text-start">
+                  <h2 class="mb-0 fw-bold text-danger">{{totalSeguros}}</h2>
+                  <p class="mb-0 text-muted">Total Seguros Impagos</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="d-flex align-items-center">
+                <div class="rounded-circle bg-warning p-3 me-3 d-flex align-items-center justify-content-center">
+                  <mat-icon class="text-white">schedule</mat-icon>
+                </div>
+                <div class="text-start">
+                  <h2 class="mb-0 fw-bold text-warning">{{getContratosActivos()}}</h2>
+                  <p class="mb-0 text-muted">Contratos Activos</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="d-flex align-items-center">
+                <div class="rounded-circle bg-info p-3 me-3 d-flex align-items-center justify-content-center">
+                  <mat-icon class="text-white">person</mat-icon>
+                </div>
+                <div class="text-start">
+                  <h2 class="mb-0 fw-bold text-info">{{getTotalClientesAfectados()}}</h2>
+                  <p class="mb-0 text-muted">Clientes Afectados</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Tabla de seguros impagos -->
+  <div class="row">
+    <div class="col-12">
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <mat-card-title>
+            <div class="d-flex align-items-center">
+              <mat-icon class="me-2 text-danger">list</mat-icon>
+              <span class="fw-bold">Listado de Seguros Impagos</span>
+            </div>
+          </mat-card-title>
+          <mat-card-subtitle>Detalle completo de seguros con pagos pendientes</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div *ngIf="cargando" class="text-center p-4">
+            <mat-spinner diameter="50" color="primary" class="mx-auto"></mat-spinner>
+            <p class="mt-3">Cargando datos...</p>
+          </div>
+
+          <div *ngIf="!cargando && segurosImpagosFiltrados.length === 0" class="text-center p-4">
+            <div class="empty-state">
+              <i class="bi bi-check-circle display-1 text-success"></i>
+              <p class="text-muted mt-3">No hay seguros impagos</p>
+            </div>
+          </div>
+
+          <div *ngIf="!cargando && segurosImpagosFiltrados.length > 0">
+            <div class="table-responsive">
+              <table class="table table-hover border-0 align-middle">
+                <thead>
+                  <tr class="bg-light">
+                    <th class="border-0">Cliente</th>
+                    <th class="border-0">Seguro</th>
+                    <th class="border-0">Agente</th>
+                    <th class="border-0">Fechas</th>
+                    <th class="border-0">Frecuencia</th>
+                    <th class="border-0">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let seguro of segurosImpagosFiltrados">
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar-sm bg-danger rounded-circle text-white me-3 d-flex align-items-center justify-content-center">
+                          <i class="bi bi-person"></i>
+                        </div>
+                        <div>
+                          <h6 class="mb-0">Cliente ID: {{seguro.clienteId}}</h6>
+                          <small class="text-muted">Contrato ID: {{seguro.id}}</small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div>
+                        <span class="badge rounded-pill bg-info-lightest text-info mb-1">
+                          {{seguro.seguro.nombre}}
+                        </span>
+                        <br>
+                        <small class="text-muted">{{seguro.seguro.tipo}}</small>
+                        <br>
+                        <small class="fw-bold">${{formatearPrecio(seguro.seguro.precioAnual)}} anual</small>
+                      </div>
+                    </td>
+                    <td>
+                      <div>
+                        <h6 class="mb-0">{{seguro.agente.nombre}} {{seguro.agente.apellido}}</h6>
+                        <small class="text-muted">{{seguro.agente.email}}</small>
+                        <br>
+                        <small class="text-muted">{{seguro.agente.telefono}}</small>
+                      </div>
+                    </td>
+                    <td>
+                      <div>
+                        <div class="mb-1">
+                          <small class="text-muted">Inicio:</small>
+                          <br>
+                          <span class="fw-bold">{{formatearFecha(seguro.fechaInicio)}}</span>
+                        </div>
+                        <div>
+                          <small class="text-muted">Fin:</small>
+                          <br>
+                          <span class="fw-bold text-danger">{{formatearFecha(seguro.fechaFin)}}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge rounded-pill bg-secondary-lightest text-secondary">
+                        {{seguro.frecuenciaPago}}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="badge rounded-pill bg-danger-lightest text-danger">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        Impago
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

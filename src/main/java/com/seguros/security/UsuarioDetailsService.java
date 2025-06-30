@@ -23,10 +23,7 @@ public class UsuarioDetailsService implements UserDetailsService {
 
         GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + usuario.getRol().getNombre());
 
-        return new User(
-                usuario.getEmail(),
-                usuario.getPassword(),
-                Collections.singleton(authority)
-        );
+        return new UsuarioDetails(usuario, Collections.singleton(authority));
     }
 }
+

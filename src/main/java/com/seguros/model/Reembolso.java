@@ -2,6 +2,7 @@ package com.seguros.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,11 +24,11 @@ public class Reembolso {
     private String descripcion;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('PENDIENTE', 'APROBADO', 'RECHAZADO') default 'PENDIENTE'")
+    @Column(nullable = false)
     private EstadoReembolso estado = EstadoReembolso.PENDIENTE;
 
-    @Column(columnDefinition = "JSON")
-    private String archivos;
+    @Column(columnDefinition = "TEXT")
+    private String archivos; // JSON string con info de archivos o rutas
 
     @ManyToOne
     @JoinColumn(name = "aprobado_por")
@@ -41,6 +42,17 @@ public class Reembolso {
 
     @Column(name = "fecha_revision")
     private LocalDateTime fechaRevision;
+
+    // Campos médicos adicionales (opcional según formulario real)
+    private String nombreMedico;
+    private String motivoConsulta;
+    private String cie10;
+    private LocalDate fechaAtencion;
+    private LocalDate inicioSintomas;
+    private Boolean esAccidente = false;
+
+    @Column(columnDefinition = "TEXT")
+    private String detalleAccidente;
 
     public enum EstadoReembolso {
         PENDIENTE, APROBADO, RECHAZADO
@@ -64,8 +76,7 @@ public class Reembolso {
         this.fechaRevision = LocalDateTime.now();
     }
 
-    //Getters y Setters
-
+    // Getters y Setters
 
     public Long getId() {
         return id;
@@ -145,5 +156,61 @@ public class Reembolso {
 
     public void setFechaRevision(LocalDateTime fechaRevision) {
         this.fechaRevision = fechaRevision;
+    }
+
+    public String getNombreMedico() {
+        return nombreMedico;
+    }
+
+    public void setNombreMedico(String nombreMedico) {
+        this.nombreMedico = nombreMedico;
+    }
+
+    public String getMotivoConsulta() {
+        return motivoConsulta;
+    }
+
+    public void setMotivoConsulta(String motivoConsulta) {
+        this.motivoConsulta = motivoConsulta;
+    }
+
+    public String getCie10() {
+        return cie10;
+    }
+
+    public void setCie10(String cie10) {
+        this.cie10 = cie10;
+    }
+
+    public LocalDate getFechaAtencion() {
+        return fechaAtencion;
+    }
+
+    public void setFechaAtencion(LocalDate fechaAtencion) {
+        this.fechaAtencion = fechaAtencion;
+    }
+
+    public LocalDate getInicioSintomas() {
+        return inicioSintomas;
+    }
+
+    public void setInicioSintomas(LocalDate inicioSintomas) {
+        this.inicioSintomas = inicioSintomas;
+    }
+
+    public Boolean getEsAccidente() {
+        return esAccidente;
+    }
+
+    public void setEsAccidente(Boolean esAccidente) {
+        this.esAccidente = esAccidente;
+    }
+
+    public String getDetalleAccidente() {
+        return detalleAccidente;
+    }
+
+    public void setDetalleAccidente(String detalleAccidente) {
+        this.detalleAccidente = detalleAccidente;
     }
 }

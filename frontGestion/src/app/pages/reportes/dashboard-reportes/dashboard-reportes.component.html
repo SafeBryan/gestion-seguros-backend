@@ -1,0 +1,417 @@
+<div class="container-fluid py-4">
+  <mat-card class="dashboard-header-card mb-4">
+    <div class="row align-items-center p-3">
+      <div class="col-md-8">
+        <h1 class="text-black fw-bold mb-1">Dashboard de Reportes</h1>
+        <p class="text-muted mb-0">Resumen de reportes y estadísticas del sistema</p>
+      </div>
+      <div class="col-md-4 text-end">
+        <div class="d-flex justify-content-end align-items-center">
+          <div class="badge bg-primary p-2 me-3 d-inline-block">
+            <i class="bi bi-calendar-check me-1"></i> {{ today | date: 'dd/MM/yyyy' }}
+          </div>
+          <button mat-mini-fab color="primary" matTooltip="Refrescar datos" (click)="refreshData()">
+            <mat-icon>refresh</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </mat-card>
+
+  <!-- Cards de resumen con efecto de elevación -->
+  <div class="row mb-4 g-3">
+    <div class="col-md-3 col-sm-6">
+      <mat-card class="h-100" appearance="outlined">
+        <mat-card-content>
+          <div class="text-center">
+            <div class="icon-wrapper mb-3">
+              <mat-icon class="text-danger" style="font-size: 3rem; width: auto; height: auto">warning</mat-icon>
+            </div>
+            <h3 class="counter-value text-danger">{{totalSegurosImpagos}}</h3>
+            <p class="text-muted mb-0">Seguros Impagos</p>
+            <mat-progress-bar mode="determinate" value="100" color="warn" class="mt-3"></mat-progress-bar>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      <mat-card class="h-100" appearance="outlined">
+        <mat-card-content>
+          <div class="text-center">
+            <div class="icon-wrapper mb-3">
+              <mat-icon class="text-warning" style="font-size: 3rem; width: auto; height: auto">pending</mat-icon>
+            </div>
+            <h3 class="counter-value text-warning">{{totalReembolsosPendientes}}</h3>
+            <p class="text-muted mb-0">Reembolsos Pendientes</p>
+            <mat-progress-bar mode="determinate" value="100" color="accent" class="mt-3"></mat-progress-bar>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      <mat-card class="h-100" appearance="outlined">
+        <mat-card-content>
+          <div class="text-center">
+            <div class="icon-wrapper mb-3">
+              <mat-icon class="text-danger" style="font-size: 3rem; width: auto; height: auto">event_busy</mat-icon>
+            </div>
+            <h3 class="counter-value text-danger">{{totalContratosVencidos}}</h3>
+            <p class="text-muted mb-0">Contratos Vencidos</p>
+            <mat-progress-bar mode="determinate" value="100" color="warn" class="mt-3"></mat-progress-bar>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="col-md-3 col-sm-6">
+      <mat-card class="h-100" appearance="outlined">
+        <mat-card-content>
+          <div class="text-center">
+            <div class="icon-wrapper mb-3">
+              <mat-icon class="text-info" style="font-size: 3rem; width: auto; height: auto">schedule</mat-icon>
+            </div>
+            <h3 class="counter-value text-info">{{totalContratosPorVencer}}</h3>
+            <p class="text-muted mb-0">Contratos por Vencer</p>
+            <mat-progress-bar mode="determinate" value="100" color="primary" class="mt-3"></mat-progress-bar>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Gráficos de distribución -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <mat-card appearance="outlined" class="h-100">
+        <mat-card-header>
+          <div class="d-flex align-items-center">
+            <mat-icon class="me-2 text-primary">pie_chart</mat-icon>
+            <mat-card-title class="fw-bold">Distribución de Estados de Contratos</mat-card-title>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="row text-center mb-4">
+            <div class="col-6">
+              <mat-card class="bg-light border-0">
+                <mat-card-content class="py-3">
+                  <div class="d-flex align-items-center">
+                    <div class="rounded-circle bg-danger p-3 me-3 d-flex align-items-center justify-content-center">
+                      <mat-icon class="text-white">event_busy</mat-icon>
+                    </div>
+                    <div class="text-start">
+                      <h2 class="mb-0 fw-bold text-danger">{{totalContratosVencidos}}</h2>
+                      <p class="mb-0 text-muted">Contratos Vencidos</p>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+
+            <div class="col-6">
+              <mat-card class="bg-light border-0">
+                <mat-card-content class="py-3">
+                  <div class="d-flex align-items-center">
+                    <div class="rounded-circle bg-info p-3 me-3 d-flex align-items-center justify-content-center">
+                      <mat-icon class="text-white">schedule</mat-icon>
+                    </div>
+                    <div class="text-start">
+                      <h2 class="mb-0 fw-bold text-info">{{totalContratosPorVencer}}</h2>
+                      <p class="mb-0 text-muted">Por Vencer</p>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>
+
+          <mat-progress-bar class="custom-progress-height" mode="determinate" [value]="totalContratosVencidos / (totalContratosVencidos + totalContratosPorVencer) * 100" color="warn"></mat-progress-bar>
+          <mat-progress-bar class="custom-progress-height mt-1" mode="determinate" [value]="totalContratosPorVencer / (totalContratosVencidos + totalContratosPorVencer) * 100" color="primary"></mat-progress-bar>
+
+          <div class="row mt-3">
+            <div class="col-6">
+              <div class="d-flex align-items-center">
+                <div class="dot bg-danger me-2"></div>
+                <small class="text-muted">Vencidos ({{(totalContratosVencidos / (totalContratosVencidos + totalContratosPorVencer) * 100).toFixed(0)}}%)</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="d-flex align-items-center">
+                <div class="dot bg-info me-2"></div>
+                <small class="text-muted">Por Vencer ({{(totalContratosPorVencer / (totalContratosVencidos + totalContratosPorVencer) * 100).toFixed(0)}}%)</small>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="col-md-6">
+      <mat-card appearance="outlined" class="h-100">
+        <mat-card-header>
+          <div class="d-flex align-items-center">
+            <mat-icon class="me-2 text-primary">trending_up</mat-icon>
+            <mat-card-title class="fw-bold">Resumen de Alertas</mat-card-title>
+          </div>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="row text-center mb-4">
+            <div class="col-6">
+              <mat-card class="bg-light border-0">
+                <mat-card-content class="py-3">
+                  <div class="d-flex align-items-center">
+                    <div class="rounded-circle bg-danger p-3 me-3 d-flex align-items-center justify-content-center">
+                      <mat-icon class="text-white">warning</mat-icon>
+                    </div>
+                    <div class="text-start">
+                      <h2 class="mb-0 fw-bold text-danger">{{totalSegurosImpagos}}</h2>
+                      <p class="mb-0 text-muted">Seguros Impagos</p>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+
+            <div class="col-6">
+              <mat-card class="bg-light border-0">
+                <mat-card-content class="py-3">
+                  <div class="d-flex align-items-center">
+                    <div class="rounded-circle bg-warning p-3 me-3 d-flex align-items-center justify-content-center">
+                      <mat-icon class="text-white">pending</mat-icon>
+                    </div>
+                    <div class="text-start">
+                      <h2 class="mb-0 fw-bold text-warning">{{totalReembolsosPendientes}}</h2>
+                      <p class="mb-0 text-muted">Reembolsos Pendientes</p>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+          </div>
+
+          <mat-progress-bar class="custom-progress-height" mode="determinate" [value]="totalSegurosImpagos / (totalSegurosImpagos + totalReembolsosPendientes) * 100" color="warn"></mat-progress-bar>
+          <mat-progress-bar class="custom-progress-height mt-1" mode="determinate" [value]="totalReembolsosPendientes / (totalSegurosImpagos + totalReembolsosPendientes) * 100" color="accent"></mat-progress-bar>
+
+          <div class="row mt-3">
+            <div class="col-6">
+              <div class="d-flex align-items-center">
+                <div class="dot bg-danger me-2"></div>
+                <small class="text-muted">Seguros Impagos ({{(totalSegurosImpagos / (totalSegurosImpagos + totalReembolsosPendientes) * 100).toFixed(0)}}%)</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="d-flex align-items-center">
+                <div class="dot bg-warning me-2"></div>
+                <small class="text-muted">Reembolsos Pendientes ({{(totalReembolsosPendientes / (totalSegurosImpagos + totalReembolsosPendientes) * 100).toFixed(0)}}%)</small>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Últimos Registros -->
+  <div class="row mb-4 g-3">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center pt-4 pb-2">
+          <h5 class="fw-bold text-black mb-0">
+            <i class="bi bi-exclamation-triangle-fill me-2 text-danger"></i>
+            Últimos Seguros Impagos
+          </h5>
+          <a routerLink="/reportes/seguros-impagos" class="btn btn-sm btn-danger">
+            Ver Todos <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+        <div class="card-body pb-4">
+          <div *ngIf="cargandoSegurosImpagos" class="text-center p-4">
+            <mat-spinner diameter="50" color="primary" class="mx-auto"></mat-spinner>
+            <p class="mt-3">Cargando datos...</p>
+          </div>
+
+          <div *ngIf="!cargandoSegurosImpagos && ultimosSegurosImpagos.length === 0" class="text-center p-4">
+            <div class="empty-state">
+              <i class="bi bi-check-circle display-1 text-success"></i>
+              <p class="text-muted mt-3">No hay seguros impagos</p>
+            </div>
+          </div>
+
+          <div *ngIf="!cargandoSegurosImpagos && ultimosSegurosImpagos.length > 0">
+            <div class="table-responsive">
+              <table class="table table-hover border-0 align-middle">
+                <thead>
+                  <tr class="bg-light">
+                    <th class="border-0">Cliente</th>
+                    <th class="border-0">Seguro</th>
+                    <th class="border-0">Estado</th>
+                    <th class="border-0">Fecha Fin</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let seguro of ultimosSegurosImpagos">
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar-sm bg-danger rounded-circle text-white me-3 d-flex align-items-center justify-content-center">
+                          <i class="bi bi-person"></i>
+                        </div>
+                        <div>
+                          <h6 class="mb-0">Cliente ID: {{seguro.clienteId}}</h6>
+                          <small class="text-muted">Agente: {{seguro.agente.nombre}}</small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge rounded-pill bg-info-lightest text-info">
+                        {{seguro.seguro.nombre}}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="badge rounded-pill bg-danger-lightest text-danger">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        Impago
+                      </span>
+                    </td>
+                    <td>
+                      <span class="fw-bold">{{formatearFecha(seguro.fechaFin)}}</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center pt-4 pb-2">
+          <h5 class="fw-bold text-black mb-0">
+            <i class="bi bi-clock-fill me-2 text-warning"></i>
+            Últimos Reembolsos Pendientes
+          </h5>
+          <a routerLink="/reportes/reembolsos-pendientes" class="btn btn-sm btn-warning">
+            Ver Todos <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+        <div class="card-body pb-4">
+          <div *ngIf="cargandoReembolsosPendientes" class="text-center p-4">
+            <mat-spinner diameter="50" color="primary" class="mx-auto"></mat-spinner>
+            <p class="mt-3">Cargando datos...</p>
+          </div>
+
+          <div *ngIf="!cargandoReembolsosPendientes && ultimosReembolsosPendientes.length === 0" class="text-center p-4">
+            <div class="empty-state">
+              <i class="bi bi-check-circle display-1 text-success"></i>
+              <p class="text-muted mt-3">No hay reembolsos pendientes</p>
+            </div>
+          </div>
+
+          <div *ngIf="!cargandoReembolsosPendientes && ultimosReembolsosPendientes.length > 0">
+            <div class="table-responsive">
+              <table class="table table-hover border-0 align-middle">
+                <thead>
+                  <tr class="bg-light">
+                    <th class="border-0">Cliente</th>
+                    <th class="border-0">Seguro</th>
+                    <th class="border-0">Monto</th>
+                    <th class="border-0">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let reembolso of ultimosReembolsosPendientes">
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar-sm bg-warning rounded-circle text-white me-3 d-flex align-items-center justify-content-center">
+                          <i class="bi bi-person"></i>
+                        </div>
+                        <div>
+                          <h6 class="mb-0">{{reembolso.clienteNombre}}</h6>
+                          <small class="text-muted">ID: {{reembolso.clienteId}}</small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge rounded-pill bg-info-lightest text-info">
+                        {{reembolso.seguroNombre}}
+                      </span>
+                    </td>
+                    <td>
+                      <span class="fw-bold">${{formatearPrecio(reembolso.monto)}}</span>
+                    </td>
+                    <td>
+                      <span class="badge rounded-pill bg-warning-lightest text-warning">
+                        <i class="bi bi-clock-fill"></i>
+                        Pendiente
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Acceso Rápido -->
+  <div class="row" style="padding-bottom: 60px;">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white border-0 pt-4 pb-2">
+          <h5 class="fw-bold text-primary mb-0">
+            <i class="bi bi-lightning-fill me-2"></i>
+            Acceso Rápido a Reportes
+          </h5>
+        </div>
+        <div class="card-body pb-4">
+          <div class="row g-3">
+            <div class="col-md-3 col-6">
+              <a routerLink="/reportes/seguros-impagos" class="card shortcut-card h-100">
+                <div class="card-body text-center p-4">
+                  <div class="icon-circle bg-danger-lightest text-danger mb-3 mx-auto">
+                    <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+                  </div>
+                  <h6 class="card-title mb-0">Seguros Impagos</h6>
+                </div>
+              </a>
+            </div>
+            <div class="col-md-3 col-6">
+              <a routerLink="/reportes/reembolsos-pendientes" class="card shortcut-card h-100">
+                <div class="card-body text-center p-4">
+                  <div class="icon-circle bg-warning-lightest text-warning mb-3 mx-auto">
+                    <i class="bi bi-clock-fill fs-4"></i>
+                  </div>
+                  <h6 class="card-title mb-0">Reembolsos Pendientes</h6>
+                </div>
+              </a>
+            </div>
+            <div class="col-md-3 col-6">
+              <a routerLink="/reportes/contratos-vencidos" class="card shortcut-card h-100">
+                <div class="card-body text-center p-4">
+                  <div class="icon-circle bg-danger-lightest text-danger mb-3 mx-auto">
+                    <i class="bi bi-calendar-x-fill fs-4"></i>
+                  </div>
+                  <h6 class="card-title mb-0">Contratos Vencidos</h6>
+                </div>
+              </a>
+            </div>
+            <div class="col-md-3 col-6">
+              <a routerLink="/reportes/contratos-por-vencer" class="card shortcut-card h-100">
+                <div class="card-body text-center p-4">
+                  <div class="icon-circle bg-info-lightest text-info mb-3 mx-auto">
+                    <i class="bi bi-hourglass-split fs-4"></i>
+                  </div>
+                  <h6 class="card-title mb-0">Contratos por Vencer</h6>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

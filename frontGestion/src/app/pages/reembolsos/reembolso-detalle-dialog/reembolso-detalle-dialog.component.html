@@ -1,0 +1,158 @@
+<div class="reembolso-dialog-container">
+  <!-- Header con estado visual -->
+  <div mat-dialog-title class="dialog-header">
+    <div class="header-content">
+      <div class="title-section">
+        <mat-icon class="header-icon">receipt_long</mat-icon>
+        <h2 class="dialog-title">Detalle del Reembolso</h2>
+      </div>
+      <div class="estado-badge" [ngClass]="getEstadoClass(data.estado)">
+        <mat-icon class="estado-icon">{{ getEstadoIcon(data.estado) }}</mat-icon>
+        <span>{{ data.estado }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div mat-dialog-content class="dialog-content">
+    
+    <!-- Información del cliente -->
+    <mat-card class="info-card cliente-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="avatar-icon">person</mat-icon>
+        <mat-card-title>Información del Cliente</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-row">
+          <mat-icon class="info-icon">badge</mat-icon>
+          <div class="info-content">
+            <span class="info-label">Nombre completo</span>
+            <span class="info-value">{{ data.clienteNombre }}</span>
+          </div>
+        </div>
+        <div class="info-row">
+          <mat-icon class="info-icon">assignment</mat-icon>
+          <div class="info-content">
+            <span class="info-label">Contrato ID</span>
+            <span class="info-value">#{{ data.contratoId }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Información del reembolso -->
+    <mat-card class="info-card reembolso-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="avatar-icon money">attach_money</mat-icon>
+        <mat-card-title>Detalles del Reembolso</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-row">
+          <mat-icon class="info-icon">payments</mat-icon>
+          <div class="info-content">
+            <span class="info-label">Monto solicitado</span>
+            <span class="info-value monto">${{ data.monto | number:'1.2-2' }}</span>
+          </div>
+        </div>
+        <div class="info-row description-row">
+          <mat-icon class="info-icon">description</mat-icon>
+          <div class="info-content">
+            <span class="info-label">Descripción</span>
+            <p class="info-value description">{{ data.descripcion }}</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Archivo adjunto -->
+    <mat-card class="info-card archivo-card" *ngIf="archivoUrlCompleta">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="avatar-icon file">attach_file</mat-icon>
+        <mat-card-title>Documento Adjunto</mat-card-title>
+        <mat-card-subtitle>{{ nombreArchivo }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="archivo-preview">
+          <iframe
+            [src]="archivoUrlCompleta | safeUrl"
+            width="100%"
+            height="300px"
+            class="preview-iframe"
+          ></iframe>
+        </div>
+        <div class="archivo-actions">
+          <button mat-stroked-button color="primary" (click)="abrirArchivo()">
+            <mat-icon>open_in_new</mat-icon>
+            Abrir en nueva pestaña
+          </button>
+          <button mat-stroked-button color="accent" (click)="descargarArchivo()">
+            <mat-icon>download</mat-icon>
+            Descargar
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Sección de comentarios -->
+    <mat-card class="info-card comentario-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="avatar-icon comment">comment</mat-icon>
+        <mat-card-title>Comentario de Revisión</mat-card-title>
+        <mat-card-subtitle>Agregue sus observaciones sobre esta solicitud</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="comentario-field">
+          <mat-label>Escriba su comentario aquí</mat-label>
+          <textarea 
+            matInput 
+            [(ngModel)]="comentario" 
+            rows="4"
+            placeholder="Ingrese detalles sobre la aprobación o motivos del rechazo..."
+            [class.required-field]="mostrarCampoRequerido"
+          ></textarea>
+          <mat-hint *ngIf="!comentario.trim() && mostrarCampoRequerido" class="error-hint">
+            <mat-icon>warning</mat-icon>
+            El comentario es obligatorio para rechazar
+          </mat-hint>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+
+  <!-- Acciones del diálogo -->
+  <div mat-dialog-actions class="dialog-actions">
+    <div class="actions-container">
+      <button mat-button class="cancel-btn" (click)="cerrar()">
+        <mat-icon>close</mat-icon>
+        Cancelar
+      </button>
+      
+      <div class="primary-actions">
+        <button 
+          mat-raised-button 
+          color="warn" 
+          class="reject-btn"
+          (click)="rechazar()"
+          [disabled]="procesando"
+        >
+          <mat-icon>block</mat-icon>
+          <span *ngIf="!procesando">Rechazar</span>
+          <span *ngIf="procesando">Procesando...</span>
+        </button>
+        
+        <button 
+          mat-raised-button 
+          color="primary" 
+          class="approve-btn"
+          (click)="aprobar()"
+          [disabled]="procesando"
+        >
+          <mat-icon>check_circle</mat-icon>
+          <span *ngIf="!procesando">Aprobar</span>
+          <span *ngIf="procesando">Procesando...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
