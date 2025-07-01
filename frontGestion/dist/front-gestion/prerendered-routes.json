@@ -1,0 +1,23 @@
+{
+  "routes": {
+    "/": {},
+    "/clientes": {},
+    "/contratos": {},
+    "/depositos": {},
+    "/home": {},
+    "/login": {},
+    "/pagos": {},
+    "/reembolsos": {},
+    "/reembolsos/crear": {},
+    "/reembolsos/pendientes": {},
+    "/reportes": {},
+    "/reportes/contratos-por-cliente": {},
+    "/reportes/contratos-por-vencer": {},
+    "/reportes/contratos-vencidos": {},
+    "/reportes/dashboard-reportes": {},
+    "/reportes/reembolsos-pendientes": {},
+    "/reportes/seguros-impagos": {},
+    "/seguros": {},
+    "/usuarios": {}
+  }
+}
