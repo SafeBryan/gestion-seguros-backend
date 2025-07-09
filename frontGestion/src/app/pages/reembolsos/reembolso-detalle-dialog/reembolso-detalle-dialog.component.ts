@@ -10,7 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ReembolsoService } from '../../../core/services/reembolso.service';
 import { SafeUrlPipe } from '../../../shared/pipes/safe-url.pipe';
-import { ReembolsoResponse,  } from '../../../models/reembolso-response.model';
+import { ReembolsoResponse } from '../../../models/reembolso-response.model';
 import { EstadoReembolso } from '../../../models/reembolso-estado.enum';
 
 @Component({
@@ -28,7 +28,7 @@ import { EstadoReembolso } from '../../../models/reembolso-estado.enum';
     SafeUrlPipe,
   ],
   templateUrl: './reembolso-detalle-dialog.component.html',
-  styleUrls: ['./reembolso-detalle-dialog.component.css']
+  styleUrls: ['./reembolso-detalle-dialog.component.css'],
 })
 export class ReembolsoDetalleDialogComponent {
   comentario = '';
@@ -52,7 +52,7 @@ export class ReembolsoDetalleDialogComponent {
 
     this.nombreArchivo = firstFileKey || 'Documento';
     this.archivoUrlCompleta = relativePath
-      ? `http://192.168.1.37:8080/${relativePath.replace(/\\/g, '/')}`
+      ? `http://10.79.15.84:8080/${relativePath.replace(/\\/g, '/')}`
       : '';
   }
 
@@ -138,7 +138,7 @@ export class ReembolsoDetalleDialogComponent {
    */
   private procesar(aprobado: boolean): void {
     this.procesando = true;
-    
+
     this.reembolsoService
       .procesarReembolso(this.data.id, aprobado, this.comentario)
       .subscribe({
@@ -146,18 +146,22 @@ export class ReembolsoDetalleDialogComponent {
           this.procesando = false;
           const tipoAccion = aprobado ? 'aprobado' : 'rechazado';
           this.mostrarExito(`Reembolso ${tipoAccion} exitosamente`);
-          
+
           this.dialogRef.close({
             realizado: true,
             tipo: tipoAccion,
-            comentario: this.comentario
+            comentario: this.comentario,
           });
         },
         error: (error) => {
           this.procesando = false;
           console.error('Error al procesar reembolso:', error);
-          this.mostrarError(`Error al ${aprobado ? 'aprobar' : 'rechazar'} el reembolso. Intente nuevamente.`);
-        }
+          this.mostrarError(
+            `Error al ${
+              aprobado ? 'aprobar' : 'rechazar'
+            } el reembolso. Intente nuevamente.`
+          );
+        },
       });
   }
 

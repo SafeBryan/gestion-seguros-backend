@@ -11,7 +11,7 @@ import { AuthService } from '../../services/auth.service';
   providedIn: 'root',
 })
 export class PagoService {
-  private apiUrl = 'http://192.168.1.37:8080/api/pagos';
+  private apiUrl = 'http://10.79.15.84:8080/api/pagos';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
@@ -19,24 +19,26 @@ export class PagoService {
     return this.authService.getAuthHeaders();
   }
 
-// pago.service.ts
-crearPago(pagoData: any): Observable<any> {
-  const payload = {
-    contratoId: pagoData.contratoId,
-    monto: pagoData.monto,
-    metodo: pagoData.metodo.toUpperCase().replace('É', 'E'), // Ajustar para coincidir con el enum
-    observaciones: pagoData.observaciones,
-    estado: pagoData.estado,
-    fechaPago: pagoData.fechaPago ? new Date(pagoData.fechaPago).toISOString() : null,
-    comprobante: pagoData.comprobante, // Cambiar nombre para que coincida con el DTO
-    comprobanteNombre: pagoData.comprobanteNombre,
-    comprobanteTipoContenido: pagoData.comprobanteTipoContenido
-  };
+  // pago.service.ts
+  crearPago(pagoData: any): Observable<any> {
+    const payload = {
+      contratoId: pagoData.contratoId,
+      monto: pagoData.monto,
+      metodo: pagoData.metodo.toUpperCase().replace('É', 'E'), // Ajustar para coincidir con el enum
+      observaciones: pagoData.observaciones,
+      estado: pagoData.estado,
+      fechaPago: pagoData.fechaPago
+        ? new Date(pagoData.fechaPago).toISOString()
+        : null,
+      comprobante: pagoData.comprobante, // Cambiar nombre para que coincida con el DTO
+      comprobanteNombre: pagoData.comprobanteNombre,
+      comprobanteTipoContenido: pagoData.comprobanteTipoContenido,
+    };
 
-  return this.http.post(this.apiUrl, payload, {
-    headers: this.getAuthHeaders().set('Content-Type', 'application/json')
-  });
-}
+    return this.http.post(this.apiUrl, payload, {
+      headers: this.getAuthHeaders().set('Content-Type', 'application/json'),
+    });
+  }
 
   listarPagos(): Observable<PagoResponseDTO[]> {
     return this.http.get<PagoResponseDTO[]>(this.apiUrl, {
@@ -51,15 +53,21 @@ crearPago(pagoData: any): Observable<any> {
   }
 
   listarPagosPorContrato(contratoId: number): Observable<PagoResponseDTO[]> {
-    return this.http.get<PagoResponseDTO[]>(`${this.apiUrl}/contrato/${contratoId}`, {
-      headers: this.getAuthHeaders(),
-    });
+    return this.http.get<PagoResponseDTO[]>(
+      `${this.apiUrl}/contrato/${contratoId}`,
+      {
+        headers: this.getAuthHeaders(),
+      }
+    );
   }
 
   listarPagosPorCliente(clienteId: number): Observable<PagoResponseDTO[]> {
-    return this.http.get<PagoResponseDTO[]>(`${this.apiUrl}/cliente/${clienteId}`, {
-      headers: this.getAuthHeaders(),
-    });
+    return this.http.get<PagoResponseDTO[]>(
+      `${this.apiUrl}/cliente/${clienteId}`,
+      {
+        headers: this.getAuthHeaders(),
+      }
+    );
   }
 
   obtenerTotalPagado(contratoId: number): Observable<number> {
@@ -68,7 +76,10 @@ crearPago(pagoData: any): Observable<any> {
     });
   }
 
-  generarReporte(fechaInicio: string, fechaFin: string): Observable<PagoResponseDTO[]> {
+  generarReporte(
+    fechaInicio: string,
+    fechaFin: string
+  ): Observable<PagoResponseDTO[]> {
     return this.http.get<PagoResponseDTO[]>(
       `${this.apiUrl}/reporte?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`,
       { headers: this.getAuthHeaders() }
@@ -76,10 +87,12 @@ crearPago(pagoData: any): Observable<any> {
   }
 
   revertirPago(id: number, motivo: string): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/${id}/revertir?motivo=${motivo}`, {}, {
-      headers: this.getAuthHeaders(),
-    });
+    return this.http.post<void>(
+      `${this.apiUrl}/${id}/revertir?motivo=${motivo}`,
+      {},
+      {
+        headers: this.getAuthHeaders(),
+      }
+    );
   }
 }
-
- 

@@ -8,7 +8,7 @@
     providedIn: 'root',
   })
   export class ReembolsoService {
-    private apiUrl = 'http://192.168.1.37:8080/api/reembolsos';
+    private apiUrl = 'http://10.79.15.84:8080/api/reembolsos';
 
     constructor(private http: HttpClient, private authService: AuthService) {}
 

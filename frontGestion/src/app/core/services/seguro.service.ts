@@ -9,7 +9,7 @@ import { AuthService } from '../../services/auth.service';
   providedIn: 'root',
 })
 export class SeguroService {
-  private baseUrl = 'http://192.168.1.37:8080/api/seguros';
+  private baseUrl = 'http://10.79.15.84:8080/api/seguros';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
@@ -19,9 +19,9 @@ export class SeguroService {
 
   private handleError(error: any) {
     console.error('Error en SeguroService:', error);
-    
+
     let errorMessage = 'Ha ocurrido un error inesperado';
-    
+
     if (error.error instanceof ErrorEvent) {
       // Error del lado del cliente
       errorMessage = `Error: ${error.error.message}`;
@@ -50,7 +50,7 @@ export class SeguroService {
           errorMessage = `Error ${error.status}: ${error.message}`;
       }
     }
-    
+
     return throwError(() => new Error(errorMessage));
   }
 
@@ -60,12 +60,11 @@ export class SeguroService {
    * @returns Observable<Seguro>
    */
   crearSeguro(seguro: Omit<Seguro, 'id'>): Observable<Seguro> {
-    return this.http.post<Seguro>(this.baseUrl, seguro, {
-      headers: this.getAuthHeaders(),
-    }).pipe(
-      retry(1),
-      catchError(this.handleError)
-    );
+    return this.http
+      .post<Seguro>(this.baseUrl, seguro, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(retry(1), catchError(this.handleError));
   }
 
   /**
@@ -73,12 +72,11 @@ export class SeguroService {
    * @returns Observable<Seguro[]>
    */
   obtenerTodosLosSeguros(): Observable<Seguro[]> {
-    return this.http.get<Seguro[]>(this.baseUrl, {
-      headers: this.getAuthHeaders(),
-    }).pipe(
-      retry(1),
-      catchError(this.handleError)
-    );
+    return this.http
+      .get<Seguro[]>(this.baseUrl, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(retry(1), catchError(this.handleError));
   }
 
   /**
@@ -86,12 +84,11 @@ export class SeguroService {
    * @returns Observable<Seguro[]>
    */
   obtenerSegurosActivos(): Observable<Seguro[]> {
-    return this.http.get<Seguro[]>(`${this.baseUrl}/activos`, {
-      headers: this.getAuthHeaders(),
-    }).pipe(
-      retry(1),
-      catchError(this.handleError)
-    );
+    return this.http
+      .get<Seguro[]>(`${this.baseUrl}/activos`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(retry(1), catchError(this.handleError));
   }
 
   /**
@@ -100,12 +97,11 @@ export class SeguroService {
    * @returns Observable<Seguro[]>
    */
   obtenerPorTipo(tipo: 'VIDA' | 'SALUD'): Observable<Seguro[]> {
-    return this.http.get<Seguro[]>(`${this.baseUrl}/tipo/${tipo}`, {
-      headers: this.getAuthHeaders(),
-    }).pipe(
-      retry(1),
-      catchError(this.handleError)
-    );
+    return this.http
+      .get<Seguro[]>(`${this.baseUrl}/tipo/${tipo}`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(retry(1), catchError(this.handleError));
   }
 
   /**
@@ -114,12 +110,11 @@ export class SeguroService {
    * @returns Observable<Seguro>
    */
   obtenerSeguroPorId(id: number): Observable<Seguro> {
-    return this.http.get<Seguro>(`${this.baseUrl}/${id}`, {
-      headers: this.getAuthHeaders(),
-    }).pipe(
-      retry(1),
-      catchError(this.handleError)
-    );
+    return this.http
+      .get<Seguro>(`${this.baseUrl}/${id}`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(retry(1), catchError(this.handleError));
   }
 
   /**
@@ -129,12 +124,11 @@ export class SeguroService {
    * @returns Observable<Seguro>
    */
   editarSeguro(id: number, seguro: Partial<Seguro>): Observable<Seguro> {
-    return this.http.put<Seguro>(`${this.baseUrl}/${id}`, seguro, {
-      headers: this.getAuthHeaders(),
-    }).pipe(
-      retry(1),
-      catchError(this.handleError)
-    );
+    return this.http
+      .put<Seguro>(`${this.baseUrl}/${id}`, seguro, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(retry(1), catchError(this.handleError));
   }
 
   /**
@@ -144,16 +138,15 @@ export class SeguroService {
    * @returns Observable<Seguro>
    */
   actualizarEstado(id: number, activo: boolean): Observable<Seguro> {
-    return this.http.put<Seguro>(
-      `${this.baseUrl}/${id}/estado?activo=${activo}`,
-      {},
-      {
-        headers: this.getAuthHeaders(),
-      }
-    ).pipe(
-      retry(1),
-      catchError(this.handleError)
-    );
+    return this.http
+      .put<Seguro>(
+        `${this.baseUrl}/${id}/estado?activo=${activo}`,
+        {},
+        {
+          headers: this.getAuthHeaders(),
+        }
+      )
+      .pipe(retry(1), catchError(this.handleError));
   }
 
   /**
@@ -162,12 +155,11 @@ export class SeguroService {
    * @returns Observable<void>
    */
   eliminarSeguro(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`, {
-      headers: this.getAuthHeaders(),
-    }).pipe(
-      retry(1),
-      catchError(this.handleError)
-    );
+    return this.http
+      .delete<void>(`${this.baseUrl}/${id}`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(retry(1), catchError(this.handleError));
   }
 
   /**
@@ -180,17 +172,16 @@ export class SeguroService {
     inactivos: number;
     porTipo: { VIDA: number; SALUD: number };
   }> {
-    return this.http.get<{
-      total: number;
-      activos: number;
-      inactivos: number;
-      porTipo: { VIDA: number; SALUD: number };
-    }>(`${this.baseUrl}/estadisticas`, {
-      headers: this.getAuthHeaders(),
-    }).pipe(
-      retry(1),
-      catchError(this.handleError)
-    );
+    return this.http
+      .get<{
+        total: number;
+        activos: number;
+        inactivos: number;
+        porTipo: { VIDA: number; SALUD: number };
+      }>(`${this.baseUrl}/estadisticas`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(retry(1), catchError(this.handleError));
   }
 
   /**
@@ -202,13 +193,15 @@ export class SeguroService {
     if (!termino.trim()) {
       return this.obtenerTodosLosSeguros();
     }
-    
-    return this.http.get<Seguro[]>(`${this.baseUrl}/buscar?q=${encodeURIComponent(termino)}`, {
-      headers: this.getAuthHeaders(),
-    }).pipe(
-      retry(1),
-      catchError(this.handleError)
-    );
+
+    return this.http
+      .get<Seguro[]>(
+        `${this.baseUrl}/buscar?q=${encodeURIComponent(termino)}`,
+        {
+          headers: this.getAuthHeaders(),
+        }
+      )
+      .pipe(retry(1), catchError(this.handleError));
   }
 
   /**
@@ -217,12 +210,15 @@ export class SeguroService {
    * @returns Observable<Seguro>
    */
   duplicarSeguro(id: number): Observable<Seguro> {
-    return this.http.post<Seguro>(`${this.baseUrl}/${id}/duplicar`, {}, {
-      headers: this.getAuthHeaders(),
-    }).pipe(
-      retry(1),
-      catchError(this.handleError)
-    );
+    return this.http
+      .post<Seguro>(
+        `${this.baseUrl}/${id}/duplicar`,
+        {},
+        {
+          headers: this.getAuthHeaders(),
+        }
+      )
+      .pipe(retry(1), catchError(this.handleError));
   }
 
   /**
@@ -231,12 +227,15 @@ export class SeguroService {
    * @returns Observable<Seguro[]>
    */
   activarMultiplesSeguros(ids: number[]): Observable<Seguro[]> {
-    return this.http.put<Seguro[]>(`${this.baseUrl}/activar-multiples`, { ids }, {
-      headers: this.getAuthHeaders(),
-    }).pipe(
-      retry(1),
-      catchError(this.handleError)
-    );
+    return this.http
+      .put<Seguro[]>(
+        `${this.baseUrl}/activar-multiples`,
+        { ids },
+        {
+          headers: this.getAuthHeaders(),
+        }
+      )
+      .pipe(retry(1), catchError(this.handleError));
   }
 
   /**
@@ -245,11 +244,14 @@ export class SeguroService {
    * @returns Observable<Seguro[]>
    */
   desactivarMultiplesSeguros(ids: number[]): Observable<Seguro[]> {
-    return this.http.put<Seguro[]>(`${this.baseUrl}/desactivar-multiples`, { ids }, {
-      headers: this.getAuthHeaders(),
-    }).pipe(
-      retry(1),
-      catchError(this.handleError)
-    );
+    return this.http
+      .put<Seguro[]>(
+        `${this.baseUrl}/desactivar-multiples`,
+        { ids },
+        {
+          headers: this.getAuthHeaders(),
+        }
+      )
+      .pipe(retry(1), catchError(this.handleError));
   }
 }

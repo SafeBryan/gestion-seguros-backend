@@ -29,7 +29,7 @@ interface JwtPayload {
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://192.168.1.37:8080/api/auth';
+  private apiUrl = 'http://10.79.15.84:8080/api/auth';
   private tokenUserProfile = 'UserProfile';
   private tokenKey = 'jwtToken';
   private loggedIn = new BehaviorSubject<boolean>(false);
@@ -88,18 +88,18 @@ export class AuthService {
   isLoggedIn(): Observable<boolean> {
     return this.loggedIn.asObservable();
   }
-  
-// auth.service.ts
-getAuthHeaders(): HttpHeaders {
-  const token = this.getToken(); // Asume que tienes un método para obtener el token
-  if (!token) {
-    throw new Error('No authentication token available');
+
+  // auth.service.ts
+  getAuthHeaders(): HttpHeaders {
+    const token = this.getToken(); // Asume que tienes un método para obtener el token
+    if (!token) {
+      throw new Error('No authentication token available');
+    }
+
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
   }
-  
-  return new HttpHeaders({
-    'Authorization': `Bearer ${token}`
-  });
-}
 
   // Get user ID from decoded JWT
   getUsuarioId(): number {

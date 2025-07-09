@@ -8,7 +8,7 @@ import { Observable, tap } from 'rxjs';
   providedIn: 'root',
 })
 export class ClienteService {
-  private apiUrl = 'http://192.168.1.37:8080/api/clientes';
+  private apiUrl = 'http://10.79.15.84:8080/api/clientes';
 
   constructor(private http: HttpClient) {}
 

@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { Usuario } from '../../models/usuario.model';
 
-
 export interface RegistroDTO {
   email: string;
   password: string;
@@ -18,7 +17,7 @@ export interface RegistroDTO {
   providedIn: 'root',
 })
 export class UsuarioService {
-  private baseUrl = 'http://192.168.1.37:8080/api/usuarios';
+  private baseUrl = 'http://10.79.15.84:8080/api/usuarios';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
