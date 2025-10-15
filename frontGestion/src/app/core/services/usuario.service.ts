@@ -17,7 +17,7 @@ export interface RegistroDTO {
   providedIn: 'root',
 })
 export class UsuarioService {
-  private baseUrl = 'http://10.79.15.84:8080/api/usuarios';
+  private baseUrl = 'http://localhost:8080/api/usuarios';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
